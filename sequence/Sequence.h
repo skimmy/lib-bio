@@ -16,6 +16,9 @@ using namespace boost;
  */
 class Sequence {
  public:
+
+  virtual ~Sequence() {}
+  
   /**
    * \brief Returnsthe raw representation of the sequence.
    * 

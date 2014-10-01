@@ -2,6 +2,7 @@
 #define SMITH_WATERMAN_DP
 
 #include "../adt.h"
+#include "aligndef.hpp"
 
 /**
  * \brief This class represents the implementation of a <em>Smith
@@ -23,9 +24,12 @@ private:
   // algorithm parameters
   int** sim;
   int gapPenalty;
+  // backtrack related members
+  BacktrackOperation** btMatrix;
+  bool btEnabled;
 public:
   // ---------------------------------------------------------
-  //                constructors and destructor
+  //                CONSTRUCTORS AND DESTRUCTOR
   // ---------------------------------------------------------
   /**
    * \brief Constructs the SmithWatermanDP object from the two
@@ -83,15 +87,31 @@ public:
    * \brief Returns the position 
    */
   MatrixPoint2D getGlobalBest() const;
+
+  // ---------------------------------------------------------
+  //                   BACKTRACKING METHODS  
+  // ---------------------------------------------------------
+  void enableBacktrack();
+  void disableBacktrack();
+  bool isBacktrackEnabled() const;
+  void printBacktrackMatrix() const;
   
 private:
   // ---------------------------------------------------------
   //                  PRIVATE UTILITY METHODS
   // ---------------------------------------------------------
+  // matrix creation and destructon
   void createMatrix();
   void destroyMatrix();
+  // algorithm parameters helper(s)
   int** createDefaultSimilarityMatrix(size_t s);
+  // querying
   void indicesOfMaxElement(size_t& i, size_t& j) const;
+  // backtracking
+  void initBtMatrix();
+  void deleteBtMatrix();
+  void resetBtMatrix();
+  BacktrackOperation getBtForPosition(size_t i, size_t j) const;
 };
 
 #endif

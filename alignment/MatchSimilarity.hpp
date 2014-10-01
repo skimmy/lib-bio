@@ -10,7 +10,7 @@ using namespace std;
  * \brief This class represents a <em>match similarity</em>
  * dynamic programming algorithm
  *
- * Match similiraty is the numbero fo mismatches between two
+ * Match similiraty is the number of mismatches between two
  * sequences. This class implements the dynamic programming
  * algorithm to compute this \e metric.
  * The class inherites from DynamicProgramming class in order

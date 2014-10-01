@@ -64,7 +64,7 @@ $(GPUNAME): $(ALL_SRC) $(ALL_HDR) $(CUDA_SRC) $(CUDA_HDR)
 $(DOC_INDEX_FILE): $(ALL_SRC) $(ALL_HDR) 
 	$(DOXYGEN) $(DOXYGEN_CONF)
 	rm -rf $(DOC_INDEX_FILE)
-	ln -s /home/skimmy/doc/ACGTool/html/index.html $(DOC_INDEX_FILE)
+	ln -s $(HOME)/doc/ACGTool/html/index.html $(DOC_INDEX_FILE)
 
 doc: $(DOC_INDEX_FILE)
 

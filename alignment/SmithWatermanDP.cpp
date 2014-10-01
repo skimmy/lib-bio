@@ -73,6 +73,13 @@ void SmithWatermanDP::setGapPenalty(int d) {
   this->gapPenalty = d;
 }
 
+/**************** RESEULT RETRIEVING METHODS ****************/
+MatrixPoint2D SmithWatermanDP::getGlobalBest() const {
+  MatrixPoint2D entryIndices;
+  this->indicesOfMaxElement(entryIndices.i, entryIndices.j);
+  return entryIndices;
+}
+
 
 /******************* PRIVATE UTIL METHODS *******************/
 
@@ -103,4 +110,17 @@ int** SmithWatermanDP::createDefaultSimilarityMatrix(size_t s) {
     }
   }
   return sim;
+}
+
+void SmithWatermanDP::indicesOfMaxElement(size_t& i, size_t& j) const {
+  // init with first element of the matrix
+  i = j = 0;
+  for (size_t r = 0; r < this->n; ++r) {
+    for (size_t c = 0; c < this->m; ++c) {
+      if (this->matrix[r][c] > this->matrix[i][j]) {
+	i = r;
+	j = c;
+      }
+    }
+  }
 }

@@ -76,6 +76,14 @@ public:
    * \sa setSimilarityMatrix()
    */
   void setGapPenalty(int d);
+  // ---------------------------------------------------------
+  //                RESEULT RETRIEVING METHODS
+  // ---------------------------------------------------------
+  /**
+   * \brief Returns the position 
+   */
+  MatrixPoint2D getGlobalBest() const;
+  
 private:
   // ---------------------------------------------------------
   //                  PRIVATE UTILITY METHODS
@@ -83,6 +91,7 @@ private:
   void createMatrix();
   void destroyMatrix();
   int** createDefaultSimilarityMatrix(size_t s);
+  void indicesOfMaxElement(size_t& i, size_t& j) const;
 };
 
 #endif

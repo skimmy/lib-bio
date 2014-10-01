@@ -2,6 +2,20 @@
 #define DYNAMIC_PROGRAMMING_H
 
 #include <cstddef>
+
+typedef struct {// _matrix_point_2d {
+  /**
+   * Row index
+   */
+  size_t i;
+  /**
+   * Column index
+   */
+  size_t j;
+} MatrixPoint2D;
+
+//typedef MatrixPoint2D _matrix_point_2d;
+
 /**
  * \brief This class is used to represent the general structure
  * of a dynamic programing model.

@@ -23,11 +23,13 @@ typedef DNACompressedSymbol DnaSymb;
 
 void test() {
   cout << "-- CPU SMITH WATERMAN TEST --\n";
-  string a = "ACG";
+  string a = "ACGT";
   string b = "AATGTGACGTTTG";
   SmithWatermanDP swa(a.c_str(), a.length(), b.c_str(), b.length());
   swa.computeMatrix();
   swa.printMatrix();
+  MatrixPoint2D maxPos = swa.getGlobalBest();
+  cout << "Max Position (" << maxPos.i << ", " << maxPos.j << ")" << endl;
 }
 
 // TODO

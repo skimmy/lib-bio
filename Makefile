@@ -17,8 +17,8 @@ DOC_INDEX_FILE=doc/index.html
 # Source header and object files
 
 ALIGNMENT_SRC=alignment/SmithWatermanDP.cpp alignment/Position.cpp
-ALIGNMENT_HDR=alignment/SmithWatermanDP.hpp alignment/Position.hpp
-ALIGNMENT_OBJ=alignment/SmithWatermanDP.o alignment/Position.o
+ALIGNMENT_HDR=alignment/SmithWatermanDP.hpp alignment/Position.hpp alignment/aligndef.hpp
+ALIGNMENT_OBJ=alignment/SmithWatermanDP.o alignment/Position.o alignment/align.o
 
 ALPHA_SRC=sequence/DNAAlphabet.cpp sequence/ColorAlphabet.cpp
 ALPHA_HDR=sequence/DNAAlphabet.hpp sequence/ColorAlphabet.hpp

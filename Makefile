@@ -16,7 +16,7 @@ DOC_INDEX_FILE=doc/index.html
 
 # Source header and object files
 
-ALIGNMENT_SRC=alignment/SmithWatermanDP.cpp alignment/Position.cpp
+ALIGNMENT_SRC=alignment/SmithWatermanDP.cpp alignment/Position.cpp alignment/align.cpp
 ALIGNMENT_HDR=alignment/SmithWatermanDP.hpp alignment/Position.hpp alignment/aligndef.hpp
 ALIGNMENT_OBJ=alignment/SmithWatermanDP.o alignment/Position.o alignment/align.o
 
@@ -50,10 +50,14 @@ GEN_SRC=generator/ReadGenerator.cpp
 GEN_HDR=generator/ReadGenerator.hpp
 GEN_OBJ=generator/ReadGenerator.o
 
+MISC_SRC=tasks.cpp
+MISC_OBJ=tasks.o
+MISC_HDR=tasks.hpp
+
 
 ALL_SRC=main.cpp #$(ADT_SRC) $(ALIGNMENT_SRC) $(SEQ_SRC) $(UTIL_SRC) $(QUAL_SRC) $(IO_SRC) 
-ALL_OBJ=$(ALIGNMENT_OBJ) $(SEQ_OBJ) $(IO_OBJ) $(UTIL_OBJ) $(QUAL_OBJ) $(ALPHA_OBJ) $(GEN_OBJ)
-ALL_HDR=$(SEQ_HDR) $(IO_HDR) $(ADT_HDR) $(UTIL_HDR) $(ALIGNMENT_HDR) $(QUAL_HDR) $(ALPHA_HDR) $(GEN_HDR)
+ALL_OBJ=$(ALIGNMENT_OBJ) $(SEQ_OBJ) $(IO_OBJ) $(UTIL_OBJ) $(QUAL_OBJ) $(ALPHA_OBJ) $(GEN_OBJ) $(MISC_OBJ)
+ALL_HDR=$(SEQ_HDR) $(IO_HDR) $(ADT_HDR) $(UTIL_HDR) $(ALIGNMENT_HDR) $(QUAL_HDR) $(ALPHA_HDR) $(GEN_HDR) $(MISC_HDR)
 
 $(NAME): $(ALL_SRC) $(ALL_OBJ) $(ALL_HDR) 
 	$(CXX) $(CXXFLAGS) $(ALL_OBJ) $(ALL_SRC) -o $(NAME) 

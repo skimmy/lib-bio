@@ -20,7 +20,7 @@ size_t bytesRemainingToTheEnd(ifstream& ifs) {
   return (totalLength - ifs.tellg());
 }
 
-void alignSmithWaterman(std::vector<Read>* reads, const Reference* ref,) {
+void alignSmithWaterman(std::vector<Read>* reads, const Reference* ref) {
   int nReads = reads->size();
   string refBases((char*)ref->getSequence());
   std::cout << "Aligning " << nReads << " reads" << std::endl;
@@ -34,7 +34,7 @@ void alignSmithWaterman(std::vector<Read>* reads, const Reference* ref,) {
 
 
 std::vector<Position<int>> alignFastqReadsSimpleSW(const string& readsPath, const string& referencePath, 
-						   uint nThreads, size_t nReads) {
+						   uint64_t nThreads, size_t nReads) {
   std::vector<Position<int>> aligns;
   // some constants
   uint64_t T = (nThreads > 0) ? nThreads : 1;

@@ -19,6 +19,20 @@ SmithWatermanDP::SmithWatermanDP(const char* s1, size_t n1, const char* s2, size
   createMatrix();
 }
 
+SmithWatermanDP::SmithWatermanDP(const string& s1, const string& s2)
+  : DynamicProgramming(s1.size() + 1, s2.size() + 1){
+  this->x = s1.c_str();
+  this->y = s2.c_str();
+  // default gap penalty is 1 and efault sim matrix is 1 on
+  // diagonal and 0 elsewere
+  this->gapPenalty = 1;
+  this->sim = createDefaultSimilarityMatrix(256);
+  // defualt value for backtracking is not enbaled
+  this->btEnabled = false;
+  this->btMatrix = NULL;
+  createMatrix();
+}
+
 SmithWatermanDP::~SmithWatermanDP() {
   destroyMatrix();
   deleteBtMatrix();

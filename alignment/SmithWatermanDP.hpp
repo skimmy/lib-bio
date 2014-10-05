@@ -4,6 +4,8 @@
 #include "../adt.h"
 #include "aligndef.hpp"
 
+#include <string>
+
 /**
  * \brief This class represents the implementation of a <em>Smith
  * Waterman</em> dynamic programming algorithm.
@@ -41,6 +43,8 @@ public:
    * \param n2 The length of the second sequence
    */
   SmithWatermanDP(const char* s1, size_t n1, const char* s2, size_t n2);
+
+  SmithWatermanDP(const std::string& s1, const std::string& s2);
   ~SmithWatermanDP();
 
   // ---------------------------------------------------------

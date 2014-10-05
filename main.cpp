@@ -4,6 +4,7 @@
 #include "alignment.h"
 #include "quality.h"
 #include "adt.h"
+#include "tasks.hpp"
 
 #include <vector>
 #include <iostream>
@@ -295,6 +296,9 @@ int test_main(int argc, char** argv) {
 int main(int argc, char** argv) {
   //  gpu_main(argc, argv);
   //test_main(argc,argv);
-  test();
+  //  test();
+  string ref = "/home/skimmy/filtering/data/ecoli.fasta";
+  string reads = "/home/skimmy/filtering/data/ecoli.sample.custom.fastq.out";
+  alignFastqReadsSimpleSW(reads, ref, 4, 10);
   return 0;
 }

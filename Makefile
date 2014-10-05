@@ -1,7 +1,7 @@
 # Compiler and linker variables
 
 CXX=g++
-CXXFLAGS=-Wall -g -std=c++0x
+CXXFLAGS=-Wall -g -std=c++11
 
 GPUXX=nvcc
 GPUXXFLAGS=-Xcompiler "$(CXXFLAGS)"
@@ -54,16 +54,17 @@ MISC_SRC=tasks.cpp
 MISC_OBJ=tasks.o
 MISC_HDR=tasks.hpp
 
-
 ALL_SRC=main.cpp #$(ADT_SRC) $(ALIGNMENT_SRC) $(SEQ_SRC) $(UTIL_SRC) $(QUAL_SRC) $(IO_SRC) 
 ALL_OBJ=$(ALIGNMENT_OBJ) $(SEQ_OBJ) $(IO_OBJ) $(UTIL_OBJ) $(QUAL_OBJ) $(ALPHA_OBJ) $(GEN_OBJ) $(MISC_OBJ)
 ALL_HDR=$(SEQ_HDR) $(IO_HDR) $(ADT_HDR) $(UTIL_HDR) $(ALIGNMENT_HDR) $(QUAL_HDR) $(ALPHA_HDR) $(GEN_HDR) $(MISC_HDR)
 
+DYN_LIBS=-pthread
+
 $(NAME): $(ALL_SRC) $(ALL_OBJ) $(ALL_HDR) 
-	$(CXX) $(CXXFLAGS) $(ALL_OBJ) $(ALL_SRC) -o $(NAME) 
+	$(CXX) $(CXXFLAGS) $(ALL_OBJ) $(ALL_SRC) $(DYN_LIBS) -o $(NAME) 
 
 $(GPUNAME): $(ALL_SRC) $(ALL_HDR) $(CUDA_SRC) $(CUDA_HDR) 
-	$(GPUXX) $(GPUXXFLAGS) $(ALL_SRC) -o $(GPUNAME
+	$(GPUXX) $(GPUXXFLAGS) $(ALL_SRC) -o $(GPUNAME)
 
 $(DOC_INDEX_FILE): $(ALL_SRC) $(ALL_HDR) 
 	$(DOXYGEN) $(DOXYGEN_CONF)

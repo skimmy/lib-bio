@@ -293,12 +293,29 @@ int test_main(int argc, char** argv) {
   return 0;
 }
 
+int runTask(int argc, char** argv) {
+  // parse arguments
+  OPTIONS opts;
+  opts.parseInputArgs(argc, argv);
+  int task = 1; 
+  switch(task) {
+  case 1:
+    {
+      string ref = opts.genomeFile; // "/home/skimmy/filtering/data/ecoli.fasta";
+      string reads = opts.readsFile; //"/home/skimmy/filtering/data/ecoli.sample.custom.fastq.out";
+      alignFastqReadsSimpleSW(reads, ref, 4, 10);
+      break;
+    }
+  default:
+    return 1;
+  }
+  return 0;
+}
+
 int main(int argc, char** argv) {
   //  gpu_main(argc, argv);
   //test_main(argc,argv);
   //  test();
-  string ref = "/home/skimmy/filtering/data/ecoli.fasta";
-  string reads = "/home/skimmy/filtering/data/ecoli.sample.custom.fastq.out";
-  alignFastqReadsSimpleSW(reads, ref, 4, 10);
+  runTask(argc, argv);
   return 0;
 }

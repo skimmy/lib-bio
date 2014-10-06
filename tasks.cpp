@@ -35,6 +35,10 @@ void alignSmithWaterman(std::vector<Read>* reads, const Reference* ref) {
 
 std::vector<Position<int>> alignFastqReadsSimpleSW(const string& readsPath, const string& referencePath, 
 						   uint64_t nThreads, size_t nReads) {
+
+  std::cout << "-- Smith Waterman alignment --" << std::endl;
+  std::cout.flush();
+  
   std::vector<Position<int>> aligns;
   // some constants
   uint64_t T = (nThreads > 0) ? nThreads : 1;
@@ -48,11 +52,17 @@ std::vector<Position<int>> alignFastqReadsSimpleSW(const string& readsPath, cons
   std::vector<std::thread> threads;
 
   // read input reference...
+  std::cout << "    Loading reference..." << std::endl;
+  std::cout.flush();
   FastFormat fast;
   fast.loadFromFile(referencePath);
   Reference ref = (Reference)fast;
 
+  
+
   // ...and reads
+  std::cout << "    Loading reads..." << std::endl;
+  std::cout.flush();
   if (nReads >= 0) {
     // CASE 1: A specific total number of reads has been specified or
     uint64_t readsPerThread = (size_t)ceil( ((double)(M)) / ((double)(T)) );

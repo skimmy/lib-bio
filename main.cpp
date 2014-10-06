@@ -28,12 +28,13 @@ void test() {
   string aa = "ACGGT";
   string aaa = "ACGT";
   string b = "AATGTGACGTTTG";
-  SmithWatermanDP swa(a.c_str(), a.length(), b.c_str(), b.length());
+  //  SmithWatermanDP swa(a.c_str(), a.length(), b.c_str(), b.length());
+  SmithWatermanDP swa(a, b);
   swa.enableBacktrack();
   swa.computeMatrix();
   swa.printMatrix();
   MatrixPoint2D maxPos = swa.getGlobalBest();
-  cout << "Max Position (" << maxPos.i << ", " << maxPos.j << ")" << endl;
+  cout << "Max Position (" << maxPos.i << ", " << maxPos.j << "): " << swa.getScoreAt(maxPos)  << " " << endl;
   swa.printBacktrackMatrix();
 
   vector<Read> v;
@@ -301,9 +302,9 @@ int runTask(int argc, char** argv) {
   switch(task) {
   case 1:
     {
-      string ref = opts.genomeFile; // "/home/skimmy/filtering/data/ecoli.fasta";
-      string reads = opts.readsFile; //"/home/skimmy/filtering/data/ecoli.sample.custom.fastq.out";
-      alignFastqReadsSimpleSW(reads, ref, 4, 10);
+      string ref = opts.genomeFile; 
+      string reads = opts.readsFile; 
+      alignFastqReadsSimpleSW(reads, ref, std::cout, 2, 8);      
       break;
     }
   default:
@@ -315,7 +316,7 @@ int runTask(int argc, char** argv) {
 int main(int argc, char** argv) {
   //  gpu_main(argc, argv);
   //test_main(argc,argv);
-  //  test();
+  //test();
   runTask(argc, argv);
   return 0;
 }

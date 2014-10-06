@@ -38,6 +38,6 @@
   \param nReads The number of reads, can be omitted in which case this number is
   estimated when creating reads blocks (see above).
 */
-std::vector<Position<int>> alignFastqReadsSimpleSW(const string& readsPath, const string& referencePath, uint64_t nThreads = 1, size_t nReads = -1);
+std::vector<ScoredPosition<int,int> > alignFastqReadsSimpleSW(const string& readsPath, const string& referencePath, std::ostream& output, uint64_t nThreads = 1, size_t nReads = -1);
 
 #endif

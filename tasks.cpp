@@ -20,7 +20,8 @@ size_t bytesRemainingToTheEnd(ifstream& ifs) {
   return (totalLength - ifs.tellg());
 }
 
-void alignSmithWaterman(std::vector<Read>* reads, const Reference* ref) {
+void alignSmithWaterman(std::vector<Read>* reads, const Reference* ref, 
+			std::vector<ScoredPosition<int,int> >* aligns, int indexOffset) {
   int nReads = reads->size();
   string refBases((char*)ref->getSequence());
   std::cout << "Aligning " << nReads << " reads" << std::endl;
@@ -28,37 +29,40 @@ void alignSmithWaterman(std::vector<Read>* reads, const Reference* ref) {
     SmithWatermanDP sw((*reads)[i].getBases(), refBases);
     sw.computeMatrix();
     MatrixPoint2D maxP = sw.getGlobalBest();
-    std::cout << i << " - "  << maxP.i << ", " << maxP.j << std::endl;
+    aligns->push_back(ScoredPosition<int, int>((i + indexOffset),maxP.j, sw.getScoreAt(maxP)));
   }
 }
 
 
-std::vector<Position<int>> alignFastqReadsSimpleSW(const string& readsPath, const string& referencePath, 
-						   uint64_t nThreads, size_t nReads) {
 
+std::vector<ScoredPosition<int, int> > alignFastqReadsSimpleSW(const string& readsPath, const string& referencePath, 
+							       std::ostream& output, uint64_t nThreads, size_t nReads) {
+  
   std::cout << "-- Smith Waterman alignment --" << std::endl;
   std::cout.flush();
   
-  std::vector<Position<int>> aligns;
-  // some constants
+  std::vector<ScoredPosition<int,int> > aligns;
+						   // some constants
   uint64_t T = (nThreads > 0) ? nThreads : 1;
   uint64_t M = (nReads > 0) ? nReads : 0;
 
+  std::cout << " ************* " << T << "  " <<  M << "**************"  << std::endl;
+  std::cout.flush();
+	       
   // open files
   std::ifstream readsIn(readsPath, std::ifstream::in);
   //  std::ifstream refIn(referencePath, std::ifstream::in);  
 
   // list of all threads (use later for joining)  
   std::vector<std::thread> threads;
+  std::vector<std::vector<ScoredPosition<int,int> >*> threadAligns;
 
   // read input reference...
   std::cout << "    Loading reference..." << std::endl;
   std::cout.flush();
   FastFormat fast;
   fast.loadFromFile(referencePath);
-  Reference ref = (Reference)fast;
-
-  
+  Reference ref = (Reference)fast;  
 
   // ...and reads
   std::cout << "    Loading reads..." << std::endl;
@@ -77,7 +81,10 @@ std::vector<Position<int>> alignFastqReadsSimpleSW(const string& readsPath, cons
 	reads->push_back(r);
       	actualReads++;
       }
-      threads.push_back(std::thread(alignSmithWaterman,reads,&ref));
+      // create the aligns vector for the next starting thread
+      std::vector<ScoredPosition<int,int> >* alignsVector = new std::vector<ScoredPosition< int,int > >();
+      threadAligns.push_back(alignsVector);
+      threads.push_back(std::thread(alignSmithWaterman, reads, &ref, alignsVector, t * readsPerThread));
     }
 
 
@@ -99,5 +106,22 @@ std::vector<Position<int>> alignFastqReadsSimpleSW(const string& readsPath, cons
   for (auto& thr : threads) {
     thr.join();
   }
+  aligns.clear();
+  for (std::vector<ScoredPosition<int,int> >* v : threadAligns) {
+    std::cout << "++++ " << v->size() <<  std::endl;
+    aligns.insert(aligns.end(), v->begin(), v->end());
+    delete v;
+  }
+  
+
+  output << "*** Alignments: " << std::endl;
+  for (ScoredPosition< int,int > p : aligns) {
+    output << p.getSequenceId() << "\t" << p.getPosition() << " (" << p.getScore() << ")" << std::endl;
+  }
+
+  // for (Position<int> p : aligns) {
+  //   output << p.getSequenceId() << "\t" << p.getPosition() << std::endl;
+  // }
+
   return aligns;
 }

@@ -19,7 +19,7 @@
  */
 template<class ID> 
 class Position {
-private:
+protected:
   ID id;
   size_t position;
 public:

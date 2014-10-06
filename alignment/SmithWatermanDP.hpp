@@ -88,9 +88,31 @@ public:
   //                RESEULT RETRIEVING METHODS
   // ---------------------------------------------------------
   /**
-   * \brief Returns the position 
+   * \brief Returns the position.
+   *
+   * If two or more positions have same best score one of them is returned
+   * (usually the first one in a row major scan of the matrix, but this is not
+   * guaranteed and can change).
+   *
+   * \return The position of the best computed score
+   *
+   * \sa getScoreAt()
    */
   MatrixPoint2D getGlobalBest() const;
+  
+  /**
+   * \brief Returns the score at the given position
+   *
+   * \param The MatrixPoint2D for the position we want to query the score.  
+   *
+   * At the current implementation there is no check for the indices of the given
+   * position, if they are not on a valid range the behaviour is umpredexted.
+   *
+   * \return The score at the given position.
+   *
+   * \sa getGlobalBest()
+   */
+  int getScoreAt(const MatrixPoint2D& p);
 
   // ---------------------------------------------------------
   //                   BACKTRACKING METHODS  

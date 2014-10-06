@@ -112,6 +112,10 @@ MatrixPoint2D SmithWatermanDP::getGlobalBest() const {
   return entryIndices;
 }
 
+int SmithWatermanDP::getScoreAt(const MatrixPoint2D& p) {
+  return this->matrix[p.i][p.j];
+}
+
 
 /******************* BACKTRACKING METHODS *******************/
 

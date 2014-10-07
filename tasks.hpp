@@ -40,4 +40,7 @@
 */
 std::vector<ScoredPosition<int,int> > alignFastqReadsSimpleSW(const string& readsPath, const string& referencePath, std::ostream& output, uint64_t nThreads = 1, size_t nReads = -1);
 
+
+void taskComputeKSpectrum(size_t k, const string& referenceFile);
+
 #endif

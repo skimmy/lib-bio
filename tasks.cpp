@@ -125,3 +125,15 @@ std::vector<ScoredPosition<int, int> > alignFastqReadsSimpleSW(const string& rea
 
   return aligns;
 }
+
+/**************************** K-SPECTRUM FUNCTIONS ****************************/
+void taskComputeKSpectrum(size_t k, const string& referenceFile) {
+  
+  //  Reference ref("CCATTACCACAGGTAACGGTG");
+  FastFormat fast;
+  fast.loadFromFile(referenceFile);
+  Reference ref = (Reference) fast;
+  std::vector<uint64_t>* freq = getKmersFrequency(ref, k);
+  // Do stuff with the vector
+  delete freq;
+}

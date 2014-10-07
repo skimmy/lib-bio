@@ -294,17 +294,26 @@ int test_main(int argc, char** argv) {
   return 0;
 }
 
+#define TASK 2
+
 int runTask(int argc, char** argv) {
   // parse arguments
   OPTIONS opts;
   opts.parseInputArgs(argc, argv);
-  int task = 1; 
+  int task = TASK; 
   switch(task) {
-  case 1:
+  case 1: // Smith Waterman alignment
     {
       string ref = opts.genomeFile; 
       string reads = opts.readsFile; 
       alignFastqReadsSimpleSW(reads, ref, std::cout, 2, 8);      
+      break;
+    }
+  case 2: // k-spectrum calculation
+    {
+      size_t k = opts.kmerSize;
+      string ref = opts.genomeFile;
+      taskComputeKSpectrum(k, ref);
       break;
     }
   default:

@@ -24,9 +24,9 @@ ALPHA_SRC=sequence/DNAAlphabet.cpp sequence/ColorAlphabet.cpp
 ALPHA_HDR=sequence/DNAAlphabet.hpp sequence/ColorAlphabet.hpp
 ALPHA_OBJ=sequence/DNAAlphabet.o sequence/ColorAlphabet.o
 
-SEQ_SRC=sequence/CompressedSequence.cpp sequence/DNACompressedSymbol.cpp sequence/Read.cpp sequence/CompressedReadSet.cpp sequence/KMer.cpp sequence/QualifiedSequence.cpp sequence/FullyQualifiedSequence.cpp sequence/Reference.cpp 
-SEQ_HDR=sequence.h sequence/CompressedSequence.h sequence/DNACompressedSymbol.h sequence/Read.h sequence/Sequence.h sequence/CompressedReadSet.h sequence/KMer.hpp sequence/QualifiedSequence.hpp sequence/FullyQualifiedSequence.hpp sequence/Reference.hpp 
-SEQ_OBJ=sequence/CompressedSequence.o sequence/DNACompressedSymbol.o sequence/Read.o sequence/CompressedReadSet.o sequence/KMer.o sequence/QualifiedSequence.o sequence/FullyQualifiedSequence.o sequence/Reference.o 
+SEQ_SRC=sequence/CompressedSequence.cpp sequence/DNACompressedSymbol.cpp sequence/Read.cpp sequence/CompressedReadSet.cpp sequence/KMer.cpp sequence/QualifiedSequence.cpp sequence/FullyQualifiedSequence.cpp sequence/Reference.cpp sequence/DNAAlphabet2Bits.cpp sequence/NumericKMer.cpp
+SEQ_HDR=sequence.h sequence/CompressedSequence.h sequence/DNACompressedSymbol.h sequence/Read.h sequence/Sequence.h sequence/CompressedReadSet.h sequence/KMer.hpp sequence/QualifiedSequence.hpp sequence/FullyQualifiedSequence.hpp sequence/Reference.hpp sequence/DNAAlphabet2Bits.hpp sequence/NumericKMer.hpp
+SEQ_OBJ=sequence/CompressedSequence.o sequence/DNACompressedSymbol.o sequence/Read.o sequence/CompressedReadSet.o sequence/KMer.o sequence/QualifiedSequence.o sequence/FullyQualifiedSequence.o sequence/Reference.o sequence/DNAAlphabet2Bits.o sequence/NumericKMer.o
 
 IO_SRC=io/Format.cpp io/FastFormat.cpp io/FastqRead.cpp io/FastqFormat.cpp io/CSFastRead.cpp io/CSFastFormat.cpp
 IO_HDR=io.h io/Format.h io/FastFormat.h io/FastqRead.h io/FastqFormat.h io/CSFastRead.hpp io/CSFastFormat.hpp

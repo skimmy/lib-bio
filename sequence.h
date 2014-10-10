@@ -19,4 +19,7 @@
 #include "sequence/QualifiedSequence.hpp"
 #include "sequence/FullyQualifiedSequence.hpp"
 
+#include "sequence/DNAAlphabet2Bits.hpp"
+#include "sequence/NumericKMer.hpp"
+
 #endif

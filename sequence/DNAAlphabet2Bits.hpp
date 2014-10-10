@@ -1,0 +1,4 @@
+#ifndef DNA_ALPHABET_2BITS_H
+#define DNA_ALPHABET_2BITS_H
+
+#endif

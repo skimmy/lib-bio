@@ -23,32 +23,41 @@ using namespace boost;
 typedef DNACompressedSymbol DnaSymb;
 
 void test() {
-  cout << "-- CPU SMITH WATERMAN TEST --\n";
-  string a = "AATGTTA";
-  string aa = "ACGGT";
-  string aaa = "ACGT";
-  string b = "AATGTGACGTTTG";
-  //  SmithWatermanDP swa(a.c_str(), a.length(), b.c_str(), b.length());
-  SmithWatermanDP swa(a, b);
-  swa.enableBacktrack();
-  swa.computeMatrix();
-  swa.printMatrix();
-  MatrixPoint2D maxPos = swa.getGlobalBest();
-  cout << "Max Position (" << maxPos.i << ", " << maxPos.j << "): " << swa.getScoreAt(maxPos)  << " " << endl;
-  swa.printBacktrackMatrix();
+  // -------------------
+  // SMITH WATERMAN TEST
+  // -------------------
+  // cout << "-- CPU SMITH WATERMAN TEST --\n";
+  // string a = "AATGTTA";
+  // string aa = "ACGGT";
+  // string aaa = "ACGT";
+  // string b = "AATGTGACGTTTG";
+  // //  SmithWatermanDP swa(a.c_str(), a.length(), b.c_str(), b.length());
+  // SmithWatermanDP swa(a, b);
+  // swa.enableBacktrack();
+  // swa.computeMatrix();
+  // swa.printMatrix();
+  // MatrixPoint2D maxPos = swa.getGlobalBest();
+  // cout << "Max Position (" << maxPos.i << ", " << maxPos.j << "): " << swa.getScoreAt(maxPos)  << " " << endl;
+  // swa.printBacktrackMatrix();
 
-  vector<Read> v;
-  Read r;
-  r.setBases(a);
-  v.push_back(r);
-  r.setBases(aa);
-  v.push_back(r);
-  r.setBases(aaa);
-  v.push_back(r);
-  vector<Position<int>> alignsVector = alignReads(v,b);
-  for(Position<int> p : alignsVector) {
-    cout << "(" << p.getSequenceId() << ", " << p.getPosition() << ")" << endl;
-  }
+  // vector<Read> v;
+  // Read r;
+  // r.setBases(a);
+  // v.push_back(r);
+  // r.setBases(aa);
+  // v.push_back(r);
+  // r.setBases(aaa);
+  // v.push_back(r);
+  // vector<Position<int>> alignsVector = alignReads(v,b);
+  // for(Position<int> p : alignsVector) {
+  //   cout << "(" << p.getSequenceId() << ", " << p.getPosition() << ")" << endl;
+  // }
+
+  // -----------------
+  // NUMERIC KMER TEST
+  // -----------------
+  Reference ref("ACGGTGGTCTAA");
+  NumericKMer kmer(ref);
 }
 
 // TODO
@@ -325,7 +334,7 @@ int runTask(int argc, char** argv) {
 int main(int argc, char** argv) {
   //  gpu_main(argc, argv);
   //test_main(argc,argv);
-  //test();
-  runTask(argc, argv);
+  test();
+  //runTask(argc, argv);
   return 0;
 }

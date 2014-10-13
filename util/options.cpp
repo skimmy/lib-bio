@@ -1,7 +1,29 @@
-#include "options.hpp"
-
 #include <getopt.h>
 #include <stdlib.h>
+
+#include "options.hpp"
+
+#include <string>
+#include <map>
+
+const string tVec[] = 
+  {
+    "nop",
+    "align",
+    "kspectrum"
+  };
+
+
+int parseTask(const string& taskName) {
+  std::cout << " *** " << taskName;
+  map<string, int> tMap;
+  for (int i = 0; i < 2; i++) {
+    tMap[tVec[i]] = i;
+  }  
+  int task = tMap[taskName];
+  std::cout << " **  " << task << std::endl;
+  return task;
+}
 
 GenomeFormat parseGenomeFormat(const char* optval) {
   int v = atoi(optval);
@@ -61,6 +83,9 @@ const struct option longOptions[] =
   };
 
 options::options() {
+
+  task = 0;
+
   genomeFormat = GENOME_CUSTOM;
   readsFormat = READS_CUSTOM;
   genomeFile = "genome.dat";
@@ -85,9 +110,10 @@ void options::printUsage(ostream& os, const char* name, int exitCode) {
 }
 
 void options::parseInputArgs(int argc, char** argv) {
-  if ( argc < 3 ) {
+  if ( argc < 4 ) {
     this->printUsage(cerr, argv[0], 1);
   }
+  task = parseTask(argv[1]);
   int nextOption = -2;
   do {
     nextOption = getopt_long( argc, argv, shortOptions, longOptions, NULL );
@@ -139,6 +165,8 @@ void options::parseInputArgs(int argc, char** argv) {
 }
 
 void options::printOptions(ostream& os) {
+  os << "-- TASK \n";
+  os << tVec[this->task] << '\n';
   os << "-- INPUT --\n";
   os << "Genome: " << this->genomeFile << '\n';
   os << "Reads:  " << this->readsFile << '\n';

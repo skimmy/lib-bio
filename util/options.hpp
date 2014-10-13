@@ -75,6 +75,12 @@ struct options {
   // ---------------------------------------------------------
   //                   ALGORITHM INFORMATION
   // ---------------------------------------------------------
+
+  /**
+   * \brief Selects the task to be performed
+   */
+  int task;
+
   /**
    * \brief Enables the output translation in the custom
    * format

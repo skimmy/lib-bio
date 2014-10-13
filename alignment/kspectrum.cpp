@@ -4,32 +4,33 @@
 #include <iostream>
 
 #include "../alignment.h"
+#include "../sequence.h"
 
-char basesArray[] = "ACGT";
-std::map< char, uint64_t > constructBasesMap() {
-  std::map< char, uint64_t > basesMap;
-  basesMap['A'] = 0;
-  basesMap['C'] = 1;
-  basesMap['G'] = 2;
-  basesMap['T'] = 3;
-  return basesMap;
-}
+// char basesArray[] = "ACGT";
+// std::map< char, uint64_t > constructBasesMap() {
+//   std::map< char, uint64_t > basesMap;
+//   basesMap['A'] = 0;
+//   basesMap['C'] = 1;
+//   basesMap['G'] = 2;
+//   basesMap['T'] = 3;
+//   return basesMap;
+// }
 
-string codeToBases(uint64_t code, size_t k) {
-  string s = "";
-  for (size_t i = 0; i < k; ++i) {
-    s = basesArray[code & 0x3] + s;
-    code = code >> 2;
-  }
-  return s;
-}
+// string codeToBases(uint64_t code, size_t k) {
+//   string s = "";
+//   for (size_t i = 0; i < k; ++i) {
+//     s = basesArray[code & 0x3] + s;
+//     code = code >> 2;
+//   }
+//   return s;
+// }
 
 std::vector<uint64_t>* getKmersFrequency(const Sequence& seq, size_t k) {
   std::ios::fmtflags f( std::cout.flags() );
   // TODO: check for k < 0 and k > N
   size_t N = seq.getSequenceLength();
   size_t M = (1 << 2*k);
-  std::map< char, uint64_t > basesMap = constructBasesMap();
+  std::map< char, uint64_t > basesMap = DNAAlphabet2Bits::charToIntMap();
   // init the frequencies vector
   std::vector<uint64_t>* freq = new std::vector<uint64_t>(M);
   for (size_t l = 0; l < M; ++l) {

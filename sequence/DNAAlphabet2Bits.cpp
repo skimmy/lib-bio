@@ -34,3 +34,7 @@ char DNAAlphabet2Bits::intToChar(uint64_t i) {
 uint64_t DNAAlphabet2Bits:: charToInt(char c) {
   return fromChar(c);
 }
+
+map<char, uint64_t> DNAAlphabet2Bits::charToIntMap() {
+  return initBasesMap();
+}

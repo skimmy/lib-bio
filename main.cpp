@@ -309,6 +309,7 @@ int runTask(int argc, char** argv) {
   // parse arguments
   OPTIONS opts;
   opts.parseInputArgs(argc, argv);
+  opts.printOptions(std::cout);
   int task = TASK; 
   switch(task) {
   case 1: // Smith Waterman alignment
@@ -334,7 +335,7 @@ int runTask(int argc, char** argv) {
 int main(int argc, char** argv) {
   //  gpu_main(argc, argv);
   //test_main(argc,argv);
-  test();
-  //runTask(argc, argv);
+  //test();
+  runTask(argc, argv);
   return 0;
 }

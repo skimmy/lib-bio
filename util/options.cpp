@@ -6,22 +6,23 @@
 #include <string>
 #include <map>
 
-const string tVec[] = 
+const std::string tVec[] = 
   {
-    "nop",
-    "align",
-    "kspectrum"
+    std::string("nop"),
+    std::string("align"),
+    std::string("kspectrum")
   };
+#define TASK_COUNT 3
 
 
 int parseTask(const string& taskName) {
-  std::cout << " *** " << taskName;
-  map<string, int> tMap;
-  for (int i = 0; i < 2; i++) {
-    tMap[tVec[i]] = i;
-  }  
-  int task = tMap[taskName];
-  std::cout << " **  " << task << std::endl;
+  int task = -1;
+  for (int i = 0; i < TASK_COUNT; i++) {
+    if (taskName == tVec[i]) {
+      task = i;
+      break;
+    }
+  }
   return task;
 }
 

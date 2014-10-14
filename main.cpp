@@ -309,9 +309,16 @@ int runTask(int argc, char** argv) {
   // parse arguments
   OPTIONS opts;
   opts.parseInputArgs(argc, argv);
-  opts.printOptions(std::cout);
-  int task = TASK; 
+  #ifndef DEBUG
+    opts.printOptions(std::cout);
+  #endif
+  int task = opts.task;
   switch(task) {
+  case 0:
+    {      
+      std::cout << std::endl << "'nop' task selected\n\tno operation has been performed\n" << std::endl;
+      break;
+    }
   case 1: // Smith Waterman alignment
     {
       string ref = opts.genomeFile; 
@@ -327,6 +334,7 @@ int runTask(int argc, char** argv) {
       break;
     }
   default:
+    std::cout << "Unrecognized operation" << std::endl;
     return 1;
   }
   return 0;

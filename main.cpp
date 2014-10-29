@@ -5,10 +5,12 @@
 #include "quality.h"
 #include "adt.h"
 #include "tasks.hpp"
+#include "algorithms.h"
 
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <unordered_map>
 
 #include <math.h>
 
@@ -58,12 +60,14 @@ void test() {
   // -----------------
   Reference ref("TACGGTGGTCTAA");
   NumericKMer kmer(ref);
-  std::cout << hex << (uint64_t)kmer << " --- " << kmer << std::endl;
+  std::cout << ref << std::endl;
 
-  char r[] = "TACCGTTA";
-  size_t n = strlen(r);
-  uint64_t nr = NumericKMer::fromChars(r,n);
-  std::cout << hex << nr << " --- " << NumericKMer(nr,n) << std::endl;
+  for (size_t k = 1; k < ref.getSequenceLength() - 1; ++k) {
+    std::unordered_map< uint64_t, uint64_t> index = spectrumAsIntMap(ref, k);
+      for (pair< uint64_t, uint64_t > kmer : index) {
+	std::cout << NumericKMer(kmer.first,k) << " " << kmer.second << std::endl;
+    }
+  }
 }
 
 // TODO

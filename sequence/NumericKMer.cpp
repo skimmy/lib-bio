@@ -35,18 +35,43 @@ NumericKMer::operator uint64_t() {
 
 
 uint64_t NumericKMer::sequenceToInt(const Sequence& s) {
-  uint64_t kmer = 0;
-  //  uint64_t currentMask = 0x3;
-  //  std::cout << "c  -   (2*i) base  -   kmer   -   mask" << std::endl;
-  for (int i = 0; i < k; i++) {    
+  uint64_t kmer = 0;  
+  for (int i = 0; i < k; ++i) {    
+    kmer <<= 2;
     char c = s.getBaseAt(i);
     // TODO: It may be worth to add a (fast) check for 'c'
     uint64_t base = DNAAlphabet2Bits::charToInt(c);
-    //std::cout << std::hex << c << " (" << 2*i << ") " << base << " " << kmer << " " << currentMask << std::endl;
-    kmer |= (base & 0x03);
-    kmer <<= 2;
-    //currentMask <<= 2;
-
+    kmer |= (base & 0x03);   
   }
   return kmer;
+}
+
+// -----------------------------------------------------------------------------
+//                            STATIC UTILITY METHODS
+// -----------------------------------------------------------------------------
+uint64_t NumericKMer::fromChars(const char* chars, size_t k) {
+  uint64_t kmer = 0;
+  for (size_t i = 0; i < k; ++i) {
+    kmer <<= 2;
+    char c = chars[i];
+    uint64_t base = DNAAlphabet2Bits::charToInt(c);
+    kmer |= (base & 0x03);
+  }
+  return kmer;
+}
+
+// -----------------------------------------------------------------------------
+//                                     IOSTREAM
+// -----------------------------------------------------------------------------
+
+ostream& operator<< (ostream& os, const NumericKMer& kmer) {
+  uint64_t copy = kmer.kmer;
+  size_t k = kmer.k;
+  std::string out("");
+  for (size_t i = 0; i < k; ++i) {
+    out = DNAAlphabet2Bits::intToChar(copy & 0x03) + out;
+    copy >>= 2;
+ }	 
+ os << out;
+ return os;
 }

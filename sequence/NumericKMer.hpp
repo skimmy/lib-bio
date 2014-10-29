@@ -25,7 +25,14 @@ public:
   // CONVERSIONT OPERATORS
   operator uint64_t();
 
+  // IOSTREAM
+  friend ostream& operator<< (ostream& os, const NumericKMer& kmer);
+
+
   static const size_t KMax = 32;
+
+  // STATIC UTILITY METHODS
+  static uint64_t fromChars(const char* chars, size_t k);
 };
 
 #endif

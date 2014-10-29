@@ -90,3 +90,10 @@ void Reference::init(size_t n) {
   this-> length = n;
   this->sequence = new char[n];
 }
+
+// ---------------------------------------------------------
+//                          IOSTREAM
+// ---------------------------------------------------------
+ostream& operator<< (ostream& os, const Reference& ref) {
+  os << ref.sequence;
+}

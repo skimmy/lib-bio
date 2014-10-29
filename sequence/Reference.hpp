@@ -158,11 +158,15 @@ public:
   size_t getElementSize() const;
   size_t getByteCount() const;
   char getBaseAt(size_t i) const;
+
+  // IOSTREAM
+  friend ostream& operator<< (ostream& os, const Reference& ref);
+
 private:
   // ---------------------------------------------------------
   //                      UTILITY METHODS
   // ---------------------------------------------------------
-  void init(size_t n);
+  void init(size_t n);  
 };
 
 #endif

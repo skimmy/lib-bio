@@ -59,14 +59,16 @@ void test() {
   // NUMERIC KMER TEST
   // -----------------
   Reference ref("TACGGTGGTCTAA");
+  size_t k = 2;
   NumericKMer kmer(ref);
-  std::cout << ref << std::endl;
-
-  for (size_t k = 1; k < ref.getSequenceLength() - 1; ++k) {
-    std::unordered_map< uint64_t, uint64_t> index = spectrumAsIntMap(ref, k);
-      for (pair< uint64_t, uint64_t > kmer : index) {
-	std::cout << NumericKMer(kmer.first,k) << " " << kmer.second << std::endl;
+  std::cout << ref << " (" << k << ")" << std::endl;
+  std::unordered_map< uint64_t, std::vector< size_t> > index = kmersMapping(ref, k);
+  for (pair< uint64_t, vector< size_t > > p : index) {
+    std::cout << NumericKMer(p.first, k) << " --> [ ";
+    for (size_t i : p.second) {
+      std::cout << i << " ";
     }
+    std::cout << "]" << std::endl;      
   }
 }
 

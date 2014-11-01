@@ -36,7 +36,7 @@ NumericKMer::operator uint64_t() {
 
 uint64_t NumericKMer::sequenceToInt(const Sequence& s) {
   uint64_t kmer = 0;  
-  for (int i = 0; i < k; ++i) {    
+  for (size_t i = 0; i < k; ++i) {    
     kmer <<= 2;
     char c = s.getBaseAt(i);
     // TODO: It may be worth to add a (fast) check for 'c'

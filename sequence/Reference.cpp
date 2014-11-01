@@ -2,6 +2,8 @@
 
 #include "ColorAlphabet.hpp"
 
+
+
 // ---------------------------------------------------------
 //                 CONSTRUCTORS AND DESTRUCTOR
 // ---------------------------------------------------------
@@ -96,4 +98,5 @@ void Reference::init(size_t n) {
 // ---------------------------------------------------------
 ostream& operator<< (ostream& os, const Reference& ref) {
   os << ref.sequence;
+  return os;
 }

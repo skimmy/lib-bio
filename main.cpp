@@ -184,8 +184,8 @@ int runTask(int argc, char** argv) {
 }
 
 int main(int argc, char** argv) {
-  //  runTask(argc, argv);
-  test();
+  runTask(argc, argv);
+  //test();
 
   return 0;
 }

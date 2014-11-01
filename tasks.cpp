@@ -1,4 +1,4 @@
-#include <math.h>
+#include <cmath>
 
 #include <vector>
 #include <fstream>
@@ -8,6 +8,7 @@
 #include "sequence.h"
 #include "io.h"
 #include "alignment.h"
+#include "algorithms.h"
 
 // This utilitu function returns the bytes remaining until the end of the file
 // is reached. It should be probably made publicly availale in a separate util
@@ -119,21 +120,16 @@ std::vector<ScoredPosition<int, int> > alignFastqReadsSimpleSW(const string& rea
     output << p.getSequenceId() << "\t" << p.getPosition() << " (" << p.getScore() << ")" << std::endl;
   }
 
-  // for (Position<int> p : aligns) {
-  //   output << p.getSequenceId() << "\t" << p.getPosition() << std::endl;
-  // }
-
   return aligns;
 }
 
 /**************************** K-SPECTRUM FUNCTIONS ****************************/
 void taskComputeKSpectrum(size_t k, const string& referenceFile) {
-  
-  //  Reference ref("CCATTACCACAGGTAACGGTG");
   FastFormat fast;
   fast.loadFromFile(referenceFile);
   Reference ref = (Reference) fast;
-  std::vector<uint64_t>* freq = getKmersFrequency(ref, k);
-  // Do stuff with the vector
-  delete freq;
+  std::unordered_map< uint64_t, uint64_t > index = spectrumAsIntMap(ref, k);
+  for (std::pair< uint64_t, uint64_t > p : index) {
+    std::cout << NumericKMer(p.first, k) << " " << p.second << std::endl;
+  }
 }

@@ -2,7 +2,7 @@
 #define SPECTRUM_H
 
 #include <unordered_map>
-#include <vector>
+#include <list>
 
 #include "../sequence.h"
 
@@ -74,6 +74,6 @@ std::unordered_map< uint64_t, uint64_t > spectrumAsIntMap(const Sequence& ref, s
    a `vector` of positions where that k-mer was observed
 
  */
-std::unordered_map< uint64_t, std::vector< size_t > > kmersMapping(const Sequence& ref, size_t k);
+std::unordered_map< uint64_t, std::list< size_t > > kmersMapping(const Sequence& ref, size_t k);
 
 #endif

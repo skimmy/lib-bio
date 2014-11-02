@@ -32,8 +32,8 @@ std::unordered_map< uint64_t, uint64_t > spectrumAsIntMap(const Sequence& ref, s
 }
 
 
-std::unordered_map< uint64_t, std::vector< size_t > > kmersMapping(const Sequence& ref, size_t k) {
-  unordered_map< uint64_t, std::vector< size_t > > index;
+std::unordered_map< uint64_t, std::list< size_t > > kmersMapping(const Sequence& ref, size_t k) {
+  unordered_map< uint64_t, std::list< size_t > > index;
   char* kmer = new char[k];
   // scan the sequence
   size_t N = ref.getSequenceLength();

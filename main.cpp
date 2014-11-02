@@ -62,8 +62,8 @@ void test() {
   size_t k = 2;
   NumericKMer kmer(ref);
   std::cout << ref << " (" << k << ")" << std::endl;
-  std::unordered_map< uint64_t, std::vector< size_t> > index = kmersMapping(ref, k);
-  for (pair< uint64_t, vector< size_t > > p : index) {
+  std::unordered_map< uint64_t, std::list< size_t> > index = kmersMapping(ref, k);
+  for (pair< uint64_t, std::list< size_t > > p : index) {
     std::cout << NumericKMer(p.first, k) << " --> [ ";
     for (size_t i : p.second) {
       std::cout << i << " ";

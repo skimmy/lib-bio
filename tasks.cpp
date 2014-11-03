@@ -1,8 +1,8 @@
 #include <cmath>
-
 #include <vector>
 #include <fstream>
 #include <thread>
+#include <unordered_map>
 
 #include "tasks.hpp"
 #include "sequence.h"
@@ -132,4 +132,39 @@ void taskComputeKSpectrum(size_t k, const string& referenceFile) {
   for (std::pair< uint64_t, uint64_t > p : index) {
     std::cout << NumericKMer(p.first, k) << " " << p.second << std::endl;
   }
+}
+
+void taskMapReadsKmers(const string& reference, const string& reads, size_t k, const string& out) {
+  // open files
+  std::ofstream outFileStream;
+  if (!out.empty()) {
+    outFileStream.open(out, std::ios::out);
+  }
+  std::ostream& outStream = (out.empty()) ? std::cout : outFileStream;
+  FastFormat refFast;
+  refFast.loadFromFile(reference);
+  Reference ref = refFast.toReference();
+  
+  std::ifstream readsStream(reads, std::ios::in);
+
+  // compute index for the reference
+  std::unordered_map< uint64_t, std::list< size_t > > index = kmersMapping(ref, k);
+  
+  // scan reads and find mappings
+  size_t read_index = 0;
+  size_t kmer_index = 0;
+  while(!readsStream.eof()) {
+    FastqRead r;// = fastqReads.getNextRead();
+    readsStream >> r;
+    list< KMer > kmers = r.getKMerList(k);
+    kmer_index = 0;
+    for (KMer kmer : kmers) {
+      NumericKMer nkmer(kmer);
+      std::unordered_map< uint64_t, std::list< size_t > >::const_iterator it = index.find((uint64_t)nkmer);
+      outStream << read_index << ":" << kmer_index << " "  << ((it == index.end()) ? (int64_t)(-1) :  (int64_t)it->second.front() ) << std::endl;
+      kmer_index++;
+    }
+    read_index++;
+  }
+
 }

@@ -12,7 +12,7 @@ using namespace boost;
 template<class K, class V>
 class Index {
 private:
-  unordered_map<K,V> map;
+  boost::unordered_map<K,V> map;
 public:
   void insert(const KeyValuePair<K,V>& pair) { map[*(pair.getKey())] = *(pair.getValue()); }
   // virtual KeyValuePair<K,V>* find(const KeyValuePair& pair); 

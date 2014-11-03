@@ -11,7 +11,7 @@
  * on the input received from the command line.
  */
 
-/**  \fn alignFastqReadsSimpleSW(const string& readsPath, const string& referencePath, uint nThreads = 1, size_t nReads = -1);
+/**  \fn alignFastqReadsSimpleSW(const string& readsPath, const string& referencePath, std::ostream& output, uint64_t nThreads = 1, size_t nReads = -1);
   \brief Aligns reads contained in a fastq file against a regerence contained in
   a fast file.
 
@@ -40,7 +40,20 @@
 */
 std::vector<ScoredPosition<int,int> > alignFastqReadsSimpleSW(const string& readsPath, const string& referencePath, std::ostream& output, uint64_t nThreads = 1, size_t nReads = -1);
 
-
+/**
+   \fn taskComputeKSpectrum(size_t k, const string& referenceFile);
+   \brief Computes the \f$ k \f$ spectrum of the input reference file.
+ */
 void taskComputeKSpectrum(size_t k, const string& referenceFile);
+
+/**
+   \fn taskMapReadsKmers(const string& reference, const string& reads, size_t k, const string& out = "");
+   \brief For each read in the input set, maps its kmers against the given reference.
+
+   This function takes as input file name for reference sequence and reads set, the size
+   of kmers \f$ k \$f and a (possibly empty) `string` representing the output path.
+   First it creates a _map_g
+ */
+void taskMapReadsKmers(const string& reference, const string& reads, size_t k, const string& out = "");
 
 #endif

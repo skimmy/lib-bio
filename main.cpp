@@ -58,18 +58,22 @@ void test() {
   // -----------------
   // NUMERIC KMER TEST
   // -----------------
-  Reference ref("TACGGTGGTCTAA");
-  size_t k = 2;
-  NumericKMer kmer(ref);
-  std::cout << ref << " (" << k << ")" << std::endl;
-  std::unordered_map< uint64_t, std::list< size_t> > index = kmersMapping(ref, k);
-  for (pair< uint64_t, std::list< size_t > > p : index) {
-    std::cout << NumericKMer(p.first, k) << " --> [ ";
-    for (size_t i : p.second) {
-      std::cout << i << " ";
-    }
-    std::cout << "]" << std::endl;      
-  }
+  // Reference ref("TACGGTGGTCTAA");
+  // size_t k = 2;
+  // NumericKMer kmer(ref);
+  // std::cout << ref << " (" << k << ")" << std::endl;
+  // std::unordered_map< uint64_t, std::list< size_t> > index = kmersMapping(ref, k);
+  // for (pair< uint64_t, std::list< size_t > > p : index) {
+  //   std::cout << NumericKMer(p.first, k) << " --> [ ";
+  //   for (size_t i : p.second) {
+  //     std::cout << i << " ";
+  //   }
+  //   std::cout << "]" << std::endl;      
+  // }
+
+  taskMapReadsKmers("/home/skimmy/filtering/data/ecoli.fasta",
+		    "/home/skimmy/filtering/data/ecoli.sample.custom.fastq",
+		    14, "/home/skimmy/Temporary/ecoli_kmers.out");
 }
 
 // TODO
@@ -184,8 +188,9 @@ int runTask(int argc, char** argv) {
 }
 
 int main(int argc, char** argv) {
-  runTask(argc, argv);
-  //test();
-
+  //runTask(argc, argv);
+  test();
+  
+  
   return 0;
 }

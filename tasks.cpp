@@ -135,6 +135,7 @@ void taskComputeKSpectrum(size_t k, const string& referenceFile) {
 }
 
 void taskMapReadsKmers(const string& reference, const string& reads, size_t k, const string& out) {
+  std::cout << "-------------------- Reads Mapping --------------------" << std::endl;
   // open files
   std::ofstream outFileStream;
   if (!out.empty()) {
@@ -142,19 +143,26 @@ void taskMapReadsKmers(const string& reference, const string& reads, size_t k, c
   }
   std::ostream& outStream = (out.empty()) ? std::cout : outFileStream;
   FastFormat refFast;
+  std::cout << "Loading reference (" << reference << ")...";
+  std::cout.flush();
   refFast.loadFromFile(reference);
+  std::cout << " Ok!" << std::endl;
   Reference ref = refFast.toReference();
   
   std::ifstream readsStream(reads, std::ios::in);
 
   // compute index for the reference
+  std::cout << "Index creation...";
+  std::cout.flush();
   std::unordered_map< uint64_t, std::list< size_t > > index = kmersMapping(ref, k);
-  
+  std::cout << " Ok!" << std::endl;
   // scan reads and find mappings
   size_t read_index = 0;
   size_t kmer_index = 0;
+  std::cout << "Reads mapping...";
+  std::cout.flush();
   while(!readsStream.eof()) {
-    FastqRead r;// = fastqReads.getNextRead();
+    FastqRead r;
     readsStream >> r;
     list< KMer > kmers = r.getKMerList(k);
     kmer_index = 0;
@@ -166,5 +174,5 @@ void taskMapReadsKmers(const string& reference, const string& reads, size_t k, c
     }
     read_index++;
   }
-
+  std::cout << "Ok!" << std::endl << "-------------------- DONE --------------------" << std::endl;
 }

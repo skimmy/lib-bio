@@ -71,9 +71,9 @@ void test() {
   //   std::cout << "]" << std::endl;      
   // }
 
-  taskMapReadsKmers("/home/skimmy/filtering/data/ecoli.fasta",
-		    "/home/skimmy/filtering/data/ecoli.sample.custom.fastq",
-		    14, "/home/skimmy/Temporary/ecoli_kmers.out");
+  // taskMapReadsKmers("/home/skimmy/filtering/data/ecoli.fasta",
+  // 		    "/home/skimmy/filtering/data/ecoli.sample.custom.fastq",
+  // 		    14, "/home/skimmy/Temporary/ecoli_kmers.out");
 }
 
 // TODO
@@ -180,6 +180,15 @@ int runTask(int argc, char** argv) {
       taskComputeKSpectrum(k, ref);
       break;
     }
+  case 3:
+    {
+      size_t k = opts.kmerSize;
+      string ref = opts.genomeFile;
+      string reads = opts.readsFile;
+      string out = opts.alignOutputFile;
+      taskMapReadsKmers(ref, reads, k, out);
+      break;
+    }
   default:
     std::cout << "Unrecognized operation" << std::endl;
     return 1;
@@ -188,8 +197,8 @@ int runTask(int argc, char** argv) {
 }
 
 int main(int argc, char** argv) {
-  //runTask(argc, argv);
-  test();
+  runTask(argc, argv);
+  //test();
   
   
   return 0;

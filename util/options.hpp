@@ -18,6 +18,10 @@ typedef struct options OPTIONS;
 struct options {
   // constructor to assign default values
   options();
+
+  // DEBUG INFO
+  bool verbose;
+  
   // input information
   /**
    * \brief The format of the input genome file

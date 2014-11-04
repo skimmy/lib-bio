@@ -10,9 +10,10 @@ const std::string tVec[] =
   {
     std::string("nop"),
     std::string("align"),
-    std::string("kspectrum")
+    std::string("kspectrum"),
+    std::string("kmapping")
   };
-#define TASK_COUNT 3
+const int TASK_COUNT = 4;
 
 
 int parseTask(const string& taskName) {
@@ -64,10 +65,11 @@ AlignAlgorithm parseAlgorithmType(const char* optval) {
   }
 }
 
-const char* shortOptions = "hntg:G:f:r:R:F:o:p:c:A:k:";
+const char* shortOptions = "hvntg:G:f:r:R:F:o:p:c:A:k:";
 const struct option longOptions[] = 
   {
     { "help", 0, NULL, 'h' },
+    { "verbose", 0, NULL, 'v' },
     { "no-align", 0, NULL, 'n' },
     { "translate", 0, NULL, 't' },
     { "genome", 1, NULL, 'g' },
@@ -86,6 +88,7 @@ const struct option longOptions[] =
 options::options() {
 
   task = 0;
+  verbose = false;
 
   genomeFormat = GENOME_CUSTOM;
   readsFormat = READS_CUSTOM;
@@ -94,7 +97,7 @@ options::options() {
   
   genomeOutputFile = "genome.dat";
   readsOutputFile = "reads.dat";
-  alignOutputFile = "align.out";
+  alignOutputFile = "";
 
   padding = 0;
   genomeCopies = 1;
@@ -121,6 +124,9 @@ void options::parseInputArgs(int argc, char** argv) {
     switch(nextOption) {
     case 'h':
       printUsage(cout, argv[0], 0);
+      break;
+    case 'v':
+      this->verbose = true;
       break;
     case 'n':
       this->align = false;

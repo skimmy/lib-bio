@@ -182,6 +182,7 @@ int runTask(int argc, char** argv) {
     }
   case 3:
     {
+      // k-mer mapping
       size_t k = opts.kmerSize;
       string ref = opts.genomeFile;
       string reads = opts.readsFile;

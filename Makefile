@@ -24,9 +24,9 @@ ALPHA_SRC=sequence/DNAAlphabet.cpp sequence/ColorAlphabet.cpp
 ALPHA_HDR=sequence/DNAAlphabet.hpp sequence/ColorAlphabet.hpp
 ALPHA_OBJ=sequence/DNAAlphabet.o sequence/ColorAlphabet.o
 
-ALGS_SRC=algorithms/spectrum.cpp
-ALGS_HDR=algorithms/spectrum.hpp
-ALGS_OBJ=algorithms/spectrum.o
+ALGS_SRC=algorithms/spectrum.cpp algorithms/kmerscore.cpp
+ALGS_HDR=algorithms.h algorithms/spectrum.hpp algorithms/kmerscore.hpp algorithms/types.hpp
+ALGS_OBJ=algorithms/spectrum.o algorithms/kmerscore.o
 
 SEQ_SRC=sequence/CompressedSequence.cpp sequence/DNACompressedSymbol.cpp sequence/Read.cpp sequence/CompressedReadSet.cpp sequence/KMer.cpp sequence/QualifiedSequence.cpp sequence/FullyQualifiedSequence.cpp sequence/Reference.cpp sequence/DNAAlphabet2Bits.cpp sequence/NumericKMer.cpp
 SEQ_HDR=sequence.h sequence/CompressedSequence.h sequence/DNACompressedSymbol.h sequence/Read.h sequence/Sequence.h sequence/CompressedReadSet.h sequence/KMer.hpp sequence/QualifiedSequence.hpp sequence/FullyQualifiedSequence.hpp sequence/Reference.hpp sequence/DNAAlphabet2Bits.hpp sequence/NumericKMer.hpp

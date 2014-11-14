@@ -14,6 +14,13 @@
 
 
 /**
+   Defines a new type `KmerMap` to indicate as an `unordered_map` with key 
+   `uint64_t`(for numeric k-mer) and value a list of positions (<i>i.e.</i>
+   `size_t`)
+ */
+typedef std::unordered_map< uint64_t, std::list< size_t > > KmerMap;
+
+/**
    \fn spectrumAsIntMap(const Sequence& ref, size_t k);
    \brief Computes the \f$ k \f$ spectrum of the given Sequence.
 
@@ -74,6 +81,8 @@ std::unordered_map< uint64_t, uint64_t > spectrumAsIntMap(const Sequence& ref, s
    a `vector` of positions where that k-mer was observed
 
  */
-std::unordered_map< uint64_t, std::list< size_t > > kmersMapping(const Sequence& ref, size_t k);
+KmerMap kmersMapping(const Sequence& ref, size_t k);
+
+
 
 #endif

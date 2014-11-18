@@ -34,15 +34,25 @@ class FastFormat : public Format {
   /**
    * \brief Creates an empty FastFormat object
    *
-   * Defualt constructor is the only available constructor and 
-   * creates an empty FastFormat object, the only performed
-   * initialization is the one required by Format::Format()
-   * constructor requiring a name, <em>FAST</em> is the ssigned
-   * name.
+   * The only operations perfromed by the default constructors are
+   * those required by Format::Format() constructor requiring a name,
+   * <em>FAST</em> is the ssigned
    *
    * \sa Fast::Format(const string &name)
    */
   FastFormat();
+
+  
+  /**
+   * \brief Creates a FastFormat object by loading the fast file
+   * with path passed as parameter.
+   *
+   * This is a shortcut for the invocation of default constructor
+   * followed by a call to loadFromFile method.
+   * 
+   */
+  FastFormat(const std::string& filePath);
+
   // ---------------------------------------------------------
   //                     CONVERSION METHODS
   // ---------------------------------------------------------

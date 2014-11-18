@@ -15,11 +15,10 @@
  */
 
 
-
 /**
    \fn isKmerUnique(const ReadkmerMap& map);
  */
-bool isKmerUnique(const ReadKmerMap& map);
+bool isKmerUnique(const KmersMap& map);
 
 
 #endif

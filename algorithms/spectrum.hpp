@@ -5,6 +5,7 @@
 #include <list>
 
 #include "../sequence.h"
+#include "../algorithms.h"
 
 /**
    \file spectrum.hpp
@@ -12,13 +13,6 @@
    sequence.
  */
 
-
-/**
-   Defines a new type `KmerMap` to indicate as an `unordered_map` with key 
-   `uint64_t`(for numeric k-mer) and value a list of positions (<i>i.e.</i>
-   `size_t`)
- */
-typedef std::unordered_map< uint64_t, std::list< size_t > > KmerMap;
 
 /**
    \fn spectrumAsIntMap(const Sequence& ref, size_t k);
@@ -49,7 +43,7 @@ typedef std::unordered_map< uint64_t, std::list< size_t > > KmerMap;
    for each kmer contained in ref, there is the total number of occurances of
    such kmer in the whole sequence.
  */
-std::unordered_map< uint64_t, uint64_t > spectrumAsIntMap(const Sequence& ref, size_t k);
+IntMap spectrumAsIntMap(const Sequence& ref, size_t k);
 
 /**
    \fn kmersMapping(const Sequence& ref, size_t k);
@@ -81,8 +75,16 @@ std::unordered_map< uint64_t, uint64_t > spectrumAsIntMap(const Sequence& ref, s
    a `vector` of positions where that k-mer was observed
 
  */
-KmerMap kmersMapping(const Sequence& ref, size_t k);
+NumericKmerIndex kmersMapping(const Sequence& ref, size_t k);
 
 
+
+/**
+   \fn extractKmersMapPosition(const Sequence& seq, NumericKmerIndex index, size_t k);
+   
+   \brief Computes (the first) mapping position of each kmers in the input
+   sequence, against the index provided as parameter
+ */
+KmersMap extractKmersMapPosition(const Sequence& seq, NumericKmerIndex index, size_t k);
 
 #endif

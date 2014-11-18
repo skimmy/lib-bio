@@ -25,59 +25,17 @@ using namespace boost;
 typedef DNACompressedSymbol DnaSymb;
 
 void test() {
-  // -------------------
-  // SMITH WATERMAN TEST
-  // -------------------
-  // cout << "-- CPU SMITH WATERMAN TEST --\n";
-  // string a = "AATGTTA";
-  // string aa = "ACGGT";
-  // string aaa = "ACGT";
-  // string b = "AATGTGACGTTTG";
-  // //  SmithWatermanDP swa(a.c_str(), a.length(), b.c_str(), b.length());
-  // SmithWatermanDP swa(a, b);
-  // swa.enableBacktrack();
-  // swa.computeMatrix();
-  // swa.printMatrix();
-  // MatrixPoint2D maxPos = swa.getGlobalBest();
-  // cout << "Max Position (" << maxPos.i << ", " << maxPos.j << "): " << swa.getScoreAt(maxPos)  << " " << endl;
-  // swa.printBacktrackMatrix();
-
-  // vector<Read> v;
-  // Read r;
-  // r.setBases(a);
-  // v.push_back(r);
-  // r.setBases(aa);
-  // v.push_back(r);
-  // r.setBases(aaa);
-  // v.push_back(r);
-  // vector<Position<int>> alignsVector = alignReads(v,b);
-  // for(Position<int> p : alignsVector) {
-  //   cout << "(" << p.getSequenceId() << ", " << p.getPosition() << ")" << endl;
-  // }
-
-  // -----------------
-  // NUMERIC KMER TEST
-  // -----------------
-  // Reference ref("TACGGTGGTCTAA");
-  // size_t k = 2;
-  // NumericKMer kmer(ref);
-  // std::cout << ref << " (" << k << ")" << std::endl;
-  // std::unordered_map< uint64_t, std::list< size_t> > index = kmersMapping(ref, k);
-  // for (pair< uint64_t, std::list< size_t > > p : index) {
-  //   std::cout << NumericKMer(p.first, k) << " --> [ ";
-  //   for (size_t i : p.second) {
-  //     std::cout << i << " ";
-  //   }
-  //   std::cout << "]" << std::endl;      
-  // }
-
-  // taskMapReadsKmers("/home/skimmy/filtering/data/ecoli.fasta",
-  // 		    "/home/skimmy/filtering/data/ecoli.sample.custom.fastq",
-  // 		    14, "/home/skimmy/Temporary/ecoli_kmers.out");
+  string genome = "/home/skimmy/filtering/data/ecoli.fasta";
+  Reference ref = (FastFormat(genome)).toReference();
+  Reference read("TTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAATTTTATTGAC");
+  size_t k = 16;
+  NumericKmerIndex index = kmersMapping(ref, k);
+  KmersMap map = extractKmersMapPosition(read, index, k);
+  for (size_t p : map) {
+    std::cout << p << " ";
+  }
+  std::cout << std::endl;
 }
-
-// TODO
-// 2. Create minimal code to perform gpu alignment
 
 /**
  * This function create m copies (shifted on the first base by
@@ -198,8 +156,8 @@ int runTask(int argc, char** argv) {
 }
 
 int main(int argc, char** argv) {
-  runTask(argc, argv);
-  //test();
+  // runTask(argc, argv);
+  test();
   
   
   return 0;

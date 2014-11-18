@@ -13,6 +13,12 @@ FastFormat::FastFormat()
 {
 }
 
+FastFormat::FastFormat(const std::string& filePath) 
+  : Format("FAST"), sequence(""), header("")
+{
+  this->loadFromFile(filePath);
+}
+
 // ---------------------------------------------------------
 //                     CONVERSION METHODS
 // ---------------------------------------------------------

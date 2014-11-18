@@ -1,10 +1,12 @@
 #include "spectrum.hpp"
 
+const size_t NoPos = (size_t) -1;
+
 /**
  */
 uint64_t shiftAndPaddWithCharKmer(uint64_t old, char c, size_t k) {
   uint64_t tmp = old << 2;
-  tmp &= ( ( 0x1 << (2*k) ) - 1 ) ;
+  tmp &= ( ( 0x1L << (2*k) ) - 1 ) ;
   tmp |= (DNAAlphabet2Bits::charToInt(c) & 0x3) ;
   return tmp;  
 }
@@ -51,4 +53,24 @@ std::unordered_map< uint64_t, std::list< size_t > > kmersMapping(const Sequence&
   } while(i <= N);
   delete[] kmer;
   return index;
+}
+
+KmersMap extractKmersMapPosition(const Sequence& seq, NumericKmerIndex index, size_t k) {
+  size_t m = seq.getSequenceLength();
+  size_t barm = m - k + 1;
+  KmersMap map = KmersMap(barm);
+  char* kmer = new char[k];
+  // get the first k-mer
+  size_t i = 0;
+  for (; i < k; ++i) {
+    kmer[i] = seq.getBaseAt(i);
+  }
+  uint64_t n_kmer = NumericKMer::fromChars(kmer, k);
+  for (size_t j = 0; j < barm; ++j) {    
+    NumericKmerIndex::const_iterator it = index.find(n_kmer);
+    map[j] = (it == index.end()) ? NoPos : (it->second).front();    
+    n_kmer = shiftAndPaddWithCharKmer(n_kmer, seq.getBaseAt(j+k), k);
+  }
+  delete[] kmer;
+  return map;
 }

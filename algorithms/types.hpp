@@ -23,8 +23,7 @@
    to indicate no map for the corresponding position.
 
    The fact that mapped positions are implicitly ordered on a `vector` structure
-   can be used to map consecutive kmers of the input sequence. The library extensively 
-   uses this implicit order on implemented algorithms.
+   can be used to map consecutive kmers of the input sequence. 
  */
 typedef std::vector< size_t > KmersMap;
 

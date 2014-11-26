@@ -35,6 +35,9 @@ void test() {
     std::cout << p << " ";
   }
   std::cout << std::endl;
+  std::cout << "Unique (before): " << isKmerUniquelyMapped(map) << std::endl;
+  map[1] = map[0];
+  std::cout << "Unique (after):  " << isKmerUniquelyMapped(map) << std::endl;
 }
 
 /**

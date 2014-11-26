@@ -30,7 +30,7 @@ typedef std::vector< size_t > KmersMap;
 /**
    \brief The k-mer score type defined as a long (may change in the future)
  */
-typedef long KmerScoreType;
+typedef double KmerScoreType;
 
 /**
    \brief Defines a type for indexing numeric k-mers in a sequence.

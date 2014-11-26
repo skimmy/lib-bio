@@ -25,18 +25,21 @@ using namespace boost;
 typedef DNACompressedSymbol DnaSymb;
 
 void test() {
-  string genome = "/home/skimmy/filtering/data/ecoli.fasta";
+  //  string genome = "/home/skimmy/filtering/data/ecoli.fasta";
+  string genome = "/Users/micheleschimd/filtering/data/ecoli.fa";
   Reference ref = (FastFormat(genome)).toReference();
-  Reference read("TTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAATTTTATTGAC");
+  Reference read("TTCTGAACTGGTTACCTGCCGTGAGTACATTAAAATTTTATTGAC");
+  //  Reference read("TTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAATTTTATTGAC");
   size_t k = 16;
   NumericKmerIndex index = kmersMapping(ref, k);
   KmersMap map = extractKmersMapPosition(read, index, k);
-  for (size_t p : map) {
+  std::vector< uint64_t > scoreV = kmerScoreVector(map, k);
+  for (auto p : scoreV) {
     std::cout << p << " ";
   }
   std::cout << std::endl;
+  std::cout << scoreForVector(scoreV, k) << std::endl;
   std::cout << "Unique (before): " << isKmerUniquelyMapped(map) << std::endl;
-  map[1] = map[0];
   std::cout << "Unique (after):  " << isKmerUniquelyMapped(map) << std::endl;
 }
 

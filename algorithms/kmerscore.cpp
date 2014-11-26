@@ -1,7 +1,40 @@
 #include "../algorithms.h"
 #include "../sequence.h"
 
+#include <algorithm>
+
 const size_t NoPos = (size_t) -1;
+
+void inline add_k(std::vector< uint64_t >& v, size_t i, size_t k, uint64_t o = 1) {
+  size_t n = std::min(v.size(), i + k);
+  while(i < n) {
+    v[i] += o;
+    ++i;
+  }
+}
+
+std::vector< uint64_t > kmerScoreVector(const KmersMap& map, size_t k) {
+  size_t barm = map.size();
+  size_t m = barm + k - 1;
+  std::vector< uint64_t > v(m, 0);
+  for(size_t i = 0; i < barm; ++i) {
+    if (map[i] != NoPos) {
+      add_k(v, i, k);
+    }
+  }
+  return v;
+}
+
+KmerScoreType scoreForVector(const std::vector< uint64_t >& v, size_t k) {
+  KmerScoreType score = 0;
+  size_t barm = v.size() - k + 1;
+  std::vector< uint64_t >::const_iterator it = v.begin();
+  while(it != v.end()) {
+    score += (KmerScoreType)(*it);
+    ++it;
+  }
+  return score / ((double)(k*barm));
+}
 
 // Get a reference and a read and compute the vector
 //   A = a1 a2 .. 
@@ -25,8 +58,10 @@ bool isKmerUniquelyMapped(const KmersMap& map) {
   if (i < m) {
     firstMap = map[i];
     ++i;
+    // scan till the and
     while(i < m) {
       ++firstMap;
+      // if map[i] is different from -1 it must match the current counter
       if ( (map[i] != NoPos) && (map[i] != firstMap) ) {
 	return false;
       }

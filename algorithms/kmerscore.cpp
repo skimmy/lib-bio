@@ -36,6 +36,17 @@ KmerScoreType scoreForVector(const std::vector< uint64_t >& v, size_t k) {
   return score / ((double)(k*barm));
 }
 
+size_t kmerErrorCount(const KmersMap& map, size_t k) {
+  std::vector< uint64_t > v = kmerScoreVector(map, k);
+  size_t errs = 0;
+  std::vector< uint64_t >::const_iterator it = v.begin();
+  while(it != v.end()) {    
+    errs += (size_t)((*it) == 0);
+    ++it;
+  }
+  return errs;
+}
+
 // Get a reference and a read and compute the vector
 //   A = a1 a2 .. 
 // where ai = 1 iff i-th kmer maps (somewhere)

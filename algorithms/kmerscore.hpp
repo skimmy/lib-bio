@@ -40,4 +40,6 @@ std::vector< uint64_t > kmerScoreVector(const KmersMap& map, size_t k);
 
 KmerScoreType scoreForVector(const std::vector< uint64_t >& v, size_t k);
 
+size_t kmerErrorCount(const KmersMap& map, size_t k);
+
 #endif

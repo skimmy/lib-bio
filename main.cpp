@@ -25,11 +25,12 @@ using namespace boost;
 typedef DNACompressedSymbol DnaSymb;
 
 void test() {
-  //  string genome = "/home/skimmy/filtering/data/ecoli.fasta";
-  string genome = "/Users/micheleschimd/filtering/data/ecoli.fa";
+  string genome = "/home/skimmy/filtering/data/ecoli.fasta";
+  //  string genome = "/Users/micheleschimd/filtering/data/ecoli.fa";
   Reference ref = (FastFormat(genome)).toReference();
-  Reference read("TTCTGAACTGGTTACCTGCCGTGAGTACATTAAAATTTTATTGAC");
-  //  Reference read("TTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAATTTTATTGAC");
+  // Real         TTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAATTTTATTGAC
+  Reference read("TTCTGAACTGGTTACCTGCCGTGAGTACATTAAAATTTTATTGAA");
+//Reference read("TTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAATTTTATTGAC");
   size_t k = 16;
   NumericKmerIndex index = kmersMapping(ref, k);
   KmersMap map = extractKmersMapPosition(read, index, k);
@@ -39,8 +40,11 @@ void test() {
   }
   std::cout << std::endl;
   std::cout << scoreForVector(scoreV, k) << std::endl;
-  std::cout << "Unique (before): " << isKmerUniquelyMapped(map) << std::endl;
-  std::cout << "Unique (after):  " << isKmerUniquelyMapped(map) << std::endl;
+
+  size_t errs = kmerErrorCount(map, k);
+  std::cout << "Errors (est.): " << errs << std::endl;
+  // std::cout << "Unique (before): " << isKmerUniquelyMapped(map) << std::endl;
+  // std::cout << "Unique (after):  " << isKmerUniquelyMapped(map) << std::endl;
 }
 
 /**

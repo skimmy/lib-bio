@@ -3,6 +3,7 @@
 #include <fstream>
 #include <thread>
 #include <unordered_map>
+#include <ctime>
 
 #include "tasks.hpp"
 #include "sequence.h"
@@ -154,7 +155,7 @@ void taskMapReadsKmers(const string& reference, const string& reads, size_t k, c
   // compute index for the reference
   std::cout << "Index creation...";
   std::cout.flush();
-  std::unordered_map< uint64_t, std::list< size_t > > index = kmersMapping(ref, k);
+  NumericKmerIndex index = kmersMapping(ref, k);
   std::cout << " Ok!" << std::endl;
   // scan reads and find mappings
   size_t read_index = 0;
@@ -175,4 +176,36 @@ void taskMapReadsKmers(const string& reference, const string& reads, size_t k, c
     read_index++;
   }
   std::cout << "Ok!" << std::endl << "-------------------- DONE --------------------" << std::endl;
+}
+
+// Computes for each reads of the input set the kmerscore and the numero fo errors
+// (see algorithms/kmerscore) against the reference sequence
+void taskKmerScoreReads(const string& reference, const string& reads, size_t k, const string& out) {
+
+  // define output (either a file or the standard out)
+  std::ofstream outFileStream;
+  if (!out.empty()) {
+    outFileStream.open(out, std::ios::out);
+  }
+  std::ostream& outStream = (out.empty()) ? std::cout : outFileStream;
+  time_t beginTime, endTime;
+  
+  std::cout << "-------------------- Reads Mapping --------------------" << std::endl;
+  // open files 
+  std::cout << "Loading reference (" << reference << ")...";
+  std::cout.flush(); // in case of stuck code we see at which point
+  FastFormat refFast(reference);  
+  Reference ref = refFast.toReference();
+  std::cout << " Done (" << ref.getSequenceLength() << " bases)" << std::endl;
+
+  // open a stream for reading reads file
+  std::ifstream readsStream(reads, std::ios::in);
+
+  // compute the index for the reference
+  std::cout << "Index creation...";
+  std::cout.flush();
+  time(&beginTime);
+  NumericKmerIndex index = kmersMapping(ref, k); 
+  time(&endTime);  
+  std::cout << " Ok! (" << difftime(endTime, beginTime) << " sec)" << std::endl;
 }

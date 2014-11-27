@@ -56,4 +56,6 @@ void taskComputeKSpectrum(size_t k, const string& referenceFile);
  */
 void taskMapReadsKmers(const string& reference, const string& reads, size_t k, const string& out = "");
 
+void taskKmerScoreReads(const string& reference, const string& reads, size_t k, const string& out = "");
+
 #endif

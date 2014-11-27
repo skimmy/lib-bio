@@ -11,9 +11,10 @@ const std::string tVec[] =
     std::string("nop"),
     std::string("align"),
     std::string("kspectrum"),
-    std::string("kmapping")
+    std::string("kmapping"),
+    std::string("kscore")
   };
-const int TASK_COUNT = 4;
+const int TASK_COUNT = 5;
 
 
 int parseTask(const string& taskName) {
@@ -101,6 +102,7 @@ options::options() {
 
   padding = 0;
   genomeCopies = 1;
+
   
   translate = false;
   align = true;

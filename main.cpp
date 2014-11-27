@@ -25,26 +25,26 @@ using namespace boost;
 typedef DNACompressedSymbol DnaSymb;
 
 void test() {
-  string genome = "/home/skimmy/filtering/data/ecoli.fasta";
-  //  string genome = "/Users/micheleschimd/filtering/data/ecoli.fa";
-  Reference ref = (FastFormat(genome)).toReference();
-  // Real         TTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAATTTTATTGAC
-  Reference read("TTCTGAACTGGTTACCTGCCGTGAGTACATTAAAATTTTATTGAA");
-//Reference read("TTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAATTTTATTGAC");
-  size_t k = 16;
-  NumericKmerIndex index = kmersMapping(ref, k);
-  KmersMap map = extractKmersMapPosition(read, index, k);
-  std::vector< uint64_t > scoreV = kmerScoreVector(map, k);
-  for (auto p : scoreV) {
-    std::cout << p << " ";
-  }
-  std::cout << std::endl;
-  std::cout << scoreForVector(scoreV, k) << std::endl;
+//   string genome = "/home/skimmy/filtering/data/ecoli.fasta";
+//   //  string genome = "/Users/micheleschimd/filtering/data/ecoli.fa";
+//   Reference ref = (FastFormat(genome)).toReference();
+//   // Real         TTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAATTTTATTGAC
+//   Reference read("TTCTGAACTGGTTACCTGCCGTGAGTACATTAAAATTTTATTGAA");
+// //Reference read("TTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAATTTTATTGAC");
+//   size_t k = 16;
+//   NumericKmerIndex index = kmersMapping(ref, k);
+//   KmersMap map = extractKmersMapPosition(read, index, k);
+//   std::vector< uint64_t > scoreV = kmerScoreVector(map, k);
+//   for (auto p : scoreV) {
+//     std::cout << p << " ";
+//   }
+//   std::cout << std::endl;
+//   std::cout << scoreForVector(scoreV, k) << std::endl;
 
-  size_t errs = kmerErrorCount(map, k);
-  std::cout << "Errors (est.): " << errs << std::endl;
+//   size_t errs = kmerErrorCount(map, k);
+//   std::cout << "Errors (est.): " << errs << std::endl;
   // std::cout << "Unique (before): " << isKmerUniquelyMapped(map) << std::endl;
-  // std::cout << "Unique (after):  " << isKmerUniquelyMapped(map) << std::endl;
+  // std::cout << "Unique (after):  " << isKmerUniquelyMapped(map) << std::endl;  
 }
 
 /**
@@ -158,6 +158,16 @@ int runTask(int argc, char** argv) {
       taskMapReadsKmers(ref, reads, k, out);
       break;
     }
+  case 4:
+    {
+      // k-mer score for reads
+      size_t k = opts.kmerSize;
+      string ref = opts.genomeFile;
+      string reads = opts.readsFile;
+      string out = opts.alignOutputFile;
+      taskKmerScoreReads(ref, reads, k, out);
+      break;
+    }
   default:
     std::cout << "Unrecognized operation" << std::endl;
     return 1;
@@ -166,8 +176,8 @@ int runTask(int argc, char** argv) {
 }
 
 int main(int argc, char** argv) {
-  // runTask(argc, argv);
-  test();
+  runTask(argc, argv);
+  //  test();
   
   
   return 0;

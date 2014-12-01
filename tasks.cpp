@@ -205,7 +205,26 @@ void taskKmerScoreReads(const string& reference, const string& reads, size_t k, 
   std::cout << "Index creation...";
   std::cout.flush();
   time(&beginTime);
-  NumericKmerIndex index = kmersMapping(ref, k); 
+  NumericKmerIndex index = kmersMapping(ref, k);
   time(&endTime);  
   std::cout << " Ok! (" << difftime(endTime, beginTime) << " sec)" << std::endl;
+  std::cout << "Calculating scores...";
+  std::cout.flush();
+  size_t M = 0;
+  time(&beginTime);
+  while(!readsStream.eof()) {
+    FastqRead r;
+    readsStream >> r;
+    if (r.getSequenceLength() == 0) {
+      continue;
+    }
+    //std::cout << r <<  "  (" << M << ")" << std::endl; std::cout.flush(); // just for debug
+    KmersMap map = extractKmersMapPosition(r, index, k);
+    M++;
+  }
+  readsStream.close();
+  time(&endTime);
+  double elapsed = difftime(endTime, beginTime);
+  double rate = M / elapsed;
+  std::cout << " Done (" << M << " reads in " << elapsed  << " sec, " << rate << " reads/sec)"  << std::endl;
 }

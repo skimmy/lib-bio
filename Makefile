@@ -42,9 +42,9 @@ ADT_SRC=
 CUDA_HDR=gpu.h
 CUDA_SRC=
 
-UTIL_SRC=util/options.cpp
-UTIL_HDR=util.h util/options.hpp
-UTIL_OBJ=util/options.o
+UTIL_SRC=util/options.cpp util/io.cpp
+UTIL_HDR=util.h util/options.hpp util/io.hpp
+UTIL_OBJ=util/options.o util/io.o
 
 QUAL_SRC=quality/ReadQuality.cpp quality/CSQualityRead.cpp quality/ProbabilisticQuality.cpp quality/PhredQuality.cpp quality/FullQuality.cpp
 QUAL_HDR=quality.h quality/ReadQuality.hpp quality/CSQualityRead.hpp quality/Quality.hpp quality/ProbabilisticQuality.hpp quality/PhredQuality.hpp quality/FullQuality.hpp

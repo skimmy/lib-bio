@@ -66,7 +66,7 @@ AlignAlgorithm parseAlgorithmType(const char* optval) {
   }
 }
 
-const char* shortOptions = "hvntg:G:f:r:R:F:o:p:c:A:k:";
+const char* shortOptions = "hvntg:G:f:r:R:F:o:p:c:A:k:T:";
 const struct option longOptions[] = 
   {
     { "help", 0, NULL, 'h' },
@@ -83,7 +83,8 @@ const struct option longOptions[] =
     { "padding", 1, NULL, 'p' },
     { "genome-copies", 1, NULL, 'c' },
     { "algorithm-type", 1, NULL, 'A' },
-    { "kmer-size", 1, NULL, 'k' }
+    { "kmer-size", 1, NULL, 'k' },
+    { "threads", 1, NULL, 'T' }
   };
 
 options::options() {
@@ -108,6 +109,8 @@ options::options() {
   align = true;
   alignAlgorithm = CPU_DP;
   kmerSize = 15;
+
+  threadsNumber = 1;
 }
 
 void options::printUsage(ostream& os, const char* name, int exitCode) {
@@ -166,6 +169,8 @@ void options::parseInputArgs(int argc, char** argv) {
     case 'k':
       this->kmerSize = atoi(optarg);
       break;
+    case 'T':
+      this->threadsNumber = atoi(optarg);
     default:
       return;
       //      this->printUsage(cerr, argv[0], 1);
@@ -191,4 +196,6 @@ void options::printOptions(ostream& os) {
   os << "Alignment:  " << this->align << '\n';
   os << "Algorithm:  " << this->alignAlgorithm << '\n';
   os << "K-Mer size: " << this->kmerSize << '\n';
+  os << "-- RUNTIME --" << '\n';
+  os << "Threads:    " << this->threadsNumber;
 }

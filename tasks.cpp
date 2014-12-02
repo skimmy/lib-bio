@@ -11,6 +11,8 @@
 #include "alignment.h"
 #include "algorithms.h"
 
+#include "util/io.hpp"
+
 // This utilitu function returns the bytes remaining until the end of the file
 // is reached. It should be probably made publicly availale in a separate util
 // section of the library (e.g. util/io.h)
@@ -178,9 +180,17 @@ void taskMapReadsKmers(const string& reference, const string& reads, size_t k, c
   std::cout << "Ok!" << std::endl << "-------------------- DONE --------------------" << std::endl;
 }
 
+
+// *****************************************************************************
+// *                                   KSCORE                                  *
+// *****************************************************************************
 // Computes for each reads of the input set the kmerscore and the numero fo errors
 // (see algorithms/kmerscore) against the reference sequence
-void taskKmerScoreReads(const string& reference, const string& reads, size_t k, const string& out) {
+void taskKmerScoreReads(const string& reference, const string& reads, size_t k, const string& out, size_t T) {
+
+  size_t rn = getFileLength(reference);
+  std::cout << "--> " << rn << " " << (rn/T) << " " << std::endl;
+  
 
   // define output (either a file or the standard out)
   std::ofstream outFileStream;

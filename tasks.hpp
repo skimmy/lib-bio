@@ -47,7 +47,7 @@ std::vector<ScoredPosition<int,int> > alignFastqReadsSimpleSW(const string& read
 void taskComputeKSpectrum(size_t k, const string& referenceFile);
 
 /**
-   \fn taskMapReadsKmers(const string& reference, const string& reads, size_t k, const string& out = "");
+   \fn taskMapReadsKmers(const string& reference, const string& reads, size_t k, const string& out = "", size_t nThreads = 1);
    \brief For each read in the input set, maps its kmers against the given reference.
 
    This function takes as input file name for reference sequence and reads set, the size
@@ -56,6 +56,6 @@ void taskComputeKSpectrum(size_t k, const string& referenceFile);
  */
 void taskMapReadsKmers(const string& reference, const string& reads, size_t k, const string& out = "");
 
-void taskKmerScoreReads(const string& reference, const string& reads, size_t k, const string& out = "");
+void taskKmerScoreReads(const string& reference, const string& reads, size_t k, const string& out = "", size_t nThreads = 1);
 
 #endif

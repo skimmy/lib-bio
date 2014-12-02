@@ -165,7 +165,8 @@ int runTask(int argc, char** argv) {
       string ref = opts.genomeFile;
       string reads = opts.readsFile;
       string out = opts.alignOutputFile;
-      taskKmerScoreReads(ref, reads, k, out);
+      size_t nThreads = opts.threadsNumber;
+      taskKmerScoreReads(ref, reads, k, out, nThreads);
       break;
     }
   default:

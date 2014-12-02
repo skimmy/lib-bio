@@ -188,10 +188,6 @@ void taskMapReadsKmers(const string& reference, const string& reads, size_t k, c
 // (see algorithms/kmerscore) against the reference sequence
 void taskKmerScoreReads(const string& reference, const string& reads, size_t k, const string& out, size_t T) {
 
-  size_t rn = getFileLength(reference);
-  std::cout << "--> " << rn << " " << (rn/T) << " " << std::endl;
-  
-
   // define output (either a file or the standard out)
   std::ofstream outFileStream;
   if (!out.empty()) {

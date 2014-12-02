@@ -14,4 +14,13 @@
  */
 size_t getFileLength(const std::string& filePath);
 
+template <class T>
+void printElements(const T& coll, std::ostream& os, std::string sep = " ", std::string trail = "\n") {
+  typename T::const_iterator it;
+  for (it = coll.begin(); it != coll.end(); ++it) {
+    os << *it << sep;
+  }
+  os << trail;
+}
+
 #endif

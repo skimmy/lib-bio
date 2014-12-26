@@ -128,14 +128,16 @@ int runTask(int argc, char** argv) {
     opts.printOptions(std::cout);
   #endif
   int task = opts.task;
+  std::string taskSelectedMsg = "None";
   switch(task) {
   case 0:
     {      
-      std::cout << std::endl << "'nop' task selected\n\tno operation has been performed\n" << std::endl;
+      taskSelectedMsg = "No operation";
       break;
     }
   case 1: // Smith Waterman alignment
     {
+      taskSelectedMsg = "Smith-Waterman alignment";
       string ref = opts.genomeFile; 
       string reads = opts.readsFile; 
       alignFastqReadsSimpleSW(reads, ref, std::cout, 2, 8);      
@@ -143,6 +145,7 @@ int runTask(int argc, char** argv) {
     }
   case 2: // k-spectrum calculation
     {
+      taskSelectedMsg = "k-spectrum";
       size_t k = opts.kmerSize;
       string ref = opts.genomeFile;
       taskComputeKSpectrum(k, ref);
@@ -150,7 +153,9 @@ int runTask(int argc, char** argv) {
     }
   case 3:
     {
+      
       // k-mer mapping
+      taskSelectedMsg = "k-mapping";
       size_t k = opts.kmerSize;
       string ref = opts.genomeFile;
       string reads = opts.readsFile;
@@ -161,6 +166,7 @@ int runTask(int argc, char** argv) {
   case 4:
     {
       // k-mer score for reads
+      taskSelectedMsg = "k-score";
       size_t k = opts.kmerSize;
       string ref = opts.genomeFile;
       string reads = opts.readsFile;
@@ -173,6 +179,8 @@ int runTask(int argc, char** argv) {
     std::cout << "Unrecognized operation" << std::endl;
     return 1;
   }
+  std::cout << "[TASK]    " << taskSelectedMsg << std::endl;
+  //std::cout << "Selected task -- " << taskSelectedMsg << " --" << std::endl;
   return 0;
 }
 

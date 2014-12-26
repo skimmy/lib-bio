@@ -184,7 +184,7 @@ void taskMapReadsKmers(const string& reference, const string& reads, size_t k, c
 // *****************************************************************************
 // *                                   KSCORE                                  *
 // *****************************************************************************
-// Computes for each reads of the input set the kmerscore and the numero fo errors
+// Computes for each reads of the input set the kmerscore and the number of errors
 // (see algorithms/kmerscore) against the reference sequence
 void taskKmerScoreReads(const string& reference, const string& reads, size_t k, const string& out, size_t T) {
 
@@ -224,8 +224,11 @@ void taskKmerScoreReads(const string& reference, const string& reads, size_t k, 
     if (r.getSequenceLength() == 0) {
       continue;
     }
-    //std::cout << r <<  "  (" << M << ")" << std::endl; std::cout.flush(); // just for debug
     KmersMap map = extractKmersMapPosition(r, index, k);
+    std::vector< uint64_t > scoreVector = kmerScoreVector(map, k);
+    KmerScoreType score = scoreForVector(scoreVector, k);
+    size_t errors = kmerErrorCount(map, k);
+    outStream << score << " " << errors << std::endl;
     M++;
   }
   readsStream.close();

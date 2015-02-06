@@ -12,7 +12,8 @@
 #include <fstream>
 #include <unordered_map>
 
-#include <math.h>
+#include <cstdlib>
+#include <cmath>
 
 #define DEBUG 1
 
@@ -25,26 +26,23 @@ using namespace boost;
 typedef DNACompressedSymbol DnaSymb;
 
 void test() {
-//   string genome = "/home/skimmy/filtering/data/ecoli.fasta";
-//   //  string genome = "/Users/micheleschimd/filtering/data/ecoli.fa";
-//   Reference ref = (FastFormat(genome)).toReference();
-//   // Real         TTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAATTTTATTGAC
-//   Reference read("TTCTGAACTGGTTACCTGCCGTGAGTACATTAAAATTTTATTGAA");
-// //Reference read("TTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAATTTTATTGAC");
-//   size_t k = 16;
-//   NumericKmerIndex index = kmersMapping(ref, k);
-//   KmersMap map = extractKmersMapPosition(read, index, k);
-//   std::vector< uint64_t > scoreV = kmerScoreVector(map, k);
-//   for (auto p : scoreV) {
-//     std::cout << p << " ";
-//   }
-//   std::cout << std::endl;
-//   std::cout << scoreForVector(scoreV, k) << std::endl;
+  // Test disclaimer
+  std::cout << "\n********** WARNING ********** \n" <<  
+    "  This is a Test Release \n" << 
+    "***************************** \n" <<  std::endl;
 
-//   size_t errs = kmerErrorCount(map, k);
-//   std::cout << "Errors (est.): " << errs << std::endl;
-  // std::cout << "Unique (before): " << isKmerUniquelyMapped(map) << std::endl;
-  // std::cout << "Unique (after):  " << isKmerUniquelyMapped(map) << std::endl;  
+  size_t m = 3;
+  uint8_t* quals = new uint8_t[m];
+  double p_C = 1.0;
+  for (size_t l = 0; l < m; ++l) {
+    //    quals[l] = rand() % 40;
+    quals[l] = 10;
+    std::cout << (int)quals[l] << " ";
+    p_C *= PHRED[quals[l]];
+  }
+  std::cout << "\nPc = " << p_C << std::endl;
+  delete[] quals;
+  
 }
 
 /**
@@ -185,8 +183,8 @@ int runTask(int argc, char** argv) {
 }
 
 int main(int argc, char** argv) {
-  runTask(argc, argv);
-  //  test();
+  //runTask(argc, argv);
+  test();
   
   
   return 0;

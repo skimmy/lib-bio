@@ -36,7 +36,7 @@ IO_SRC=io/Format.cpp io/FastFormat.cpp io/FastqRead.cpp io/FastqFormat.cpp io/CS
 IO_HDR=io.h io/Format.h io/FastFormat.h io/FastqRead.h io/FastqFormat.h io/CSFastRead.hpp io/CSFastFormat.hpp
 IO_OBJ=io/Format.o io/FastFormat.cpp io/FastqRead.o io/FastqFormat.o io/CSFastRead.o io/CSFastFormat.o
 
-ADT_HDR=adt.h adt/DynamicProgramming.hpp adt/KeyValuePair.hpp
+ADT_HDR=adt.h adt/DynamicProgramming.hpp adt/KeyValuePair.hpp adt/HybridIndex.hpp
 ADT_SRC=
 
 CUDA_HDR=gpu.h

@@ -187,6 +187,8 @@ void taskMapReadsKmers(const string& reference, const string& reads, size_t k, c
 // Computes for each reads of the input set the kmerscore and the number of errors
 // (see algorithms/kmerscore) against the reference sequence
 void taskKmerScoreReads(const string& reference, const string& reads, size_t k, const string& out, size_t T) {
+  // if 0 or other wrong values are set for T, then set it to 1 (i.e. single thread)
+  T = (T > 1) ? T : 1;
 
   // define output (either a file or the standard out)
   std::ofstream outFileStream;
@@ -195,6 +197,10 @@ void taskKmerScoreReads(const string& reference, const string& reads, size_t k, 
   }
   std::ostream& outStream = (out.empty()) ? std::cout : outFileStream;
   time_t beginTime, endTime;
+
+  // "split" input file into T threads (if multithreaded is required)
+  if (T > 1) {
+  }
   
   std::cout << "-------------------- Reads Mapping --------------------" << std::endl;
   // open files 

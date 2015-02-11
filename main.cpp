@@ -42,7 +42,10 @@ void test() {
   }
   std::cout << "\nPc = " << p_C << std::endl;
   delete[] quals;
-  
+
+  HybridIndex< uint64_t, NumericKmerIndex > hi;
+  NumericKmer kmer = 0x11;
+  hi.add(kmer);
 }
 
 /**

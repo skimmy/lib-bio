@@ -12,6 +12,11 @@
    \brief Defines several types for different part of the algorithm module.
  */
 
+/**
+   \brief Defines the type of NumericIndex as a uint64_t
+ */
+typedef uint64_t NumericKmer;
+
 
 /**
    \brief Defines a type for mapping ordered k-mers into <b>one</b> single
@@ -40,7 +45,7 @@ typedef double KmerScoreType;
    used to indicate the position(s) where the k-mer maps.
 
  */
-typedef std::unordered_map< uint64_t, std::list< size_t > > NumericKmerIndex;
+typedef std::unordered_map< NumericKmer, std::list< size_t > > NumericKmerIndex;
 
 /**
    \brief Map taking `uint64_t` as both key and value.

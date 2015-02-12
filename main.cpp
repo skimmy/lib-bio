@@ -43,9 +43,10 @@ void test() {
   std::cout << "\nPc = " << p_C << std::endl;
   delete[] quals;
 
-  HybridIndex< uint64_t, NumericKmerIndex > hi;
-  NumericKmer kmer = 0x11;
-  hi.add(kmer);
+  HybridIndex< NumericKmer, size_t > hi;
+  NumericKmer kmer = 0x13;
+  size_t i = 0;
+  hi.add(kmer, i);
 }
 
 /**

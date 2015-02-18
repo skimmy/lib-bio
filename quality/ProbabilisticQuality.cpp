@@ -1,10 +1,7 @@
-#include "ProbabilisticQuality.hpp"
-
 #include <string.h>
 
-#include "PhredQuality.hpp"
-#include "QualityCostants.h"
 #include "../util.h"
+#include "../quality.h"
 
 /*************** CONSTRUCTORS AND DESTRUCTOR ****************/
 
@@ -63,13 +60,13 @@ size_t ProbabilisticQuality::length() const {
 double* ProbabilisticQuality::toProbabilistic(const int* quals, size_t n) {
   double* probs = new double[n];
   for (size_t i = 0; i < n; ++i) {
-    probs[i] = prob_lookup[quals[i]];
+    probs[i] = PHRED[quals[i]];
   }
   return probs;
 }
 
 double ProbabilisticQuality::toProbabilistic(int qual) {
-  return prob_lookup[qual];
+  return PHRED[qual];
 }
 
 

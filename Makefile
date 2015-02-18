@@ -1,13 +1,17 @@
 # Compiler and linker variables
 
 CXX=g++
-CXXFLAGS=-Wall -g -std=c++11
+CXXFLAGS=-Wall -g -std=c++11 -fPIC
 
 GPUXX=nvcc
 GPUXXFLAGS=-Xcompiler "$(CXXFLAGS)"
 GPUNAME=gpuseq
 
 NAME=seq.o
+
+LIBVERSION="0.1"
+LIBNAME="libbio"
+LIBFILE="${LIBNAME}.so.${LIBVERSION}"
 
 # Documentation variable
 DOXYGEN=doxygen
@@ -69,6 +73,9 @@ $(NAME): $(ALL_SRC) $(ALL_OBJ) $(ALL_HDR)
 
 $(GPUNAME): $(ALL_SRC) $(ALL_HDR) $(CUDA_SRC) $(CUDA_HDR) 
 	$(GPUXX) $(GPUXXFLAGS) $(ALL_SRC) -o $(GPUNAME)
+
+$(LIBFILE): $(ALL_OBJ) $(ALL_HDR)
+	g++ -shared 
 
 $(DOC_INDEX_FILE): $(ALL_SRC) $(ALL_HDR) 
 	$(DOXYGEN) $(DOXYGEN_CONF)

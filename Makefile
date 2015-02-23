@@ -50,9 +50,9 @@ UTIL_SRC=util/options.cpp util/io.cpp
 UTIL_HDR=util.h util/options.hpp util/io.hpp
 UTIL_OBJ=util/options.o util/io.o
 
-QUAL_SRC=quality/ReadQuality.cpp quality/CSQualityRead.cpp quality/ProbabilisticQuality.cpp quality/PhredQuality.cpp quality/FullQuality.cpp
-QUAL_HDR=quality.h quality/ReadQuality.hpp quality/CSQualityRead.hpp quality/Quality.hpp quality/ProbabilisticQuality.hpp quality/PhredQuality.hpp quality/FullQuality.hpp
-QUAL_OBJ=quality/ReadQuality.o quality/CSQualityRead.o quality/ProbabilisticQuality.o quality/PhredQuality.o quality/FullQuality.o
+QUAL_SRC=quality/ReadQuality.cpp quality/CSQualityRead.cpp quality/ProbabilisticQuality.cpp quality/PhredQuality.cpp quality/FullQuality.cpp quality/QualityCommon.cpp
+QUAL_HDR=quality.h quality/ReadQuality.hpp quality/CSQualityRead.hpp quality/Quality.hpp quality/ProbabilisticQuality.hpp quality/PhredQuality.hpp quality/FullQuality.hpp quality/QualityCommon.hpp
+QUAL_OBJ=quality/ReadQuality.o quality/CSQualityRead.o quality/ProbabilisticQuality.o quality/PhredQuality.o quality/FullQuality.o quality/QualityCommon.o
 
 GEN_SRC=generator/ReadGenerator.cpp
 GEN_HDR=generator/ReadGenerator.hpp
@@ -62,10 +62,9 @@ MISC_SRC=tasks.cpp
 MISC_OBJ=tasks.o
 MISC_HDR=tasks.hpp
 
-ALL_LIB=$(ALIGNMENT_OBJ) $(SEQ_OBJ) $(IO_OBJ) $(UTIL_OBJ) $(QUAL_OBJ) $(ALPHA_OBJ) $(GEN_OBJ) $(ALGS_OBJ)
-ALL_SRC=main.cpp #$(ADT_SRC) $(ALIGNMENT_SRC) $(SEQ_SRC) $(UTIL_SRC) $(QUAL_SRC) $(IO_SRC) 
+ALL_SRC=main.cpp
 ALL_OBJ=$(ALIGNMENT_OBJ) $(SEQ_OBJ) $(IO_OBJ) $(UTIL_OBJ) $(QUAL_OBJ) $(ALPHA_OBJ) $(GEN_OBJ) $(MISC_OBJ) $(ALGS_OBJ)
-ALL_HDR=$(SEQ_HDR) $(IO_HDR) $(ADT_HDR) $(UTIL_HDR) $(ALIGNMENT_HDR) $(QUAL_HDR) $(ALPHA_HDR) $(GEN_HDR) $(MISC_HDR) $(ALGS_HDR)
+ALL_HDR=$(SEQ_HDR) $(IO_HDR) $(ADT_HDR) $(UTIL_HDR) $(ALIGNMENT_HDR) $(QUAL_HDR) $(ALPHA_HDR) $(GEN_HDR) $(MISC_HDR) $(ALGS_HDR) $(QUAL_HDR)
 
 DYN_LIBS=-pthread
 

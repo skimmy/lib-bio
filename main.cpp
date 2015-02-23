@@ -47,6 +47,8 @@ void test() {
   NumericKmer kmer = 0x13;
   size_t i = 0;
   hi.add(kmer, i);
+
+  std::cout << qual::encodingToString(qual::parseQuality("IVI")) << std::endl; 
 }
 
 /**

@@ -2,6 +2,7 @@
 #define FASTQ_READ_H
 
 #include "../sequence.h"
+#include "../quality.h"
 
 #include <iostream>
 #include <vector>
@@ -34,7 +35,13 @@
  * Although these parsing rules may fail when loading long sequences
  * (i.e. sequences spanning through multiple lines) the class works
  * fine with short sequences (i.e. those produced by <em>Next
- * Generation %Sequence</em> machines.
+ * Generation %Sequence</em> machines).
+ *
+ * A final remark regards the presence of quality strings which are expected to
+ * be presented because prescribed by the `fastq` format. Such quality scores are
+ * supposed to be represented on the phred scale. An attempt to determine whether
+ * _sanger_ or _illumina_ encoding is used is automatically performed, if this
+ * fails (and an expliciti indication is not given) sanger format is assumed.
  *
  * \sa Read
  * \sa FastqFormat
@@ -95,6 +102,10 @@ class FastqRead : public Read {
   //                        STATIC METHODS
   // ---------------------------------------------------------
   static std::vector< size_t > splitReads(const std::string& filePath, size_t T);
+
+  // ---------------------------------------------------------
+  //                        QUALITY METHODS
+  // ---------------------------------------------------------
 };
 
 #endif

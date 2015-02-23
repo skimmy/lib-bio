@@ -2,7 +2,7 @@
 #define COMPRESSED_READ_SET_H
 
 #include "CompressedSequence.h"
-#include "Read.h"
+#include "Read.hpp"
 
 #include <cstddef>
 #include <vector>

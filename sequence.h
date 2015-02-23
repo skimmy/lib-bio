@@ -12,7 +12,7 @@
 #include "sequence/DNACompressedSymbol.h"
 #include "sequence/CompressedReadSet.h"
 
-#include "sequence/Read.h"
+#include "sequence/Read.hpp"
 #include "sequence/Reference.hpp"
 #include "sequence/KMer.hpp"
 

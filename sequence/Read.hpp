@@ -7,9 +7,7 @@
 
 #include <string>
 #include <list>
-using namespace std;
 
-//typedef basic_string<DNACompressedSymbol> DNAString;
 
 /**
  * \brief This class represents a read in the bioinformatics context.
@@ -41,15 +39,15 @@ class Read : public Sequence {
   /**
    * \brief The header of the read
    */
-  string header;
+  std::string header;
   /**
    * \brief The bases of the read
    */
-  string bases;
+  std::string bases;
   /**
    * The string containing quality values
    */
-  string qualities;
+  std::string qualities;
  public:
   /**
    * \brief Creates an empty Read
@@ -68,38 +66,38 @@ class Read : public Sequence {
    *
    * \param header The \em new header
    */
-  void setHeader(const string& header);
+  void setHeader(const std::string& header);
   /**
    * \brief Sets the base sequence of the Read
    *
    * \param bases The new sequence
    */
-  void setBases(const string& bases);
+  void setBases(const std::string& bases);
   /**
    * \brief Sets the qualities string of the Read
    *
    * \param qualities The new quality string
    */
-  void setQualities(const string& qualities);
+  void setQualities(const std::string& qualities);
 
   /**
    * \brief Returns the header of the Read
    *
    * \return The stored header
    */
-  string getHeader() const;
+  std::string getHeader() const;
   /**
    * \brief Returns the sequence of bases of the Read
    *
    * \return The stored base sequence
    */
-  string getBases() const;
+  std::string getBases() const;
   /**
    * \brief Returns the quality string of the Read
    *
    * \return The stored quality string
    */
-  string getQualities() const;
+  std::string getQualities() const;
   /**
    * \brief Returns the length (in bases) of the string
    *
@@ -120,7 +118,7 @@ class Read : public Sequence {
    * \return A standard list containing all k-mers.
    *
    */
-  list<KMer> getKMerList(size_t k) const;
+  std::list<KMer> getKMerList(size_t k) const;
 
   // ---------------------------------------------------------
   //                     MODIFY OPERATION

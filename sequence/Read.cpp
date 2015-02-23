@@ -1,4 +1,6 @@
-#include "Read.h"
+#include "Read.hpp"
+
+using namespace std;
 
 /*********************** CONSTRUCTORS ***********************/
 
@@ -13,23 +15,23 @@ void Read::setHeader(const string& header) {
   this->header = header;
 }
 
-void Read::setBases(const string& bases) {
+void Read::setBases(const std::string& bases) {
   this->bases = bases;
 }
 
-void Read::setQualities(const string& qualities) {
+void Read::setQualities(const std::string& qualities) {
   this->qualities = qualities;
 }
 
-string Read::getHeader() const {
+std::string Read::getHeader() const {
   return this->header;
 }
 
-string Read::getBases() const {
+std::string Read::getBases() const {
   return this->bases;
 }
 
-string Read::getQualities() const {
+std::string Read::getQualities() const {
   return this->qualities;
 }
 
@@ -37,8 +39,8 @@ size_t Read::length() const {
   return bases.length();
 }
 
-list<KMer> Read::getKMerList(size_t k) const {
-  list<KMer> kmersList;
+std::list<KMer> Read::getKMerList(size_t k) const {
+  std::list<KMer> kmersList;
   int M = bases.length() - k + 1;
   for (int i = 0; i < M; i++) {
     kmersList.push_back(KMer(bases.substr(i,k)));

@@ -9,9 +9,9 @@ GPUNAME=gpuseq
 
 NAME=seq.o
 
-LIBVERSION="0.1"
-LIBNAME="libbio"
-LIBFILE="${LIBNAME}.so.${LIBVERSION}"
+LIBVERSION=0.1
+LIBNAME=libbio.so
+LIBFILE=${LIBNAME}.so.${LIBVERSION}
 
 # Documentation variable
 DOXYGEN=doxygen
@@ -62,6 +62,7 @@ MISC_SRC=tasks.cpp
 MISC_OBJ=tasks.o
 MISC_HDR=tasks.hpp
 
+ALL_LIB=$(ALIGNMENT_OBJ) $(SEQ_OBJ) $(IO_OBJ) $(UTIL_OBJ) $(QUAL_OBJ) $(ALPHA_OBJ) $(GEN_OBJ) $(ALGS_OBJ)
 ALL_SRC=main.cpp #$(ADT_SRC) $(ALIGNMENT_SRC) $(SEQ_SRC) $(UTIL_SRC) $(QUAL_SRC) $(IO_SRC) 
 ALL_OBJ=$(ALIGNMENT_OBJ) $(SEQ_OBJ) $(IO_OBJ) $(UTIL_OBJ) $(QUAL_OBJ) $(ALPHA_OBJ) $(GEN_OBJ) $(MISC_OBJ) $(ALGS_OBJ)
 ALL_HDR=$(SEQ_HDR) $(IO_HDR) $(ADT_HDR) $(UTIL_HDR) $(ALIGNMENT_HDR) $(QUAL_HDR) $(ALPHA_HDR) $(GEN_HDR) $(MISC_HDR) $(ALGS_HDR)
@@ -74,8 +75,8 @@ $(NAME): $(ALL_SRC) $(ALL_OBJ) $(ALL_HDR)
 $(GPUNAME): $(ALL_SRC) $(ALL_HDR) $(CUDA_SRC) $(CUDA_HDR) 
 	$(GPUXX) $(GPUXXFLAGS) $(ALL_SRC) -o $(GPUNAME)
 
-$(LIBFILE): $(ALL_OBJ) $(ALL_HDR)
-	g++ -shared 
+lib: $(ALL_LIB) $(ALL_HDR) 
+	$(CXX) $(CXXFLAGS) -shared $(ALL_LIB) -o $(LIBNAME)
 
 $(DOC_INDEX_FILE): $(ALL_SRC) $(ALL_HDR) 
 	$(DOXYGEN) $(DOXYGEN_CONF)
@@ -87,7 +88,8 @@ doc: $(DOC_INDEX_FILE)
 .PHONY: clean
 
 clean:
-	rm -f $(NAME) $(GPUNAME)
+	rm -f $(NAME) $(GPUNAME) $(LIBFILE) task.o
+	rm -f algorithms/*.o
 	rm -f quality/*.o
 	rm -f util/*.o
 	rm -f io/*.o

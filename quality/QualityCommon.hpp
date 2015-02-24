@@ -9,6 +9,10 @@
 
 #include <string>
 
+#define SANGER_ASCII_OFFSET 33
+#define SOLEXA_ASCII_OFFSET 64
+#define ILLUMINA_ASCCI_OFFSET 64
+
 namespace qual
 {
 

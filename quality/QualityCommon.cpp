@@ -5,7 +5,7 @@ namespace qual
 
   QualityEncodingType parseQuality(const std::string& quals) {
     QualityEncodingType type = QualityEncodingType::SANGER;
-    for (int i = 0; i < quals.size(); ++i) {
+    for (size_t i = 0; i < quals.size(); ++i) {
       char q = (char) quals[i]; 
       // all ASCII chars less than 59 are used only by sanger encoding
       if (q < 59) {

@@ -5,7 +5,8 @@
 
 #include <cstring>
 #include <string>
-using namespace std;
+
+
 
 /**
  * \brief This class represents the qualty of a sequence using
@@ -46,8 +47,8 @@ public:
    * \sa PhredQuality(const string& quals, size_t n)
    * \sa PhredQuality(const PhredQuality& other)
    */
-  PhredQuality(const int* quals, size_t n);
-  /**
+PhredQuality(const int* quals, size_t n);
+/**
    * \brief This constructor creates a PhredQuality object from a
    * string containing the quality values. 
    *
@@ -61,7 +62,7 @@ public:
    * \sa PhredQuality(const int* quals, size_t n)
    * \sa PhredQuality(const PhredQuality& other)
    */
-  PhredQuality(const string& quals, size_t n);
+PhredQuality(const std::string& quals, size_t n);
   /**
    * \brief The copy constructor creates a copy of the passed PhredQuality
    * instance.
@@ -108,6 +109,8 @@ public:
    * \return The phred quality value if the input
    */
   static int toPhred(double p);
+
+  static void fromSangerQualities(const std::string& q, double* p);
 
 private:
   // ---------------------------------------------------------

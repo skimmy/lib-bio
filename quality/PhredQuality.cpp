@@ -3,7 +3,7 @@
 #include <string.h>
 #include <math.h>
 
-#include "ProbabilisticQuality.hpp"
+#include "../quality.h"
 #include "../util.h"
 
 #include <iostream>
@@ -386,6 +386,13 @@ size_t PhredQuality::length() const {
 }
 
 /********************** STATIC METHODS **********************/
+
+void PhredQuality::fromSangerQualities(const std::string& q, double* p) {
+  size_t n = q.size();
+  for (size_t i = 0; i < n; ++i) {
+    p[i] = PHRED[q[i] - SANGER_ASCII_OFFSET];
+  }
+}
 
 int* PhredQuality::toPhred(const double* probs, size_t n) {
   int* quals = new int[n];

@@ -48,7 +48,16 @@ void test() {
   size_t i = 0;
   hi.add(kmer, i);
 
-  std::cout << qual::encodingToString(qual::parseQuality("IVI")) << std::endl; 
+  
+  std::string qStr = "C#9AA6#B;;>@'?";
+  std::cout << qual::encodingToString(qual::parseQuality(qStr)) << std::endl;
+  size_t n = qStr.size();
+  double* probs = new double[n];
+  PhredQuality::fromSangerQualities(qStr,probs);
+  for (size_t i = 0; i < n; ++i) {
+    std::cout << probs[i] << " (" << qStr[i] << ")\n";
+  }
+  delete[] probs;
 }
 
 /**

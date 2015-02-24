@@ -1,6 +1,5 @@
-#include "FastqRead.h"
-
 #include "../util/io.hpp"
+#include "../io.h"
 
 #include <fstream>
 

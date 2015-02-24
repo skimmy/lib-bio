@@ -1,8 +1,7 @@
 #ifndef FASTQ_FORMAT_H
 #define FASTQ_FORMAT_H
 
-#include "Format.h"
-#include "FastqRead.h"
+#include "../io.h"
 
 #include <string>
 #include <iostream>

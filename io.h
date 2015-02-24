@@ -7,7 +7,7 @@
 
 #include "io/Format.h"
 #include "io/FastFormat.h"
-#include "io/FastqRead.h"
+#include "io/FastqRead.hpp"
 #include "io/FastqFormat.h"
 #include "io/CSFastRead.hpp"
 #include "io/CSFastFormat.hpp"

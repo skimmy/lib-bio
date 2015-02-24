@@ -37,7 +37,7 @@ SEQ_HDR=sequence.h sequence/CompressedSequence.h sequence/DNACompressedSymbol.h 
 SEQ_OBJ=sequence/CompressedSequence.o sequence/DNACompressedSymbol.o sequence/Read.o sequence/CompressedReadSet.o sequence/KMer.o sequence/QualifiedSequence.o sequence/FullyQualifiedSequence.o sequence/Reference.o sequence/DNAAlphabet2Bits.o sequence/NumericKMer.o
 
 IO_SRC=io/Format.cpp io/FastFormat.cpp io/FastqRead.cpp io/FastqFormat.cpp io/CSFastRead.cpp io/CSFastFormat.cpp
-IO_HDR=io.h io/Format.h io/FastFormat.h io/FastqRead.h io/FastqFormat.h io/CSFastRead.hpp io/CSFastFormat.hpp
+IO_HDR=io.h io/Format.h io/FastFormat.h io/FastqRead.hpp io/FastqFormat.h io/CSFastRead.hpp io/CSFastFormat.hpp
 IO_OBJ=io/Format.o io/FastFormat.cpp io/FastqRead.o io/FastqFormat.o io/CSFastRead.o io/CSFastFormat.o
 
 ADT_HDR=adt.h adt/DynamicProgramming.hpp adt/KeyValuePair.hpp adt/HybridIndex.hpp

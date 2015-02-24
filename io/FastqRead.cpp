@@ -1,5 +1,6 @@
 #include "../util/io.hpp"
 #include "../io.h"
+#include "../quality.h"
 
 #include <fstream>
 
@@ -33,7 +34,7 @@ size_t nextReadPosition(std::ifstream& ifs, size_t off = 0) {
 FastqRead::FastqRead() 
   : Read()
 {
-  
+  this->quality = NULL;
 }
 
 FastqRead::FastqRead(const FastqRead& other) {
@@ -85,3 +86,18 @@ std::vector< size_t > FastqRead::splitReads(const std::string& filePath, size_t 
 }
 
 /************************************************************/
+
+void FastqRead::autoDecodeQualities() {
+  this->quality = NULL;
+  // if no quality string is available no Quality object is stored (i.e., NULL)
+  if (!hasQualities()) {    
+    return;
+  }
+  // try to 'guess' the encoding used
+  qual::QualityEncodingType encoding = qual::parseQuality(this->qualities);
+  if (encoding == qual::QualityEncodingType::SANGER) {
+    
+  }
+  if (encoding == qual::QualityEcondingType::ILLUMINA) {
+  }  
+}

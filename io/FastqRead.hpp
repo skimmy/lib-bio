@@ -106,6 +106,19 @@ class FastqRead : public Read {
   // ---------------------------------------------------------
   //                        QUALITY METHODS
   // ---------------------------------------------------------
+  
+  bool hasQualities() const { return (this->qualities.size() > 0); }
+
+  /**
+   * \brief Trys to decode quality string (if any) based on its content,
+   */
+  void autoDecodeQualities();
+
+  bool hasDecodedQuality() const { return (this->quality != NULL); }
+
+ private:
+  Quality* quality;
+  
 };
 
 #endif

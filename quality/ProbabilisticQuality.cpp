@@ -60,13 +60,13 @@ size_t ProbabilisticQuality::length() const {
 double* ProbabilisticQuality::toProbabilistic(const int* quals, size_t n) {
   double* probs = new double[n];
   for (size_t i = 0; i < n; ++i) {
-    probs[i] = PHRED[quals[i]];
+    probs[i] = qual::PHRED[quals[i]];
   }
   return probs;
 }
 
 double ProbabilisticQuality::toProbabilistic(int qual) {
-  return PHRED[qual];
+  return qual::PHRED[qual];
 }
 
 

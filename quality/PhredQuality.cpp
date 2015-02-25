@@ -10,10 +10,8 @@
 using namespace std;
 
 #include <boost/tokenizer.hpp>
-#include <boost/foreach.hpp>
-using namespace boost;
 
-double PHRED[300] = {
+const double qual::PHRED[300] = {
 1.00000000000000000e+00, // 0.0
 7.94328234724281490e-01, // 1.0
 6.30957344480193250e-01, // 2.0
@@ -390,7 +388,7 @@ size_t PhredQuality::length() const {
 void PhredQuality::fromSangerQualities(const std::string& q, double* p) {
   size_t n = q.size();
   for (size_t i = 0; i < n; ++i) {
-    p[i] = PHRED[q[i] - SANGER_ASCII_OFFSET];
+    p[i] = qual::PHRED[q[i] - qual::SANGER_ASCII_OFFSET];
   }
 }
 
@@ -417,9 +415,9 @@ void PhredQuality::init(const int* v, size_t n) {
 }
 
 void  PhredQuality::parseQualityString(const string& s) {
-  tokenizer<> tok(s);
+  boost::tokenizer<> tok(s);
   size_t i = 0;
-  BOOST_FOREACH(string token, tok) {
+  for(const string& token : tok) {
     qualVector[i++] = atoi(token.c_str());
   }
 }

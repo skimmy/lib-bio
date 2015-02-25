@@ -98,6 +98,6 @@ void FastqRead::autoDecodeQualities() {
   if (encoding == qual::QualityEncodingType::SANGER) {
     
   }
-  if (encoding == qual::QualityEcondingType::ILLUMINA) {
+  if (encoding == qual::QualityEncodingType::ILLUMINA) {
   }  
 }

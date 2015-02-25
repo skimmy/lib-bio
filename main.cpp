@@ -19,46 +19,12 @@
 
 using namespace std;
 
-#include <boost/foreach.hpp>
-#include <boost/unordered_map.hpp>
-using namespace boost;
+// #include <boost/foreach.hpp>
+// #include <boost/unordered_map.hpp>
+// using namespace boost;
 
-typedef DNACompressedSymbol DnaSymb;
+//typedef DNACompressedSymbol DnaSymb;
 
-void test() {
-  // Test disclaimer
-  std::cout << "\n********** WARNING ********** \n" <<  
-    "  This is a Test Release \n" << 
-    "***************************** \n" <<  std::endl;
-
-  size_t m = 3;
-  uint8_t* quals = new uint8_t[m];
-  double p_C = 1.0;
-  for (size_t l = 0; l < m; ++l) {
-    //    quals[l] = rand() % 40;
-    quals[l] = 10;
-    std::cout << (int)quals[l] << " ";
-    p_C *= PHRED[quals[l]];
-  }
-  std::cout << "\nPc = " << p_C << std::endl;
-  delete[] quals;
-
-  HybridIndex< NumericKmer, size_t > hi;
-  NumericKmer kmer = 0x13;
-  size_t i = 0;
-  hi.add(kmer, i);
-
-  
-  std::string qStr = "C#9AA6#B;;>@'?";
-  std::cout << qual::encodingToString(qual::parseQuality(qStr)) << std::endl;
-  size_t n = qStr.size();
-  double* probs = new double[n];
-  PhredQuality::fromSangerQualities(qStr,probs);
-  for (size_t i = 0; i < n; ++i) {
-    std::cout << probs[i] << " (" << qStr[i] << ")\n";
-  }
-  delete[] probs;
-}
 
 /**
  * This function create m copies (shifted on the first base by
@@ -72,7 +38,7 @@ void test() {
  * @return A CompressedSequence dynamically allocated and containing
  * the m shifted copies of the n bases long sequence
  */
-CompressedSequence* padAndShiftGenome(const string& sequence, size_t n, size_t m) {
+/*CompressedSequence* padAndShiftGenome(const string& sequence, size_t n, size_t m) {
   CompressedSequence* cs = new CompressedSequence(n*m,4);
   size_t N = (size_t)min(sequence.length(), n);
   size_t k = 0;
@@ -84,6 +50,7 @@ CompressedSequence* padAndShiftGenome(const string& sequence, size_t n, size_t m
   }
   return cs;
 }
+*/
 
 /**
  * This functions returns a CompressedReadSet object initialized 
@@ -95,7 +62,7 @@ CompressedSequence* padAndShiftGenome(const string& sequence, size_t n, size_t m
  *
  * @param otps The structure with parsed command line options
  * @return A CompressedReadSet object upon success NULL otherwise
- */
+ 
 CompressedReadSet* loadReads(const OPTIONS& opts) {
   CompressedReadSet* crs = new CompressedReadSet();
   switch(opts.readsFormat) {
@@ -112,6 +79,10 @@ CompressedReadSet* loadReads(const OPTIONS& opts) {
   }
   return crs;
 }
+
+*/
+
+/*
 
 CompressedSequence* loadGenome(const OPTIONS& opts) {
   CompressedSequence* sequence = new CompressedSequence();
@@ -132,6 +103,8 @@ CompressedSequence* loadGenome(const OPTIONS& opts) {
   }
   return sequence;
 }
+
+*/
 
 int runTask(int argc, char** argv) {
   // parse arguments
@@ -193,14 +166,46 @@ int runTask(int argc, char** argv) {
     return 1;
   }
   std::cout << "[TASK]    " << taskSelectedMsg << std::endl;
-  //std::cout << "Selected task -- " << taskSelectedMsg << " --" << std::endl;
   return 0;
+}
+
+void test() {
+  // Test disclaimer
+  std::cout << "\n********** WARNING ********** \n" <<  
+    "  This is a Test Release \n" << 
+    "***************************** \n" <<  std::endl;
+
+  size_t m = 3;
+  uint8_t* quals = new uint8_t[m];
+  double p_C = 1.0;
+  for (size_t l = 0; l < m; ++l) {
+    //    quals[l] = rand() % 40;
+    quals[l] = 10;
+    std::cout << (int)quals[l] << " ";
+    p_C *= qual::PHRED[quals[l]];
+  }
+  std::cout << "\nPc = " << p_C << std::endl;
+  delete[] quals;
+
+  HybridIndex< NumericKmer, size_t > hi;
+  NumericKmer kmer = 0x13;
+  size_t i = 0;
+  hi.add(kmer, i);
+
+  
+  std::string qStr = "C#9AA6#B;;>@'?";
+  std::cout << qual::encodingToString(qual::parseQuality(qStr)) << std::endl;
+  size_t n = qStr.size();
+  double* probs = new double[n];
+  PhredQuality::fromSangerQualities(qStr,probs);
+  for (size_t i = 0; i < n; ++i) {
+    std::cout << probs[i] << " (" << qStr[i] << ")\n";
+  }
+  delete[] probs;
 }
 
 int main(int argc, char** argv) {
   //runTask(argc, argv);
-  test();
-  
-  
+  test();   
   return 0;
 }

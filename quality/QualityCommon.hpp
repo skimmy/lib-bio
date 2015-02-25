@@ -9,12 +9,25 @@
 
 #include <string>
 
-#define SANGER_ASCII_OFFSET 33
-#define SOLEXA_ASCII_OFFSET 64
-#define ILLUMINA_ASCCI_OFFSET 64
-
 namespace qual
 {
+
+/**
+ * \var double PHRED;
+ * \brief Pre-computed constants for <i>phred</i> qualities.
+ *
+ * This array contains pre-computed values of the PHRED function defined by
+ * <CENTER>
+ *   \f$ PHRED[q] = 10^{-q / 10} \f$
+ * </CENTER>
+ * This arrya is computed for quality values in the closed range [0,300)
+ */
+
+extern const double PHRED[];
+
+const int SANGER_ASCII_OFFSET = 33;
+const int SOLEXA_ASCII_OFFSET = 64;
+const int ILLUMINA_ASCCI_OFFSET = 64;
 
 enum class QualityEncodingType { SANGER, ILLUMINA, SOLEXA, UNKNOWN };
 

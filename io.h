@@ -11,5 +11,6 @@
 #include "io/FastqFormat.h"
 #include "io/CSFastRead.hpp"
 #include "io/CSFastFormat.hpp"
+#include "io/FastqLazyLoader.hpp"
 
 #endif

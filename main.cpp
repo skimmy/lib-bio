@@ -17,7 +17,7 @@
 
 #define DEBUG 1
 
-using namespace std;
+//using namespace std;
 
 // #include <boost/foreach.hpp>
 // #include <boost/unordered_map.hpp>
@@ -175,33 +175,12 @@ void test() {
     "  This is a Test Release \n" << 
     "***************************** \n" <<  std::endl;
 
-  size_t m = 3;
-  uint8_t* quals = new uint8_t[m];
-  double p_C = 1.0;
-  for (size_t l = 0; l < m; ++l) {
-    //    quals[l] = rand() % 40;
-    quals[l] = 10;
-    std::cout << (int)quals[l] << " ";
-    p_C *= qual::PHRED[quals[l]];
+  std::string filePath = "/home/skimmy/filtering/data/test.fastq";
+  FastqLazyLoader lazyLoader(filePath);
+  std::list<FastqRead> readsList = lazyLoader.getNextReads(2);
+  for (FastqRead read : readsList) {
+    std::cout << read << "\n\n";
   }
-  std::cout << "\nPc = " << p_C << std::endl;
-  delete[] quals;
-
-  HybridIndex< NumericKmer, size_t > hi;
-  NumericKmer kmer = 0x13;
-  size_t i = 0;
-  hi.add(kmer, i);
-
-  
-  std::string qStr = "C#9AA6#B;;>@'?";
-  std::cout << qual::encodingToString(qual::parseQuality(qStr)) << std::endl;
-  size_t n = qStr.size();
-  double* probs = new double[n];
-  PhredQuality::fromSangerQualities(qStr,probs);
-  for (size_t i = 0; i < n; ++i) {
-    std::cout << probs[i] << " (" << qStr[i] << ")\n";
-  }
-  delete[] probs;
 }
 
 int main(int argc, char** argv) {

@@ -40,7 +40,7 @@ FastqRead::FastqRead()
 FastqRead::FastqRead(const FastqRead& other) {
   bases = other.bases;
   qualities = other.qualities;
-  header = other.qualities;
+  header = other.header;
 }
 
 /********************* STREAM OPERATORS *********************/

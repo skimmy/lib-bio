@@ -118,7 +118,7 @@ class FastqRead : public Read {
 
   bool hasDecodedQuality() const { return (this->quality != NULL); }
 
-  const Quality* getQuality() { return this->quality; }
+  Quality* getQuality() { return this->quality; }
 
  private:
   Quality* quality;

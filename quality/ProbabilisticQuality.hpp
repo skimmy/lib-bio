@@ -27,6 +27,7 @@ class ProbabilisticQuality : public Quality {
 private:
   double* probVector;
   size_t n;
+  double* iidProb;
 public:
   // ---------------------------------------------------------
   //                CONSTRUCTORS AND DESTRUCTOR
@@ -56,7 +57,7 @@ public:
   // ---------------------------------------------------------
   double* getProbabilities(size_t begin = 0, size_t length = 0) const;
   int* getQualities(size_t begin = 0, size_t length = 0) const;
-  double getOverallProbability() const;
+  double getOverallProbability();
   size_t length() const;
 
   // ---------------------------------------------------------

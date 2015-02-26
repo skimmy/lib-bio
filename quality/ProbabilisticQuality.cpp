@@ -16,8 +16,12 @@ ProbabilisticQuality::ProbabilisticQuality(const ProbabilisticQuality& other) {
 ProbabilisticQuality::~ProbabilisticQuality() {
   if (probVector) {
     delete[] probVector;
+  }  
+  probVector = NULL;
+  if (iidProb != NULL) {
+    delete iidProb;
   }
-  probVector = 0;
+  iidProb = NULL;
 }
 
 /**************** 'QUALITY' OVERRIDE METHODS ****************/
@@ -40,15 +44,16 @@ int* ProbabilisticQuality::getQualities(size_t begin, size_t length) const {
   return out;
 }
 
-double ProbabilisticQuality::getOverallProbability() const {
-  if (this->n <= 0) {
-    return -1.0;
+double ProbabilisticQuality::getOverallProbability() {
+  if (iidProb == NULL) {
+    iidProb = new double;
+    double partial = 1.0 - this->probVector[0];
+    for (size_t i = 1; i < this->n; ++i) {
+      partial *= (1.0 - probVector[i]);
+    }
+    *iidProb = partial;
   }
-  double partial = 1.0 - this->probVector[0];
-  for (size_t i = 1; i < this->n; ++i) {
-    partial *= (1.0 - probVector[i]);
-  }
-  return partial;
+  return (*iidProb);
 }
 
 size_t ProbabilisticQuality::length() const {
@@ -71,7 +76,6 @@ double ProbabilisticQuality::toProbabilistic(int qual) {
 /********************* FACTORY METHODS **********************/
 
 ProbabilisticQuality ProbabilisticQuality::fromEncodedQuality(const string& v, qual::QualityEncodingType enc) {
-  //  std::cout << "@@@@@ " << v << std::endl;
   size_t m = v.size();
   double* p = new double[m];
   switch(enc) {
@@ -85,7 +89,6 @@ ProbabilisticQuality ProbabilisticQuality::fromEncodedQuality(const string& v, q
   case qual::QualityEncodingType::UNKNOWN:
     break;    
   }
-  //  for (int i = 0; i < m ; i++) {std::cout << p[i] << " ";}
   ProbabilisticQuality pq(p,m);
   delete[] p;
   return pq;

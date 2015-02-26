@@ -366,7 +366,7 @@ int* PhredQuality::getQualities(size_t begin, size_t length) const {
   return out;
 }
 
-double PhredQuality::getOverallProbability() const {
+double PhredQuality::getOverallProbability()  {
   if( this->n <= 0) {
     return -1.0;
   }

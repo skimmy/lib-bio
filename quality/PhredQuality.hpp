@@ -80,7 +80,7 @@ PhredQuality(const std::string& quals, size_t n);
   // ---------------------------------------------------------
   double* getProbabilities(size_t begin = 0, size_t length = 0) const;
   int* getQualities(size_t begin = 0, size_t length = 0) const;
-  double getOverallProbability() const;
+  double getOverallProbability();
   size_t length() const;
 
   // ---------------------------------------------------------

@@ -180,8 +180,7 @@ void test() {
   std::list<FastqRead> readsList = lazyLoader.getNextReads(2);
   for (FastqRead read : readsList) {
     read.autoDecodeQualities();
-    const ProbabilisticQuality *pq = (ProbabilisticQuality*)read.getQuality();
-    //    std::cout << pq->length();
+    ProbabilisticQuality *pq = (ProbabilisticQuality*)read.getQuality();    
     double p_C = pq->getOverallProbability();
     std::cout << read << "\n (" << p_C <<  ")\n";
   }

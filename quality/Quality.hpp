@@ -89,7 +89,7 @@ public:
    *
    * \return The overall probability
    */
-  virtual double getOverallProbability() const = 0;
+  virtual double getOverallProbability() = 0;
   /**
    * \brief Returns the length of the internal sequence.
    *

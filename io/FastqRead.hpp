@@ -66,6 +66,8 @@ class FastqRead : public Read {
    */
   FastqRead(const FastqRead& other);
 
+  ~FastqRead();
+
   // ---------------------------------------------------------
   //                 '>>' AND '<<' OPERATORS
   // ---------------------------------------------------------
@@ -115,6 +117,8 @@ class FastqRead : public Read {
   void autoDecodeQualities();
 
   bool hasDecodedQuality() const { return (this->quality != NULL); }
+
+  const Quality* getQuality() { return this->quality; }
 
  private:
   Quality* quality;

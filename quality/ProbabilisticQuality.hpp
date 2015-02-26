@@ -1,7 +1,10 @@
 #ifndef PROBABILISTIC_QUALITY_H
 #define PROBABILISTIC_QUALITY_H
 
-#include "Quality.hpp"
+#include "../quality.h"
+
+#include <string>
+
 
 /**
  * \brief This class represents the quality of a string represented
@@ -85,6 +88,10 @@ public:
    * \sa toProbabilistic(const int* quals, size_t n)
    */
   static double toProbabilistic(int qual);
+
+
+  // Static Factory methods
+  static ProbabilisticQuality fromEncodedQuality(const std::string& v, qual::QualityEncodingType enc);
 
 private:
   // ---------------------------------------------------------

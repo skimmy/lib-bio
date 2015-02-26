@@ -179,7 +179,11 @@ void test() {
   FastqLazyLoader lazyLoader(filePath);
   std::list<FastqRead> readsList = lazyLoader.getNextReads(2);
   for (FastqRead read : readsList) {
-    std::cout << read << "\n\n";
+    read.autoDecodeQualities();
+    const ProbabilisticQuality *pq = (ProbabilisticQuality*)read.getQuality();
+    //    std::cout << pq->length();
+    double p_C = pq->getOverallProbability();
+    std::cout << read << "\n (" << p_C <<  ")\n";
   }
 }
 

@@ -12,6 +12,7 @@ using namespace std;
  */
 class Quality {
 public:
+  virtual ~Quality() {}
   /**
    * \brief Returns a vector containing the error probabilities.
    *

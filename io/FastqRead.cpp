@@ -43,6 +43,13 @@ FastqRead::FastqRead(const FastqRead& other) {
   header = other.header;
 }
 
+FastqRead::~FastqRead() {
+  if (this->quality != NULL) {
+    delete this->quality;
+    this->quality = NULL;
+  }
+}
+
 /********************* STREAM OPERATORS *********************/
 
 std::istream& operator>>(std::istream& is, FastqRead& read) {
@@ -95,9 +102,6 @@ void FastqRead::autoDecodeQualities() {
   }
   // try to 'guess' the encoding used
   qual::QualityEncodingType encoding = qual::parseQuality(this->qualities);
-  if (encoding == qual::QualityEncodingType::SANGER) {
-    
-  }
-  if (encoding == qual::QualityEncodingType::ILLUMINA) {
-  }  
+  this->quality = new ProbabilisticQuality(ProbabilisticQuality::fromEncodedQuality(this->qualities, encoding));
+  
 }

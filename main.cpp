@@ -200,6 +200,9 @@ void test() {
   std::cout << "D2(s,x) =  " << dstats::computeD2(X,f,k) << std::endl;
   delete[] f;
   delete[] X;
+
+  std::cout << "D2(s,x) =  " << dstats::D2(x,s,k) << std::endl;
+  
 }
 
 int main(int argc, char** argv) {

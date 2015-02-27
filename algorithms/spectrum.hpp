@@ -46,6 +46,22 @@
 IntMap spectrumAsIntMap(const Sequence& ref, size_t k);
 
 /**
+   \fn void spectrumAsArray(const Sequence& ref, size_t k, uint64_t* v);
+   \brief Computes the \f$ k\f$ spectrum of the given sequence.
+
+   The function stores the frequency of the i-th k mer in `v[i]`, the index
+   `i` is the _numeric interpretation_ of the corresponding k-mer. The functions
+   assume that array `v` has been properly initialized so that it is safe to
+   access `v[i]` for each `i` in $\f[0, 4^k)\f$.
+
+   \param ref The reference as a Sequence type on which compute the spectrum
+   \param k The size (<i>i.e.</i> number of symbols) of the k-mers
+   \param v The initialized vector of requencies
+
+ **/
+void spectrumAsArray(const Sequence& ref, size_t k, uint64_t* v);
+
+/**
    \fn kmersMapping(const Sequence& ref, size_t k);
    \brief Computes the mapping for all k-mers in a Sequence
 

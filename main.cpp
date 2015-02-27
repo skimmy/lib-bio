@@ -175,7 +175,7 @@ void test() {
     "  This is a Test Release \n" << 
     "***************************** \n" <<  std::endl;
 
-  std::string filePath = "/home/skimmy/filtering/data/test.fastq";
+  /*  std::string filePath = "/home/skimmy/filtering/data/test.fastq";
   FastqLazyLoader lazyLoader(filePath);
   std::list<FastqRead> readsList = lazyLoader.getNextReads(2);
   for (FastqRead read : readsList) {
@@ -183,7 +183,23 @@ void test() {
     ProbabilisticQuality *pq = (ProbabilisticQuality*)read.getQuality();    
     double p_C = pq->getOverallProbability();
     std::cout << read << "\n (" << p_C <<  ")\n";
-  }
+    }*/
+  
+  size_t k = 2;
+  size_t K = 1 << (2 * k);
+  Reference s("AGGGTCGTAGTCAGT");
+  Reference x("AGAGTTTTAGTCCGT");
+  uint64_t* f = new uint64_t[K];
+  uint64_t* X = new uint64_t[K];
+  std::cout << "s = " << s << " " << k << " (" << K << ")" << std::endl;
+  std::cout << "x = " << x << " " << k << " (" << K << ")" << std::endl;
+
+  spectrumAsArray(s,k,f);
+  spectrumAsArray(x,k,X);
+
+  std::cout << "D2(s,x) =  " << dstats::computeD2(X,f,k) << std::endl;
+  delete[] f;
+  delete[] X;
 }
 
 int main(int argc, char** argv) {

@@ -2,6 +2,9 @@
 
 #include "../sequence.h"
 
+namespace seq
+{
+
 // -----------------------------------------------------------------------------
 //                                  CONSTRUCTORS
 // -----------------------------------------------------------------------------
@@ -74,4 +77,6 @@ ostream& operator<< (ostream& os, const NumericKMer& kmer) {
  }	 
  os << out;
  return os;
+}
+
 }

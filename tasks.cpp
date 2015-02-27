@@ -133,7 +133,7 @@ void taskComputeKSpectrum(size_t k, const string& referenceFile) {
   Reference ref = (Reference) fast;
   std::unordered_map< uint64_t, uint64_t > index = spectrumAsIntMap(ref, k);
   for (std::pair< uint64_t, uint64_t > p : index) {
-    std::cout << NumericKMer(p.first, k) << " " << p.second << std::endl;
+    std::cout << seq::NumericKMer(p.first, k) << " " << p.second << std::endl;
   }
 }
 
@@ -170,7 +170,7 @@ void taskMapReadsKmers(const string& reference, const string& reads, size_t k, c
     list< KMer > kmers = r.getKMerList(k);
     kmer_index = 0;
     for (KMer kmer : kmers) {
-      NumericKMer nkmer(kmer);
+      seq::NumericKMer nkmer(kmer);
       std::unordered_map< uint64_t, std::list< size_t > >::const_iterator it = index.find((uint64_t)nkmer);
       outStream << read_index << ":" << kmer_index << " "  << ((it == index.end()) ? (int64_t)(-1) :  (int64_t)it->second.front() ) << std::endl;
       kmer_index++;

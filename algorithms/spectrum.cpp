@@ -23,7 +23,7 @@ std::unordered_map< uint64_t, uint64_t > spectrumAsIntMap(const Sequence& ref, s
     kmer[i] = ref.getBaseAt(i);
   }
   i = k;
-  uint64_t n_kmer = NumericKMer::fromChars(kmer, k);
+  uint64_t n_kmer = seq::NumericKMer::fromChars(kmer, k);
   do {
     index[n_kmer]++;
     n_kmer = shiftAndPaddWithCharKmer(n_kmer, ref.getBaseAt(i), k);
@@ -31,6 +31,28 @@ std::unordered_map< uint64_t, uint64_t > spectrumAsIntMap(const Sequence& ref, s
   } while(i <= N);
   delete[] kmer;
   return index;
+}
+
+void spectrumAsArray(const Sequence& ref, size_t k, uint64_t* v) {
+  // initialize the vector v
+  size_t K = 1 << (2 * k);
+  memset(v, 0, K * sizeof(uint64_t));
+  char* kmer = new char[k];
+  // scan the sequence
+  size_t N = ref.getSequenceLength();
+  size_t i = 0;
+  // get the first k-mer
+  for (; i < k; ++i) {
+    kmer[i] = ref.getBaseAt(i);
+  }
+  i = k;
+  uint64_t n_kmer = seq::NumericKMer::fromChars(kmer, k);
+  do {
+    v[n_kmer]++;
+    n_kmer = shiftAndPaddWithCharKmer(n_kmer, ref.getBaseAt(i), k);
+    ++i;
+  } while(i <= N);
+  delete[] kmer;
 }
 
 
@@ -45,7 +67,7 @@ std::unordered_map< uint64_t, std::list< size_t > > kmersMapping(const Sequence&
     kmer[i] = ref.getBaseAt(i);
   }
   i = k;
-  uint64_t n_kmer = NumericKMer::fromChars(kmer, k);
+  uint64_t n_kmer = seq::NumericKMer::fromChars(kmer, k);
   do {
     index[n_kmer].push_back(i);
     n_kmer = shiftAndPaddWithCharKmer(n_kmer, ref.getBaseAt(i), k);
@@ -65,7 +87,7 @@ KmersMap extractKmersMapPosition(const Sequence& seq, NumericKmerIndex index, si
   for (; i < k; ++i) {
     kmer[i] = seq.getBaseAt(i);
   }
-  uint64_t n_kmer = NumericKMer::fromChars(kmer, k);
+  uint64_t n_kmer = seq::NumericKMer::fromChars(kmer, k);
   for (size_t j = 0; j < barm; ++j) {    
     NumericKmerIndex::const_iterator it = index.find(n_kmer);
     map[j] = (it == index.end()) ? NoPos : (it->second).front();    

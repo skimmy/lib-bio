@@ -1,8 +1,11 @@
+
 #ifndef NUMERIC_KMER_H
 #define NUMERIC_KMER_H
 
 #include "Sequence.h"
 
+namespace seq
+{
 
 // At the moment I don't feel this should extend the Sequence type, however to
 // be on the safe side I will use same methods name as Sequence class
@@ -35,4 +38,5 @@ public:
   static uint64_t fromChars(const char* chars, size_t k);
 };
 
+}
 #endif

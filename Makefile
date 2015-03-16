@@ -54,9 +54,9 @@ QUAL_SRC=quality/ProbabilisticQuality.cpp quality/PhredQuality.cpp quality/FullQ
 QUAL_HDR=quality.h quality/Quality.hpp quality/ProbabilisticQuality.hpp quality/PhredQuality.hpp quality/FullQuality.hpp quality/QualityCommon.hpp 
 QUAL_OBJ=quality/ProbabilisticQuality.o quality/PhredQuality.o quality/FullQuality.o quality/QualityCommon.o 
 
-GEN_SRC=generator/ReadGenerator.cpp
-GEN_HDR=generator/ReadGenerator.hpp
-GEN_OBJ=generator/ReadGenerator.o
+GEN_SRC=generator/ReadGenerator.cpp generator/GenomeGenerator.cpp
+GEN_HDR=generator/ReadGenerator.hpp generator/GenomeGenerator.hpp
+GEN_OBJ=generator/ReadGenerator.o generator/GenomeGenerator.o
 
 MISC_SRC=tasks.cpp
 MISC_OBJ=tasks.o

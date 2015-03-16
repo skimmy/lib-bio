@@ -6,6 +6,7 @@
 #include "adt.h"
 #include "tasks.hpp"
 #include "algorithms.h"
+#include "generator.h"
 
 #include <vector>
 #include <iostream>
@@ -183,7 +184,7 @@ void test() {
     ProbabilisticQuality *pq = (ProbabilisticQuality*)read.getQuality();    
     double p_C = pq->getOverallProbability();
     std::cout << read << "\n (" << p_C <<  ")\n";
-    }*/
+    }
   
   size_t k = 2;
   size_t K = 1 << (2 * k);
@@ -201,8 +202,24 @@ void test() {
   delete[] f;
   delete[] X;
 
-  std::cout << "D2(s,x) =  " << dstats::D2(x,s,k) << std::endl;
-  
+  std::cout << "D2(s,x) =  " << dstats::D2(x,s,k) << std::endl; */
+
+  size_t N = 100;
+  std::unique_ptr<char[]> pSeq = libbio::generator::generateIidSequence(N);
+  std::unique_ptr<char[]> pSeqGCRich = libbio::generator::generateGCRichSequence(N);
+  std::unique_ptr<char[]> pSeqGCPoor = libbio::generator::generateGCPoorSequence(N);
+  for (size_t i = 0; i < N; ++i) {
+    std::cout << pSeq[i];
+  }
+  std::cout << std::endl;
+  for (size_t i = 0; i < N; ++i) {
+    std::cout << pSeqGCRich[i];
+  }
+  std::cout << std::endl;
+  for (size_t i = 0; i < N; ++i) {
+    std::cout << pSeqGCPoor[i];
+  }
+  std::cout << std::endl;
 }
 
 int main(int argc, char** argv) {

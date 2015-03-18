@@ -18,7 +18,7 @@ Reference::Reference(const Reference& other) {
   init(other.length);
   memcpy(this->sequence, other.sequence, this->length);
 }
-`
+
 Reference::Reference(const string& sequence) {
   init(sequence.length());
   memcpy(this->sequence, sequence.c_str(), this->length);

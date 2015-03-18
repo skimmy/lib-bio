@@ -1,12 +1,15 @@
-#include "Reference.hpp"
+#include <memory>
 
+#include "Reference.hpp"
 #include "ColorAlphabet.hpp"
 
 
+// -------------------------- STATIC FACTORY METHODS -------------------------
+unique_ptr<Reference> Reference::createFromString(const string& s) {
+  return unique_ptr<Reference>(new Reference(s));
+}
 
-// ---------------------------------------------------------
-//                 CONSTRUCTORS AND DESTRUCTOR
-// ---------------------------------------------------------
+// ------------------------- CONSTRUCTORS AND DESTRUCTOR -----------------------
 Reference::Reference() {
   init(0);
 }
@@ -15,7 +18,7 @@ Reference::Reference(const Reference& other) {
   init(other.length);
   memcpy(this->sequence, other.sequence, this->length);
 }
-
+`
 Reference::Reference(const string& sequence) {
   init(sequence.length());
   memcpy(this->sequence, sequence.c_str(), this->length);
@@ -32,9 +35,7 @@ Reference::~Reference() {
   }
 }
 
-// ---------------------------------------------------------
-//                    GET AND SET METHODS
-// ---------------------------------------------------------
+// ---------------------------- GET AND SET METHODS ----------------------------
 list<KMer> Reference::getKMerList(size_t k) {
   list<KMer> kmers;
   size_t m = this->length - k + 1;

@@ -4,6 +4,7 @@
 #include "Sequence.h"
 #include "KMer.hpp"
 
+#include <memory>
 #include <cstring>
 #include <list>
 
@@ -22,13 +23,14 @@
  * \sa Sequence
  */
 class Reference : public Sequence {
-private:
-  char* sequence;
-  size_t length;
+
 public:
-  // ---------------------------------------------------------
-  //                 CONSTRUCTORS AND DESTRUCTOR
-  // ---------------------------------------------------------
+
+  // -------------------------- STATIC FACTORY METHODS -------------------------
+
+  static unique_ptr<Reference> createFromString(const string& s);
+
+  // ----------------------- CONSTRUCTORS AND DESTRUCTOR  ----------------------
   /**
    * \brief Creates an empty Reference object
    *
@@ -81,9 +83,7 @@ public:
   Reference(const Reference& other);
   ~Reference();
 
-  // ---------------------------------------------------------
-  //                    GET AND SET METHODS
-  // ---------------------------------------------------------
+  // ---------------------------- GET AND SET METHODS ----------------------------
   /**
    * \brief Returns the list of all k-mers of the stored seuqence.
    *
@@ -163,10 +163,12 @@ public:
   friend ostream& operator<< (ostream& os, const Reference& ref);
 
 private:
-  // ---------------------------------------------------------
-  //                      UTILITY METHODS
-  // ---------------------------------------------------------
+  // -------------------- UTILITY METHODS --------------------
   void init(size_t n);  
+
+
+  char* sequence;
+  size_t length;
 };
 
 #endif

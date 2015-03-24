@@ -36,6 +36,10 @@ SEQ_SRC=sequence/CompressedSequence.cpp sequence/DNACompressedSymbol.cpp sequenc
 SEQ_HDR=sequence.h sequence/CompressedSequence.h sequence/DNACompressedSymbol.h sequence/Read.hpp sequence/Sequence.h sequence/CompressedReadSet.h sequence/KMer.hpp sequence/QualifiedSequence.hpp sequence/FullyQualifiedSequence.hpp sequence/Reference.hpp sequence/DNAAlphabet2Bits.hpp sequence/NumericKMer.hpp
 SEQ_OBJ=sequence/CompressedSequence.o sequence/DNACompressedSymbol.o sequence/Read.o sequence/CompressedReadSet.o sequence/KMer.o sequence/QualifiedSequence.o sequence/FullyQualifiedSequence.o sequence/Reference.o sequence/DNAAlphabet2Bits.o sequence/NumericKMer.o
 
+FILTER_SRC=
+FILTER_HDR=filtering/FilterBase.hpp
+FILTER_OBJ=
+
 IO_SRC=io/Format.cpp io/FastFormat.cpp io/FastqRead.cpp io/FastqFormat.cpp io/CSFastRead.cpp io/CSFastFormat.cpp io/FastqLazyLoader.cpp
 IO_HDR=io.h io/Format.h io/FastFormat.h io/FastqRead.hpp io/FastqFormat.h io/CSFastRead.hpp io/CSFastFormat.hpp io/FastqLazyLoader.hpp
 IO_OBJ=io/Format.o io/FastFormat.cpp io/FastqRead.o io/FastqFormat.o io/CSFastRead.o io/CSFastFormat.o io/FastqLazyLoader.o
@@ -63,8 +67,8 @@ MISC_OBJ=tasks.o
 MISC_HDR=tasks.hpp
 
 ALL_SRC=main.cpp
-ALL_OBJ=$(ALIGNMENT_OBJ) $(SEQ_OBJ) $(IO_OBJ) $(UTIL_OBJ) $(QUAL_OBJ) $(ALPHA_OBJ) $(GEN_OBJ) $(MISC_OBJ) $(ALGS_OBJ)
-ALL_HDR=$(SEQ_HDR) $(IO_HDR) $(ADT_HDR) $(UTIL_HDR) $(ALIGNMENT_HDR) $(QUAL_HDR) $(ALPHA_HDR) $(GEN_HDR) $(MISC_HDR) $(ALGS_HDR) $(QUAL_HDR)
+ALL_OBJ=$(ALIGNMENT_OBJ) $(SEQ_OBJ) $(IO_OBJ) $(UTIL_OBJ) $(QUAL_OBJ) $(ALPHA_OBJ) $(GEN_OBJ) $(MISC_OBJ) $(ALGS_OBJ) $(FILTER_OBJ)
+ALL_HDR=$(SEQ_HDR) $(IO_HDR) $(ADT_HDR) $(UTIL_HDR) $(ALIGNMENT_HDR) $(QUAL_HDR) $(ALPHA_HDR) $(GEN_HDR) $(MISC_HDR) $(ALGS_HDR) $(QUAL_HDR) $(FILTER_HDR)
 
 DYN_LIBS=-pthread
 

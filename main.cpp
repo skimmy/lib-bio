@@ -7,6 +7,7 @@
 #include "tasks.hpp"
 #include "algorithms.h"
 #include "generator.h"
+#include "filtering.h"
 
 #include <vector>
 #include <iostream>

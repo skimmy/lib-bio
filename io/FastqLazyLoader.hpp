@@ -10,7 +10,7 @@ class FastqLazyLoader {
 private:
   std::ifstream input;
 public:
-  FastqLazyLoader(const string& filePath); 
+  explicit FastqLazyLoader(const string& filePath); 
   ~FastqLazyLoader();
   std::list<FastqRead> getNextReads(const size_t M);
 };

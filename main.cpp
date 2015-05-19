@@ -204,7 +204,7 @@ void test() {
   delete[] X;
 
   std::cout << "D2(s,x) =  " << dstats::D2(x,s,k) << std::endl; */
-
+  /*
   size_t N = 100;
   std::unique_ptr<char[]> pSeq = libbio::generator::generateIidSequence(N);
   std::unique_ptr<char[]> pSeqGCRich = libbio::generator::generateGCRichSequence(N);
@@ -220,7 +220,19 @@ void test() {
   for (size_t i = 0; i < N; ++i) {
     std::cout << pSeqGCPoor[i];
   }
+  std::cout << std::endl; */
+  size_t N = 4;
+  std::vector<dft::tComp> x(N);
+  x[0] = dft::tComp(0,1.0);
+  x[1] = dft::tComp(0.5,0);
+  x[2] = dft::tComp(-0.25,0);
+  x[3] = dft::tComp(0,0.5);
+  std::vector<dft::tComp> v = dft::getUnityRoots(N);
+  for (dft::tComp c : v) {
+    std::cout << c << " ";
+  }
   std::cout << std::endl;
+  std::cout << dft::dftComponent(x,1,N) << std::endl;
 }
 
 int main(int argc, char** argv) {

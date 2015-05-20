@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <unordered_map>
 
@@ -221,18 +222,16 @@ void test() {
     std::cout << pSeqGCPoor[i];
   }
   std::cout << std::endl; */
-  size_t N = 4;
-  std::vector<dft::tComp> x(N);
-  x[0] = dft::tComp(0,1.0);
-  x[1] = dft::tComp(0.5,0);
-  x[2] = dft::tComp(-0.25,0);
-  x[3] = dft::tComp(0,0.5);
-  std::vector<dft::tComp> v = dft::getUnityRoots(N);
-  for (dft::tComp c : v) {
-    std::cout << c << " ";
+  size_t k = 13;
+  FastFormat fast("/home/skimmy/biodft/data/seq_iid.fasta");
+  Reference s = fast.toReference();
+  std::list<KMer> kmers = s.getKMerList(k);
+  for (std::list<KMer>::iterator it = kmers.begin(); it != kmers.end(); it++) {
+    double mod = std::abs(dft::dftComponent(dft::basesToComplexVector(*it), 1, k ));
+    std::cout << std::setprecision(14) << mod << std::endl;
   }
-  std::cout << std::endl;
-  std::cout << dft::dftComponent(x,1,N) << std::endl;
+  cout << std::endl;  
+  
 }
 
 int main(int argc, char** argv) {

@@ -3,6 +3,7 @@
 #include "algorithms/dstats.hpp"
 #include "algorithms/types.hpp"
 #include "algorithms/dft.hpp"
+#include "algorithms/hamming.hpp"
 
 
 

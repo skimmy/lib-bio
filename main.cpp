@@ -14,6 +14,7 @@
 #include <iomanip>
 #include <fstream>
 #include <unordered_map>
+#include <queue>
 
 #include <cstdlib>
 #include <cmath>
@@ -178,59 +179,61 @@ void test() {
     "  This is a Test Release \n" << 
     "***************************** \n" <<  std::endl;
 
-  /*  std::string filePath = "/home/skimmy/filtering/data/test.fastq";
-  FastqLazyLoader lazyLoader(filePath);
-  std::list<FastqRead> readsList = lazyLoader.getNextReads(2);
-  for (FastqRead read : readsList) {
-    read.autoDecodeQualities();
-    ProbabilisticQuality *pq = (ProbabilisticQuality*)read.getQuality();    
-    double p_C = pq->getOverallProbability();
-    std::cout << read << "\n (" << p_C <<  ")\n";
-    }
-  
-  size_t k = 2;
-  size_t K = 1 << (2 * k);
-  Reference s("AGGGTCGTAGTCAGT");
-  Reference x("AGAGTTTTAGTCCGT");
-  uint64_t* f = new uint64_t[K];
-  uint64_t* X = new uint64_t[K];
-  std::cout << "s = " << s << " " << k << " (" << K << ")" << std::endl;
-  std::cout << "x = " << x << " " << k << " (" << K << ")" << std::endl;
-
-  spectrumAsArray(s,k,f);
-  spectrumAsArray(x,k,X);
-
-  std::cout << "D2(s,x) =  " << dstats::computeD2(X,f,k) << std::endl;
-  delete[] f;
-  delete[] X;
-
-  std::cout << "D2(s,x) =  " << dstats::D2(x,s,k) << std::endl; */
-  /*
-  size_t N = 100;
-  std::unique_ptr<char[]> pSeq = libbio::generator::generateIidSequence(N);
-  std::unique_ptr<char[]> pSeqGCRich = libbio::generator::generateGCRichSequence(N);
-  std::unique_ptr<char[]> pSeqGCPoor = libbio::generator::generateGCPoorSequence(N);
-  for (size_t i = 0; i < N; ++i) {
-    std::cout << pSeq[i];
-  }
-  std::cout << std::endl;
-  for (size_t i = 0; i < N; ++i) {
-    std::cout << pSeqGCRich[i];
-  }
-  std::cout << std::endl;
-  for (size_t i = 0; i < N; ++i) {
-    std::cout << pSeqGCPoor[i];
-  }
-  std::cout << std::endl; */
   size_t k = 13;
   FastFormat fast("/home/skimmy/biodft/data/seq_iid.fasta");
   Reference s = fast.toReference();
+  //  Reference s("AACGACCGATA");
   std::list<KMer> kmers = s.getKMerList(k);
+
+
+  //  std::vector< std::pair< double, size_t > > dftVsHamm(kmers.size() * (kmers.size()+1) - 1);  
+  std::priority_queue< std::pair< double, size_t > > dftVsHamming;
+  std::vector< double > dftMods(kmers.size());
+  
+  size_t i = 0, j = 0;
+  double epsilon = 0.5;
+
+  // pre-compute all the modules for dft components
   for (std::list<KMer>::iterator it = kmers.begin(); it != kmers.end(); it++) {
-    double mod = std::abs(dft::dftComponent(dft::basesToComplexVector(*it), 1, k ));
-    std::cout << std::setprecision(14) << mod << std::endl;
+    double mod = std::abs(dft::dftComponent(dft::basesToComplexVector(*it), 1, k ));    
+    dftMods[i++] = mod;
+    //  std::cout << std::setprecision(14) << mod << " (" << *it << ")"  << std::endl;
   }
-  cout << std::endl;  
+
+
+  // all VS all N^2 scan
+  i = j = 0;
+  size_t MAX_Q = 1 << 22;
+  for (std::list<KMer>::iterator it = kmers.begin(); std::next(it) != kmers.end(); it++) {    
+    j = i+1;
+    for (std::list<KMer>::iterator it2 = std::next(it); it2 != kmers.end(); it2++) {
+      
+      double d_dft = std::abs(dftMods[i] - dftMods[j]);
+      size_t d_h = bio::hammingDistance(*it, *it2);
+      if (d_dft < epsilon) {
+	dftVsHamming.push(std::pair< double, size_t >(d_dft, d_h));
+      //   dftVsHamm[l].first = d_dft;
+      //dftVsHamm[l].second = d_h;
+      /*std::cout << std::setprecision(14) << "(" << d_dft << ", " << d_h << ")\t\t" 
+	<< (*it) << " - " << (*it2) << std::endl;*/
+      }
+      if (dftVsHamming.size() >= MAX_Q) break;
+      j++;
+    }
+    if (dftVsHamming.size() >= MAX_Q) break;
+    i++;
+  }
+
+  while(!dftVsHamming.empty()) {
+    std::pair< double, size_t > p = dftVsHamming.top();
+    dftVsHamming.pop();
+    std::cout << p.first << " " << p.second << std::endl;
+  }
+
+  // std::sort(dftVsHamm.begin(), dftVsHamm.end());
+  // for (i = 0; i < dftVsHamm.size(); ++i) {
+  //   std::cout << "(" << dftVsHamm[i].first << ", " << dftVsHamm[i].second << ")" << std::endl;
+  // }
   
 }
 

@@ -192,6 +192,7 @@ void test() {
   
   size_t i = 0, j = 0;
   double epsilon = 0.5;
+  std::vector< uint64_t > hammDist(k);
 
   // pre-compute all the modules for dft components
   for (std::list<KMer>::iterator it = kmers.begin(); it != kmers.end(); it++) {
@@ -203,7 +204,7 @@ void test() {
 
   // all VS all N^2 scan
   i = j = 0;
-  size_t MAX_Q = 1 << 22;
+  //  size_t MAX_Q = 1 << 22;
   for (std::list<KMer>::iterator it = kmers.begin(); std::next(it) != kmers.end(); it++) {    
     j = i+1;
     for (std::list<KMer>::iterator it2 = std::next(it); it2 != kmers.end(); it2++) {
@@ -211,24 +212,32 @@ void test() {
       double d_dft = std::abs(dftMods[i] - dftMods[j]);
       size_t d_h = bio::hammingDistance(*it, *it2);
       if (d_dft < epsilon) {
-	dftVsHamming.push(std::pair< double, size_t >(d_dft, d_h));
+	//	std::cout << std::setprecision(14) << d_dft << " " << d_h << std::endl;     
+	hammDist[d_h]++;
+	//	dftVsHamming.push(std::pair< double, size_t >(d_dft, d_h));
+      }
+      /*
       //   dftVsHamm[l].first = d_dft;
       //dftVsHamm[l].second = d_h;
-      /*std::cout << std::setprecision(14) << "(" << d_dft << ", " << d_h << ")\t\t" 
+      std::cout << std::setprecision(14) << "(" << d_dft << ", " << d_h << ")\t\t" 
 	<< (*it) << " - " << (*it2) << std::endl;*/
-      }
-      if (dftVsHamming.size() >= MAX_Q) break;
+      
+      //      if (dftVsHamming.size() >= MAX_Q) break;
       j++;
     }
-    if (dftVsHamming.size() >= MAX_Q) break;
+    //if (dftVsHamming.size() >= MAX_Q) break;
     i++;
   }
 
-  while(!dftVsHamming.empty()) {
+  for (i = 0; i < k; ++i) {
+    std::cout << i << " " << hammDist[i] << std::endl;
+  }
+
+  /*  while(!dftVsHamming.empty()) {
     std::pair< double, size_t > p = dftVsHamming.top();
     dftVsHamming.pop();
     std::cout << p.first << " " << p.second << std::endl;
-  }
+    }*/
 
   // std::sort(dftVsHamm.begin(), dftVsHamm.end());
   // for (i = 0; i < dftVsHamm.size(); ++i) {

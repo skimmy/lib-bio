@@ -131,3 +131,9 @@ Makefile.in
 /install-sh
 /missing
 /stamp-h1
+/stamp-h1
+.deps/
+# uncomment when porting to autotools is finished
+# Makefile
+config.h.in
+config.status

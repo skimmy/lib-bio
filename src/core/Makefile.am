@@ -1,6 +1,8 @@
 noinst_LIBRARIES = libbiocore.a
-libbiocore_a_SOURCES = Read.cpp
+libbiocore_a_SOURCES = Read.cpp KMer.cpp
 
 bin_PROGRAMS = coretest
 coretest_SOURCES = coretest.cpp
 coretest_LDADD = libbiocore.a
+
+AM_CXXFLAGS = -std=c++11

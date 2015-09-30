@@ -106,7 +106,7 @@ am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 libbiocore_a_AR = $(AR) $(ARFLAGS)
 libbiocore_a_LIBADD =
-am_libbiocore_a_OBJECTS = Read.$(OBJEXT)
+am_libbiocore_a_OBJECTS = Read.$(OBJEXT) KMer.$(OBJEXT)
 libbiocore_a_OBJECTS = $(am_libbiocore_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
@@ -177,7 +177,7 @@ AR = ar
 AUTOCONF = ${SHELL} /home/skimmy/src/lib-bio/missing autoconf
 AUTOHEADER = ${SHELL} /home/skimmy/src/lib-bio/missing autoheader
 AUTOMAKE = ${SHELL} /home/skimmy/src/lib-bio/missing automake-1.15
-AWK = gawk
+AWK = mawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
@@ -263,9 +263,10 @@ top_build_prefix = ../../
 top_builddir = ../..
 top_srcdir = ../..
 noinst_LIBRARIES = libbiocore.a
-libbiocore_a_SOURCES = Read.cpp
+libbiocore_a_SOURCES = Read.cpp KMer.cpp
 coretest_SOURCES = coretest.cpp
 coretest_LDADD = libbiocore.a
+AM_CXXFLAGS = -std=c++11
 all: all-am
 
 .SUFFIXES:
@@ -360,6 +361,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+include ./$(DEPDIR)/KMer.Po
 include ./$(DEPDIR)/Read.Po
 include ./$(DEPDIR)/coretest.Po
 

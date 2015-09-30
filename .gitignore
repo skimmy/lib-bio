@@ -137,3 +137,4 @@ Makefile.in
 # Makefile
 config.h.in
 config.status
+ar-lib

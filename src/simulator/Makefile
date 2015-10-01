@@ -252,6 +252,7 @@ top_build_prefix = ../../
 top_builddir = ../..
 top_srcdir = ../..
 simulator_out_SOURCES = simulator.cpp
+AM_CXXFLAGS = -std=c++11
 all: all-am
 
 .SUFFIXES:

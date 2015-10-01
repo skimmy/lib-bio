@@ -9,8 +9,10 @@
 
 #include <iostream>
 
-char* ref = NULL;
-char* read = NULL;
+#include "../core/Read.hpp"
+
+
+
 char bases[] = {'A', 'C', 'G', 'T'};
 
 void printString(char* s, size_t n) {
@@ -32,7 +34,8 @@ void simulateReadAt(size_t j, size_t m, char* S, char* r) {
 }
 
 int main(int argc, char** argv) {
-
+  char* ref = NULL;
+  char* read = NULL;
   srand(time(NULL));
   
   size_t N = 1000000; // size of the reference
@@ -57,5 +60,7 @@ int main(int argc, char** argv) {
   delete[] read;
   delete[] ref;
   std::cout << "[OK]" << std::endl;
+
+  Read rr;
   return 0;
 }

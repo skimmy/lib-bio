@@ -2,7 +2,7 @@
 #define QUALIFIED_READ_H
 
 #include "Sequence.h"
-#include "../quality/Quality.hpp"
+#include "Quality.hpp"
 
 /**
  * \brief This class represents a sequence with quality 

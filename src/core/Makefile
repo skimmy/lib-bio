@@ -106,7 +106,13 @@ am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 libbiocore_a_AR = $(AR) $(ARFLAGS)
 libbiocore_a_LIBADD =
-am_libbiocore_a_OBJECTS = Read.$(OBJEXT) KMer.$(OBJEXT)
+am_libbiocore_a_OBJECTS = Read.$(OBJEXT) KMer.$(OBJEXT) \
+	Reference.$(OBJEXT) CompressedSequence.$(OBJEXT) \
+	NumericKMer.$(OBJEXT) CompressedReadSet.$(OBJEXT) \
+	ColorAlphabet.$(OBJEXT) DNAAlphabet.$(OBJEXT) \
+	DNACompressedSymbol.$(OBJEXT) QualityCommon.$(OBJEXT) \
+	PhredQuality.$(OBJEXT) FullQuality.$(OBJEXT) \
+	ProbabilisticQuality.$(OBJEXT)
 libbiocore_a_OBJECTS = $(am_libbiocore_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
@@ -177,7 +183,7 @@ AR = ar
 AUTOCONF = ${SHELL} /home/skimmy/src/lib-bio/missing autoconf
 AUTOHEADER = ${SHELL} /home/skimmy/src/lib-bio/missing autoheader
 AUTOMAKE = ${SHELL} /home/skimmy/src/lib-bio/missing automake-1.15
-AWK = mawk
+AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
@@ -263,7 +269,11 @@ top_build_prefix = ../../
 top_builddir = ../..
 top_srcdir = ../..
 noinst_LIBRARIES = libbiocore.a
-libbiocore_a_SOURCES = Read.cpp KMer.cpp
+libbiocore_a_SOURCES = Read.cpp KMer.cpp Reference.cpp CompressedSequence.cpp \
+	NumericKMer.cpp CompressedReadSet.cpp \
+	ColorAlphabet.cpp DNAAlphabet.cpp DNACompressedSymbol.cpp \
+	QualityCommon.cpp PhredQuality.cpp FullQuality.cpp ProbabilisticQuality.cpp
+
 coretest_out_SOURCES = coretest.cpp
 coretest_out_LDADD = libbiocore.a
 AM_CXXFLAGS = -std=c++11
@@ -361,8 +371,19 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+include ./$(DEPDIR)/ColorAlphabet.Po
+include ./$(DEPDIR)/CompressedReadSet.Po
+include ./$(DEPDIR)/CompressedSequence.Po
+include ./$(DEPDIR)/DNAAlphabet.Po
+include ./$(DEPDIR)/DNACompressedSymbol.Po
+include ./$(DEPDIR)/FullQuality.Po
 include ./$(DEPDIR)/KMer.Po
+include ./$(DEPDIR)/NumericKMer.Po
+include ./$(DEPDIR)/PhredQuality.Po
+include ./$(DEPDIR)/ProbabilisticQuality.Po
+include ./$(DEPDIR)/QualityCommon.Po
 include ./$(DEPDIR)/Read.Po
+include ./$(DEPDIR)/Reference.Po
 include ./$(DEPDIR)/coretest.Po
 
 .cpp.o:

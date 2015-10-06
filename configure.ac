@@ -7,6 +7,7 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([
   Makefile
   src/core/Makefile
+  src/io/Makefile
   src/simulator/Makefile
 ])
 AC_OUTPUT 

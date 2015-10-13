@@ -1,1 +1,1 @@
-SUBDIRS = src/core src/simulator src/io
+SUBDIRS = src/core src/simulator src/io src/algorithms

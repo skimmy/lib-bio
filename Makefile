@@ -291,7 +291,7 @@ target_alias =
 top_build_prefix = 
 top_builddir = .
 top_srcdir = .
-SUBDIRS = src/core src/simulator src/io
+SUBDIRS = src/core src/simulator src/io src/algorithms
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

@@ -8,6 +8,7 @@ AC_CONFIG_FILES([
   Makefile
   src/core/Makefile
   src/io/Makefile
+  src/algorithms/Makefile
   src/simulator/Makefile
 ])
 AC_OUTPUT 

@@ -4,15 +4,13 @@
  * of a library rather then efficient stand alon tools.
  */
 
+#include "common.h"
+
 #include <cstdlib>
 #include <ctime>
 
 #include <iostream>
 #include <list>
-
-
-char bases[] = {'A', 'C', 'G', 'T'};
-char revBases[128];
 
 void initSimulator() {
   revBases['A'] = revBases['a'] = 0;
@@ -22,22 +20,13 @@ void initSimulator() {
   srand(time(NULL));
 }
 
-char randomMutation(char c) {
-  // int C = revBases[c]; std::cout << C << " ";
-  // int r = ((rand() % 3) + 1); std::cout << r << " ";
-  
+char randomMutation(char c) { 
   return bases[(revBases[c] + ((rand() % 3) + 1) ) & 0x3];
 }
 
 void printString(char* s, size_t n) {
   for (int i = 0; i < n; ++i) {
     std::cout << s[i];
-  }
-}
-
-void generateIIDGenome(size_t N, char* S) {
-  for (size_t i = 0; i < N; ++i) {
-    S[i] = bases[rand() & 0x3];
   }
 }
 
@@ -73,47 +62,49 @@ size_t hammingDistance(const std::string& s1, const std::string& s2, size_t m) {
 
 
 int main(int argc, char** argv) {
+  std::cout << std::endl;
+  
   char* ref = NULL;
   char* read = NULL;
+  parseArguments(argc,argv);
   initSimulator();
 
   
-  size_t N = 1000000; // size of the reference
-  size_t m = 50; // length of reads
-  size_t M = 10;
+  size_t N = Options::opts.N;
+  size_t m = Options::opts.m;
+  size_t M = Options::opts.M;
   size_t Nbar = N - m + 1;
 
   double pe = 0.1;
   
-  std::cout << "Reference size: " << N << std::endl;
+
   std::cout << std::endl;
-  std::cout << "\t\t+++++  Starting simulation +++++ " << std::endl;
+  std::cout << "\t\t+++++  Starting simulation +++++ \n\n";
   
   std::cout << "* Reference generation... ";
   ref = new char[N];
   generateIIDGenome(N,ref);
   std::cout << "[OK]" << std::endl;
 
-  std::cout << "* Read generation...";
+  std::cout << "* Read generation... ";
   std::list<std::string> reads;
   read = new char[m];
   for (size_t h = 0; h < M; ++h) {
     std::string r(ref + (rand() % Nbar),m);
     std::string rr = r;
-    std::cout << r << std::endl;
     simpleIIDErrors(r,pe);
-    std::cout << r << std::endl << hammingDistance(r,rr,m) << std::endl  << std::endl;
     reads.push_front(r);
   }
   std::cout << "[OK]" << std::endl;
   
   
-  std::cout << "* Cleaning...";
+  std::cout << "* Cleaning... ";
 
 
   delete[] read;
   delete[] ref;
   std::cout << "[OK]" << std::endl;
 
+  std::cout << std::endl;
   return 0;
 }

@@ -26,18 +26,20 @@ void simulateReadAt(size_t j, size_t m, const char* S, char* r) {
   }
 }
 
-void generateOfflineReads(const std::string& s, std::list<std::string>& reads) {
+void generateOfflineReads(const std::string& s, std::priority_queue<Read>& reads) {
   size_t N = s.length();
   const char* pS = s.c_str();
   size_t m = Options::opts.m;
   size_t M = Options::opts.M;
-  size_t barN = N - m + 1;  
+  size_t barN = N - m + 1;
   char* r = new char[m + 1]; // +1 accomodates null terminating symbol
   for (size_t i = 0; i < M; ++i) {
     size_t j = rand() % barN;
     simulateReadAt(j,m,pS,r);
     r[m] = 0;
-    reads.push_back(std::string(r));
+    Read read(std::string(r),j);
+    simpleIIDErrors(read.r, Options::opts.pe);
+    reads.push(read);
   }
   delete[] r;
 }

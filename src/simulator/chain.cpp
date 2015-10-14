@@ -32,3 +32,9 @@ void printChainMatrix() {
     std::cout << '\n';
   }
 }
+
+void evaluateChainRelation(const Read& r1, const Read& r2, size_t s) {
+  if (s < Options::opts.m) {
+    M[s][0]++;
+  }
+}

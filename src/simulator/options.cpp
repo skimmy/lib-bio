@@ -14,15 +14,20 @@ void printArguments() {
   std::cout << "Reference length (N)         " << Options::opts.N << std::endl;
   std::cout << "Reads length (m)             " << Options::opts.m << std::endl;
   std::cout << "Reads count (M)              " << Options::opts.M << std::endl;
+  std::cout << "Base error probability (pe)  " << Options::opts.pe << std::endl;
 }
 
 void parseArguments(int argc, char** argv) {
+
+  // default options
   Options::opts.N = 1000000; // size of the reference;
   Options::opts.m = 50;
   Options::opts.M = 10;
+  Options::opts.pe = 0.01;
   Options::opts.verbose = false;
+  
   char c;
-  while ((c = getopt(argc, argv, "N:m:M:hv")) != -1) {
+  while ((c = getopt(argc, argv, "N:m:M:e:hv")) != -1) {
     switch(c) {
     case 'N':
       Options::opts.N = atoi(optarg);
@@ -32,6 +37,9 @@ void parseArguments(int argc, char** argv) {
       break;
     case 'm':
       Options::opts.m = atoi(optarg);
+      break;
+    case 'e':
+      Options::opts.pe = atof(optarg);
       break;
     case 'v':
       Options::opts.verbose = true;

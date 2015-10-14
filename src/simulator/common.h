@@ -4,8 +4,8 @@
 #include <cstdlib>
 
 // general variables
-char bases[] = {'A', 'C', 'G', 'T'};
-char revBases[128];
+extern char bases[];
+extern char revBases[128];
 
 // options parsing
 struct Options {
@@ -17,10 +17,15 @@ struct Options {
 public:
   static  Options opts;
 };
-Options Options::opts;
+
 void parseArguments(int argc, char** argv);
 
 // generator
 void generateIIDGenome(size_t N, char* S);
+
+// chain
+void initChainMatrix();
+void clearChainMatrix();
+void printChainMatrix();
 
 #endif

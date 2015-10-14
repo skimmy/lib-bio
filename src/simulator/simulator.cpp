@@ -12,12 +12,21 @@
 #include <iostream>
 #include <list>
 
+char bases[] = {'A', 'C', 'G', 'T'};
+char revBases[128];
+Options Options::opts;
+
 void initSimulator() {
   revBases['A'] = revBases['a'] = 0;
   revBases['C'] = revBases['c'] = 1;
   revBases['G'] = revBases['g'] = 2;
   revBases['T'] = revBases['t'] = 3;
   srand(time(NULL));
+  initChainMatrix();
+}
+
+void clearSimulator() {
+  clearChainMatrix();
 }
 
 char randomMutation(char c) { 
@@ -66,6 +75,7 @@ int main(int argc, char** argv) {
   
   char* ref = NULL;
   char* read = NULL;
+  // Important NOT invert (init requires argument to be parsed)
   parseArguments(argc,argv);
   initSimulator();
 
@@ -100,11 +110,14 @@ int main(int argc, char** argv) {
   
   std::cout << "* Cleaning... ";
 
-
+  
   delete[] read;
   delete[] ref;
+  //  printChainMatrix();
+  clearSimulator();
   std::cout << "[OK]" << std::endl;
 
+  
   std::cout << std::endl;
   return 0;
 }

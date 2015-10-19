@@ -1,5 +1,5 @@
 #include "../algorithms.h"
-#include "../sequence.h"
+#include "../core.h"
 
 #include <algorithm>
 

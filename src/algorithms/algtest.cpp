@@ -16,5 +16,7 @@ int main(int argc, char** argv) {
     std::cout << pi.getPosition();
   }
   std::cout << std::endl;
+  uint64_t D2 = dstats::D2(r1, r2, 4);
+  std::cout << D2 << std::endl;
   return 0;
 }

@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <list>
 
-#include "../sequence.h"
+#include "../core.h"
 #include "../algorithms.h"
 
 /**

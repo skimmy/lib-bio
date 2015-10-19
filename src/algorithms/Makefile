@@ -107,7 +107,9 @@ am__v_AR_1 =
 libbioalg_a_AR = $(AR) $(ARFLAGS)
 libbioalg_a_LIBADD =
 am_libbioalg_a_OBJECTS = hamming.$(OBJEXT) align.$(OBJEXT) \
-	SmithWatermanDP.$(OBJEXT)
+	SmithWatermanDP.$(OBJEXT) MatchSimilarity.$(OBJEXT) \
+	HybridIndex.$(OBJEXT) kmerscore.$(OBJEXT) spectrum.$(OBJEXT) \
+	dstats.$(OBJEXT) dft.$(OBJEXT)
 libbioalg_a_OBJECTS = $(am_libbioalg_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
@@ -264,7 +266,9 @@ top_build_prefix = ../../
 top_builddir = ../..
 top_srcdir = ../..
 noinst_LIBRARIES = libbioalg.a
-libbioalg_a_SOURCES = hamming.cpp align.cpp SmithWatermanDP.cpp
+libbioalg_a_SOURCES = hamming.cpp align.cpp SmithWatermanDP.cpp MatchSimilarity.cpp HybridIndex.cpp \
+	kmerscore.cpp spectrum.cpp dstats.cpp dft.cpp
+
 algtest_out_SOURCES = algtest.cpp
 algtest_out_LDADD = ./libbioalg.a ../core/libbiocore.a
 AM_CXXFLAGS = -std=c++11
@@ -362,10 +366,16 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+include ./$(DEPDIR)/HybridIndex.Po
+include ./$(DEPDIR)/MatchSimilarity.Po
 include ./$(DEPDIR)/SmithWatermanDP.Po
 include ./$(DEPDIR)/algtest.Po
 include ./$(DEPDIR)/align.Po
+include ./$(DEPDIR)/dft.Po
+include ./$(DEPDIR)/dstats.Po
 include ./$(DEPDIR)/hamming.Po
+include ./$(DEPDIR)/kmerscore.Po
+include ./$(DEPDIR)/spectrum.Po
 
 .cpp.o:
 	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

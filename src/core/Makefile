@@ -110,9 +110,9 @@ am_libbiocore_a_OBJECTS = Read.$(OBJEXT) KMer.$(OBJEXT) \
 	Reference.$(OBJEXT) CompressedSequence.$(OBJEXT) \
 	NumericKMer.$(OBJEXT) CompressedReadSet.$(OBJEXT) \
 	ColorAlphabet.$(OBJEXT) DNAAlphabet.$(OBJEXT) \
-	DNACompressedSymbol.$(OBJEXT) QualityCommon.$(OBJEXT) \
-	PhredQuality.$(OBJEXT) FullQuality.$(OBJEXT) \
-	ProbabilisticQuality.$(OBJEXT)
+	DNACompressedSymbol.$(OBJEXT) DNAAlphabet2Bits.$(OBJEXT) \
+	QualityCommon.$(OBJEXT) PhredQuality.$(OBJEXT) \
+	FullQuality.$(OBJEXT) ProbabilisticQuality.$(OBJEXT)
 libbiocore_a_OBJECTS = $(am_libbiocore_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
@@ -271,7 +271,7 @@ top_srcdir = ../..
 noinst_LIBRARIES = libbiocore.a
 libbiocore_a_SOURCES = Read.cpp KMer.cpp Reference.cpp CompressedSequence.cpp \
 	NumericKMer.cpp CompressedReadSet.cpp \
-	ColorAlphabet.cpp DNAAlphabet.cpp DNACompressedSymbol.cpp \
+	ColorAlphabet.cpp DNAAlphabet.cpp DNACompressedSymbol.cpp DNAAlphabet2Bits.cpp \
 	QualityCommon.cpp PhredQuality.cpp FullQuality.cpp ProbabilisticQuality.cpp
 
 coretest_out_SOURCES = coretest.cpp
@@ -375,6 +375,7 @@ include ./$(DEPDIR)/ColorAlphabet.Po
 include ./$(DEPDIR)/CompressedReadSet.Po
 include ./$(DEPDIR)/CompressedSequence.Po
 include ./$(DEPDIR)/DNAAlphabet.Po
+include ./$(DEPDIR)/DNAAlphabet2Bits.Po
 include ./$(DEPDIR)/DNACompressedSymbol.Po
 include ./$(DEPDIR)/FullQuality.Po
 include ./$(DEPDIR)/KMer.Po

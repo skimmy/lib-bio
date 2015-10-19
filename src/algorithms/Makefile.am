@@ -1,5 +1,6 @@
 noinst_LIBRARIES = libbioalg.a
-libbioalg_a_SOURCES = hamming.cpp align.cpp SmithWatermanDP.cpp
+libbioalg_a_SOURCES = hamming.cpp align.cpp SmithWatermanDP.cpp MatchSimilarity.cpp HybridIndex.cpp \
+	kmerscore.cpp spectrum.cpp dstats.cpp dft.cpp
 
 bin_PROGRAMS = algtest.out
 algtest_out_SOURCES = algtest.cpp

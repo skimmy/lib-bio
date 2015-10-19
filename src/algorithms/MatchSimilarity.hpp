@@ -1,7 +1,7 @@
 #ifndef MATCH_SIMILARITY_H
 #define MATCH_SIMILARITY_H
 
-#include "../adt.h"
+#include "../algorithms.h"
 
 #include <string>
 using namespace std;

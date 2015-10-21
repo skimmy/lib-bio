@@ -69,8 +69,10 @@ int main(int argc, char** argv) {
     size_t s = m - (r2.j - r1.j);
     evaluateChainRelation(r1, r2, s);
     int dh = -1;
-    if (s < m) {
+    if (s <= m) {
       dh = prefixSuffixHammingDistance(r2.r, r1.r, s);
+    } else {
+      addNonOverlapRecord(r2.j - r1.j - m);
     }
     r1 = r2;
   }
@@ -81,7 +83,8 @@ int main(int argc, char** argv) {
   std::cout << "* Cleaning... ";
   delete[] ref;
   std::cout << "\n\n";
-  printChainMatrix();
+  //  printChainMatrix();
+  printNonOverlapDistribution();
   clearSimulator();
   std::cout << "[OK]" << std::endl;
 

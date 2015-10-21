@@ -43,7 +43,9 @@ char randomMutation(char c);
 void initChainMatrix();
 void clearChainMatrix();
 void printChainMatrix();
+void printNonOverlapDistribution();
 void evaluateChainRelation(const Read& r1, const Read& r2, size_t s);
+void addNonOverlapRecord(size_t d);
 
 // utili
 size_t hammingDistance(const char* s1, const char* s2, size_t m);

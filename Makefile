@@ -206,7 +206,7 @@ AR = ar
 AUTOCONF = ${SHELL} /home/skimmy/src/lib-bio/missing autoconf
 AUTOHEADER = ${SHELL} /home/skimmy/src/lib-bio/missing autoheader
 AUTOMAKE = ${SHELL} /home/skimmy/src/lib-bio/missing automake-1.15
-AWK = gawk
+AWK = mawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
@@ -291,7 +291,7 @@ target_alias =
 top_build_prefix = 
 top_builddir = .
 top_srcdir = .
-SUBDIRS = src/core src/simulator src/io src/algorithms
+SUBDIRS = src/core src/simulator src/io src/algorithms src/bio-tk
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

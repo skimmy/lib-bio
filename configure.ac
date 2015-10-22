@@ -10,5 +10,6 @@ AC_CONFIG_FILES([
   src/io/Makefile
   src/algorithms/Makefile
   src/simulator/Makefile
+  src/bio-tk/Makefile
 ])
 AC_OUTPUT 

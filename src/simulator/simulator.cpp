@@ -23,10 +23,12 @@ void initSimulator() {
   revBases['T'] = revBases['t'] = 3;
   srand(time(NULL));
   initChainMatrix();
+  initFalsePositiveMatrix();
 }
 
 void clearSimulator() {
   clearChainMatrix();
+  clearFalsePositiveMatrix();
 }
 
 
@@ -84,7 +86,8 @@ int main(int argc, char** argv) {
   delete[] ref;
   std::cout << "\n\n";
   //  printChainMatrix();
-  printNonOverlapDistribution();
+  //printNonOverlapDistribution();
+  printFalsePositiveMatrix();
   clearSimulator();
   std::cout << "[OK]" << std::endl;
 

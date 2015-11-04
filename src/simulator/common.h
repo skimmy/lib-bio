@@ -40,6 +40,10 @@ void simpleIIDErrors(std::string& s, double pe);
 char randomMutation(char c);
 
 // chain
+void initFalsePositiveMatrix();
+void clearFalsePositiveMatrix();
+void printFalsePositiveMatrix();
+
 void initChainMatrix();
 void clearChainMatrix();
 void printChainMatrix();
@@ -47,7 +51,7 @@ void printNonOverlapDistribution();
 void evaluateChainRelation(const Read& r1, const Read& r2, size_t s);
 void addNonOverlapRecord(size_t d);
 
-// utili
+// util
 size_t hammingDistance(const char* s1, const char* s2, size_t m);
 size_t hammingDistance(const std::string& s1, const std::string& s2, size_t m);
 size_t prefixSuffixHammingDistance(const std::string& s1, const std::string& s2, size_t k);

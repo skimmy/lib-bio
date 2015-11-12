@@ -7,14 +7,21 @@
 
 // matrix of false positive
 double ** fpMatrix;
-
 // half of this mxm matrix is not used in case we need some optimizations
 uint64_t** M;
 // this map keeps track of the distance between non overlapping reads
 std::map<size_t, size_t> D;
 
-void initFalsePositiveMatrix() {
+void computeExpectedFalsePositiveMatrix(double** m) {
+  for (size_t i = 0; i < Options::opts.m; ++i) {
+    for (size_t j = 0; j < Options::opts.m + 1; ++j) {
+      m[i][j] = fpMatrix[i][j] * (double)M[i][j];
+      //      std::cout << fpMatrix[i][j] << ' ';
+    }
+  }
+}
 
+void initFalsePositiveMatrix() {
   double p_no_olap = (double)(Options::opts.N - 2 * Options::opts.m)
     / (double)pow(4,Options::opts.m);
   
@@ -85,6 +92,8 @@ void printNonOverlapDistribution() {
     std::cout << (int)d.first << "\t" << d.second << std::endl;
   }
 }
+
+
 
 void evaluateChainRelation(const Read& r1, const Read& r2, size_t s) {
   if (s < Options::opts.m) {

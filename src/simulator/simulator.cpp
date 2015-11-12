@@ -87,7 +87,11 @@ int main(int argc, char** argv) {
   std::cout << "\n\n";
   //  printChainMatrix();
   //printNonOverlapDistribution();
-  printFalsePositiveMatrix();
+  //printFalsePositiveMatrix();
+  double** exp = initDoubleMatrix(m, m+1);
+  computeExpectedFalsePositiveMatrix(exp);
+  printDoubleMatrix(exp, m, m+1);
+  clearDoubleMatrix(exp, m,m+1);  
   clearSimulator();
   std::cout << "[OK]" << std::endl;
 

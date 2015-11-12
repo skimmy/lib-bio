@@ -2,9 +2,36 @@
 
 #include <iostream>
 
+double** initDoubleMatrix(size_t n, size_t m) {
+  double** matrix = new double*[n];
+  for (size_t i = 0; i < n; ++i) {
+    matrix[i] = new double[m];
+    for (size_t j = 0; j < m; ++j) {
+      matrix[i][j] = 0.0;
+    }
+  }
+    return matrix;
+}
+
+void clearDoubleMatrix(double** matrix, size_t n, size_t m) {
+  for (size_t i = 0; i < n; ++i) {
+    delete[] matrix[i];
+  }
+  delete[] matrix;
+}
+
 void printString(char* s, size_t n) {
   for (int i = 0; i < n; ++i) {
     std::cout << s[i];
+  }
+}
+
+void printDoubleMatrix(double** M, size_t n, size_t m) {
+  for (size_t i = 0; i < n; ++i) {
+    for (size_t j = 0; j < n; ++j) {
+      std::cout << M[i][j] << '\t';
+    }
+    std::cout << '\n';
   }
 }
 

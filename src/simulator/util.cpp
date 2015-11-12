@@ -20,6 +20,16 @@ void clearDoubleMatrix(double** matrix, size_t n, size_t m) {
   delete[] matrix;
 }
 
+double elementsSumDoubleMatrix(double** matrix, size_t n, size_t m) {
+  double sum = 0.0;
+  for (size_t i  = 0; i < n; ++i) {
+    for (size_t j = 0; j < m; ++j) {
+      sum += matrix[i][j];
+    }
+  }
+  return sum;
+}
+
 void printString(char* s, size_t n) {
   for (int i = 0; i < n; ++i) {
     std::cout << s[i];

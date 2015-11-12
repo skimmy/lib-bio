@@ -63,5 +63,6 @@ void printString(char* s, size_t n);
 void printDoubleMatrix(double** M, size_t n, size_t m);
 double** initDoubleMatrix(size_t n, size_t m);
 void clearDoubleMatrix(double** matrix, size_t n, size_t m);
+double elementsSumDoubleMatrix(double** matrix, size_t n, size_t m);
 
 #endif

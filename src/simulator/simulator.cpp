@@ -91,6 +91,8 @@ int main(int argc, char** argv) {
   double** exp = initDoubleMatrix(m, m+1);
   computeExpectedFalsePositiveMatrix(exp);
   printDoubleMatrix(exp, m, m+1);
+  double sum = elementsSumDoubleMatrix(exp, m, m+1);
+  std::cout << "P[FP] = " << sum << '\n';
   clearDoubleMatrix(exp, m,m+1);  
   clearSimulator();
   std::cout << "[OK]" << std::endl;

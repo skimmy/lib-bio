@@ -36,8 +36,9 @@ void initFalsePositiveMatrix() {
       // NOTE: For now we use the equation for
       //   P[r2 = B | r1 = A, J = j, D = \Delta]
       // however this should (probably) be extended to all values of r1 = A
-      p_no_olap = (double) pow(3, Options::opts.m) / (double)Options::opts.N;
-      fpMatrix[i][j] = (p_no_olap + p_olap + p_hat_s) / (double)Options::opts.N;
+      p_hat_s = (double)pow(3, i + 2) / (double)pow(4, Options::opts.m - i + 1);
+      p_no_olap = (double) pow(3, Options::opts.m) - p_hat_s;// / (double)Options::opts.N;
+      fpMatrix[i][j] = (p_no_olap + p_olap) / (double)Options::opts.N;
     }
   }
 }

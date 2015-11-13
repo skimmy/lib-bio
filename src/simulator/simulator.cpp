@@ -85,9 +85,11 @@ int main(int argc, char** argv) {
   std::cout << "* Cleaning... ";
   delete[] ref;
   std::cout << "\n\n";
-  //  printChainMatrix();
+  printChainMatrix();
+  std::cout << "\n\n";
   //printNonOverlapDistribution();
-  //printFalsePositiveMatrix();
+  printFalsePositiveMatrix();
+  std::cout << "\n\n";
   double** exp = initDoubleMatrix(m, m+1);
   computeExpectedFalsePositiveMatrix(exp);
   printDoubleMatrix(exp, m, m+1);

@@ -65,4 +65,8 @@ double** initDoubleMatrix(size_t n, size_t m);
 void clearDoubleMatrix(double** matrix, size_t n, size_t m);
 double elementsSumDoubleMatrix(double** matrix, size_t n, size_t m);
 
+// probabilities
+void initProbabilities();
+void clearProbabilities();
+
 #endif

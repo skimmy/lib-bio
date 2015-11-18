@@ -22,13 +22,15 @@ void initSimulator() {
   revBases['G'] = revBases['g'] = 2;
   revBases['T'] = revBases['t'] = 3;
   srand(time(NULL));
+  initProbabilities();
   initChainMatrix();
   initFalsePositiveMatrix();
 }
 
 void clearSimulator() {
-  clearChainMatrix();
   clearFalsePositiveMatrix();
+  clearChainMatrix();
+  clearProbabilities();
 }
 
 
@@ -85,14 +87,14 @@ int main(int argc, char** argv) {
   std::cout << "* Cleaning... ";
   delete[] ref;
   std::cout << "\n\n";
-  printChainMatrix();
+  //  printChainMatrix();
   std::cout << "\n\n";
   //printNonOverlapDistribution();
-  printFalsePositiveMatrix();
+  //printFalsePositiveMatrix();
   std::cout << "\n\n";
   double** exp = initDoubleMatrix(m, m+1);
   computeExpectedFalsePositiveMatrix(exp);
-  printDoubleMatrix(exp, m, m+1);
+  //printDoubleMatrix(exp, m, m+1);
   double sum = elementsSumDoubleMatrix(exp, m, m+1);
   std::cout << "P[FP] = " << sum << '\n';
   clearDoubleMatrix(exp, m,m+1);  

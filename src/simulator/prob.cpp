@@ -8,9 +8,18 @@
 // probability of equality of two calls of the SAME reference position
 double p_equal_calls = 0.0;
 
-// after initializations this matrix will contain the probability of tw random
+// probability of 'sequenced position' which represents the probability of a read
+// starting at a given position of the reference
+double p_read_start = 0.0;
+
+// after initializations this matrix will contain the probability of two random
 // generated reads showing a overlap of s bases with dh discrepancies
-double** p_ran_read_olap;
+double** p_rand_read_olap;
+
+// after initializations this matrix will contain in position [s][d] the probability
+// of two consecutive reads showing an overlap of 's' bases with 'd' hamming
+// distance
+double** p_cons_read_olap;
 
 void initProbabilities() {
 // convenience variables
@@ -22,27 +31,43 @@ void initProbabilities() {
   // init p_equal_calls
   p_equal_calls = q_err * q_err + (1.0 / 3.0) * ( p_err * p_err );
 
+  // init p_read_start
+  p_read_start = (double)Options::opts.M / (double)Options::opts.N;
+  std::cout << "p_start = " << p_read_start << '\n';
 
-  // init rand_read matrix
-  p_ran_read_olap = new double*[m];
+
+  // init rand_read_olap matrix
+  p_rand_read_olap = new double*[m];
   for (size_t i = 0;  i < m; ++i) {
-    p_ran_read_olap[i] = new double[m+1];
+    p_rand_read_olap[i] = new double[m+1];
     for (size_t j = 0; j <= i; ++j) {
       double binom = boost::math::binomial_coefficient<double>(i,j);
       double p_s = (pow(p_equal_calls,j) * pow(1.0 - p_equal_calls, i - j)  * binom ) /  ((double)N * pow(4,i) );
       
       double p_not_s = ((double)N-m+1)* pow((3.0/4.0),j) / ( (double)N * pow(4,i-j) ) ;
-      p_ran_read_olap[i][j] = p_s + p_not_s;
-      std::cout << p_ran_read_olap[i][j] << '\t';
+      p_rand_read_olap[i][j] = p_s + p_not_s;
     }
-    std::cout << '\n';
+  }
+
+  // init cons_read_olap matrix
+  p_cons_read_olap  = new double*[m];
+  for (size_t i = 0; i < m; ++i) {
+    p_cons_read_olap[i] = new double[m+1];
+    for (size_t j = 0; j <= i ; ++j) {
+      double p_s = 0.0;
+      double p_not_s = 0.0;
+
+      p_cons_read_olap[i] = p_s + p_not_s;
+    }
   }
 }
 
 
 void clearProbabilities() {
 for (size_t i = 0; i < Options::opts.m; ++i) {
-delete[] p_ran_read_olap[i];
-  }
-  delete[] p_ran_read_olap;
+  delete[] p_rand_read_olap[i];
+  delete[] p_cons_read_olap[i];
+ }
+ delete[] p_rand_read_olap;
+ delete[] p_cons_read_olap;
 }

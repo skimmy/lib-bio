@@ -30,7 +30,8 @@ void initProbabilities() {
     for (size_t j = 0; j <= i; ++j) {
       double binom = boost::math::binomial_coefficient<double>(i,j);
       double p_s = (pow(p_equal_calls,j) * pow(1.0 - p_equal_calls, i - j)  * binom ) /  ((double)N * pow(4,i) );
-      double p_not_s = 0.0;
+      
+      double p_not_s = ((double)N-m+1)* pow((3.0/4.0),j) / ( (double)N * pow(4,i-j) ) ;
       p_ran_read_olap[i][j] = p_s + p_not_s;
       std::cout << p_ran_read_olap[i][j] << '\t';
     }

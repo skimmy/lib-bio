@@ -57,6 +57,7 @@ void computeExpectedFalsePositiveMatrix(double** m);
 size_t hammingDistance(const char* s1, const char* s2, size_t m);
 size_t hammingDistance(const std::string& s1, const std::string& s2, size_t m);
 size_t prefixSuffixHammingDistance(const std::string& s1, const std::string& s2, size_t k);
+size_t bestHammingOverlap(const std::string& s1, const std::string& s2);
 
 void printString(char* s, size_t n);
  
@@ -68,5 +69,6 @@ double elementsSumDoubleMatrix(double** matrix, size_t n, size_t m);
 // probabilities
 void initProbabilities();
 void clearProbabilities();
+double randomReadsOverlapProbNoErr(size_t s, size_t dh);
 
 #endif

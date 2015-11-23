@@ -42,7 +42,6 @@ int main(int argc, char** argv) {
   // Important NOT invert (init requires argument to be parsed)
   parseArguments(argc,argv);
   initSimulator();
-
   
   size_t N = Options::opts.N;
   size_t m = Options::opts.m;
@@ -64,7 +63,7 @@ int main(int argc, char** argv) {
   std::cout << "[OK]" << std::endl;
 
   std::cout << "* Processing reads... ";
-
+  double p_fail = 1.0;
   Read r1 = reads.top();
   reads.pop();
   while(!reads.empty()) {
@@ -75,30 +74,22 @@ int main(int argc, char** argv) {
     int dh = -1;
     if (s <= m) {
       dh = prefixSuffixHammingDistance(r2.r, r1.r, s);
+      size_t est_s = bestHammingOverlap(r2.r, r1.r);
+      size_t obs_dh = prefixSuffixHammingDistance(r1.r, r2.r, est_s);
+      //      p_fail += 1.0 - randomReadsOverlapProbNoErr(est_s,obs_dh);
+      p_fail += 1.0 - randomReadsOverlapProbNoErr(s,dh);
     } else {
       addNonOverlapRecord(r2.j - r1.j - m);
     }
     r1 = r2;
   }
-
   std::cout << "[OK]" << std::endl;
 
+  std::cout << "P[Fail]    = " << p_fail << std::endl;
+  std::cout << "P[Success] = " << 1.0 - p_fail << std::endl;
   
   std::cout << "* Cleaning... ";
   delete[] ref;
-  std::cout << "\n\n";
-  //  printChainMatrix();
-  std::cout << "\n\n";
-  //printNonOverlapDistribution();
-  //printFalsePositiveMatrix();
-  std::cout << "\n\n";
-  double** exp = initDoubleMatrix(m, m+1);
-  computeExpectedFalsePositiveMatrix(exp);
-  //printDoubleMatrix(exp, m, m+1);
-  double sum = elementsSumDoubleMatrix(exp, m, m+1);
-  std::cout << "P[FP] = " << sum << '\n';
-  clearDoubleMatrix(exp, m,m+1);  
-  clearSimulator();
   std::cout << "[OK]" << std::endl;
 
   

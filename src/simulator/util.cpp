@@ -60,15 +60,23 @@ size_t hammingDistance(const std::string& s1, const std::string& s2, size_t m) {
 }
 
 size_t prefixSuffixHammingDistance(const std::string& s1, const std::string& s2, size_t k) {
-  //  std::cout << '\n' << s1 << '\t' << s2 << " (" << k << ")\t";
   size_t d = 0;
   size_t md = s2.length() - k;
   for (int i = 0; i < k; ++i, ++md) {
-    //    std::cout << s1[i] << s2[md] << ' ';
     if (s2[i] != s1[md]) {
       d++;
     }
   }
-  //  std::cout << "\t\t> " << d << " <\n";
   return d;
+}
+
+size_t bestHammingOverlap(const std::string& s1, const std::string& s2) {
+  size_t m = s1.length();
+  for (size_t i = m; i >= 1; --i) {
+    size_t d_i = prefixSuffixHammingDistance(s2, s1, i);
+    if (d_i == 0) {
+      return i;
+    }
+  }
+  return 0;
 }

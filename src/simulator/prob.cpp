@@ -33,8 +33,6 @@ void initProbabilities() {
 
   // init p_read_start
   p_read_start = (double)Options::opts.M / (double)Options::opts.N;
-  std::cout << "p_start = " << p_read_start << '\n';
-
 
   // init rand_read_olap matrix
   p_rand_read_olap = new double*[m];
@@ -57,7 +55,7 @@ void initProbabilities() {
       double p_s = 0.0;
       double p_not_s = 0.0;
 
-      p_cons_read_olap[i] = p_s + p_not_s;
+      p_cons_read_olap[i][j] = p_s + p_not_s;
     }
   }
 }
@@ -70,4 +68,14 @@ for (size_t i = 0; i < Options::opts.m; ++i) {
  }
  delete[] p_rand_read_olap;
  delete[] p_cons_read_olap;
+}
+
+/**
+ * Computes probability of a random overlap of 's' bases with an hamming distance dh
+ */
+double randomReadsOverlapProbNoErr(size_t s, size_t dh) {
+  double _4s = pow(4,s);
+  double ind = dh == 0 ? 1.0 : 0.0;
+  double ind_pos = (double)(Options::opts.N - 2 * Options::opts.m + 1);
+  return ( (_4s*ind) / (ind_pos + ( _4s*ind ) ) );
 }

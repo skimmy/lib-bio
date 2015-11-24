@@ -70,12 +70,33 @@ for (size_t i = 0; i < Options::opts.m; ++i) {
  delete[] p_cons_read_olap;
 }
 
+
+/**
+ * Compute
+ *  \sum_{s}{I(A,B,s)4^s}
+ */
+double overlappingStringsSum(const std::string & s1, const std::string& s2) {
+  size_t m = Options::opts.m;
+  double sum = 0.0;
+  for (size_t s = 1; s <= m-1; ++s) {
+    size_t indicator_ab = (prefixSuffixHammingDistance(s2,s1,s) == 0) ? 1 : 0;
+    size_t indicator_ba = (prefixSuffixHammingDistance(s1,s2,s) == 0) ? 1 : 0;
+    sum += pow(4,s) * ( indicator_ab + indicator_ba );
+  }
+  size_t indic_m = (prefixSuffixHammingDistance(s2,s1,m) == 0) ? 1 : 0;
+  sum += indic_m * pow(4,m);
+  
+  return sum;
+}
+
 /**
  * Computes probability of a random overlap of 's' bases with an hamming distance dh
  */
-double randomReadsOverlapProbNoErr(size_t s, size_t dh) {
-  double _4s = pow(4,s);
-  double ind = dh == 0 ? 1.0 : 0.0;
-  double ind_pos = (double)(Options::opts.N - 2 * Options::opts.m + 1);
-  return ( (_4s*ind) / (ind_pos + ( _4s*ind ) ) );
+double randomReadsOverlapProbNoErr(const std::string& s1, const std::string& s2, size_t s) {
+  size_t dh_for_s = prefixSuffixHammingDistance(s1,s2,s);
+  if (dh_for_s != 0) {
+    return 0;
+  }
+  double olap_p = overlappingStringsSum(s1,s2) + (double)Options::opts.N - 2 * (double)Options::opts.m + 1.0;
+  return ( pow(4,s) / ( olap_p) ) ;
 }

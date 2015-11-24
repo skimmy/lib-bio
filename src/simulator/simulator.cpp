@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
   std::cout << "[OK]" << std::endl;
 
   std::cout << "* Processing reads... ";
-  double p_fail = 1.0;
+  double p_fail = 0;
   Read r1 = reads.top();
   reads.pop();
   while(!reads.empty()) {
@@ -72,12 +72,14 @@ int main(int argc, char** argv) {
     size_t s = m - (r2.j - r1.j);
     evaluateChainRelation(r1, r2, s);
     int dh = -1;
+
     if (s <= m) {
-      dh = prefixSuffixHammingDistance(r2.r, r1.r, s);
-      size_t est_s = bestHammingOverlap(r2.r, r1.r);
-      size_t obs_dh = prefixSuffixHammingDistance(r1.r, r2.r, est_s);
-      //      p_fail += 1.0 - randomReadsOverlapProbNoErr(est_s,obs_dh);
-      p_fail += 1.0 - randomReadsOverlapProbNoErr(s,dh);
+      double p_ab = randomReadsOverlapProbNoErr(r1.r,r2.r,s);
+      if (p_ab < 0.1) {
+	std::cout << "\n" << p_ab << " (" << s << ")\t\t" << r1.r << '\t' << r2.r << '\n';
+      }
+      p_fail += 1.0 - p_ab;
+
     } else {
       addNonOverlapRecord(r2.j - r1.j - m);
     }

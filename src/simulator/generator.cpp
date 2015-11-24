@@ -1,5 +1,7 @@
 #include "common.h"
 
+#include <iostream>
+
 char randomMutation(char c) { 
   return bases[(revBases[c] + ((rand() % 3) + 1) ) & 0x3];
 }
@@ -8,8 +10,8 @@ void simpleIIDErrors(std::string& s, double pe) {
   size_t m = s.length();
   for (size_t i = 0; i < m; ++i) {
     double x = (double)rand() / RAND_MAX;
-    if (x <= pe) {
-      s[i] = randomMutation(s[i]);
+    if (x < pe) {
+      s[i] = randomMutation(s[i]);      
     }
   }
 }

@@ -63,6 +63,12 @@ int main(int argc, char** argv) {
   std::cout << "[OK]" << std::endl;
 
   std::cout << "* Processing reads... ";
+
+  // Temporary variables to count the number of holes, in the future a more
+  // sophisticated way (e.g., finite state machine) should be used.
+  size_t holes = 0;
+  bool onHole = false;
+  
   double p_fail = 0;
   Read r1 = reads.top();
   reads.pop();
@@ -74,6 +80,7 @@ int main(int argc, char** argv) {
     int dh = -1;
 
     if (s <= m) {
+      onHole = false;
       double p_ab = randomReadsOverlapProbNoErr(r1.r,r2.r,s);
       if (p_ab < 0.1) {
 	std::cout << "\n" << p_ab << " (" << s << ")\t\t" << r1.r << '\t' << r2.r << '\n';
@@ -81,6 +88,10 @@ int main(int argc, char** argv) {
       p_fail += 1.0 - p_ab;
 
     } else {
+      if (onHole == false) {
+	onHole = true;
+	holes++;
+      }
       addNonOverlapRecord(r2.j - r1.j - m);
     }
     r1 = r2;
@@ -89,6 +100,8 @@ int main(int argc, char** argv) {
 
   std::cout << "P[Fail]    = " << p_fail << std::endl;
   std::cout << "P[Success] = " << 1.0 - p_fail << std::endl;
+
+  std::cout << "#[Holes]   = " << holes << std::endl;
   
   std::cout << "* Cleaning... ";
   delete[] ref;

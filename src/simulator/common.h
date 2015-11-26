@@ -70,5 +70,6 @@ double elementsSumDoubleMatrix(double** matrix, size_t n, size_t m);
 void initProbabilities();
 void clearProbabilities();
 double randomReadsOverlapProbNoErr(const std::string& s1, const std::string& s2, size_t s);
+double overlappingStringsSum(const std::string & s1, const std::string& s2);
 
 #endif

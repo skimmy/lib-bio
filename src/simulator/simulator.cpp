@@ -93,6 +93,9 @@ int main(int argc, char** argv) {
 	holes++;
       }
       addNonOverlapRecord(r2.j - r1.j - m);
+      double x = (double)Options::opts.N - 2.0 * (double)Options::opts.m + 1.0
+	+ overlappingStringsSum(r1.r, r2.r);
+      p_fail += 1.0 - ( 1.0 / x);
     }
     r1 = r2;
   }

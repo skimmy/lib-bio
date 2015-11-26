@@ -85,7 +85,6 @@ double overlappingStringsSum(const std::string & s1, const std::string& s2) {
   }
   size_t indic_m = (prefixSuffixHammingDistance(s2,s1,m) == 0) ? 1 : 0;
   sum += indic_m * pow(4,m);
-  
   return sum;
 }
 

@@ -33,15 +33,9 @@ void clearSimulator() {
   clearProbabilities();
 }
 
+void offlineSimulation() {
 
-int main(int argc, char** argv) {
-  std::cout << std::endl;
-  
   char* ref = NULL;
-
-  // Important NOT invert (init requires argument to be parsed)
-  parseArguments(argc,argv);
-  initSimulator();
   
   size_t N = Options::opts.N;
   size_t m = Options::opts.m;
@@ -110,6 +104,25 @@ int main(int argc, char** argv) {
   delete[] ref;
   std::cout << "[OK]" << std::endl;
 
+}
+
+void onlineSimulation() {
+}
+
+
+int main(int argc, char** argv) {
+  std::cout << std::endl;
+  
+  // Important NOT invert (init requires argument to be parsed)
+  parseArguments(argc,argv);
+  initSimulator();
+
+  if (Options::opts.online) {
+    onlineSimulation();
+  } else {  
+    offlineSimulation();
+  }
+  
   
   std::cout << std::endl;
   return 0;

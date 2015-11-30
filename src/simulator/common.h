@@ -17,7 +17,9 @@ struct Options {
 
   double pe;
 
-  bool verbose;
+  bool online;
+
+  bool verbose;  
 
   static  Options opts;
 };

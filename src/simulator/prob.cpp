@@ -29,6 +29,25 @@ void clearProbabilities() {
 
 }
 
+double probabilityReads(const std::string& s1, const std::string& s2, size_t d) {
+
+  
+  // probability of D = d distance between reads
+  double p_s = p_read_start * pow(1.0 - p_read_start, d);
+  // no overlap
+  if (d >= Options::opts.m) {
+    return pow(4,2*Options::opts.m) * p_s;
+  }
+
+  size_t dh = prefixSuffixHammingDistance(s1,s2,Options::opts.m - d);
+  // probability of dh unequal bases on the common part
+  double p_err = pow(p_equal_calls, (Options::opts.m - d - dh)) * pow(1.0 - p_equal_calls, dh) ;
+  // probability of indipendent parts
+  double p_ind = pow(4,2*d);
+
+  return p_s * p_err * p_ind;
+}
+
 
 /**
  * Compute

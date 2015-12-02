@@ -100,8 +100,8 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_simulator_out_OBJECTS = simulator.$(OBJEXT) options.$(OBJEXT) \
-	generator.$(OBJEXT) chain.$(OBJEXT) util.$(OBJEXT) \
-	prob.$(OBJEXT)
+	generator.$(OBJEXT) online.$(OBJEXT) chain.$(OBJEXT) \
+	util.$(OBJEXT) prob.$(OBJEXT)
 simulator_out_OBJECTS = $(am_simulator_out_OBJECTS)
 simulator_out_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_$(V))
@@ -253,7 +253,9 @@ target_alias =
 top_build_prefix = ../../
 top_builddir = ../..
 top_srcdir = ../..
-simulator_out_SOURCES = simulator.cpp options.cpp generator.cpp chain.cpp util.cpp prob.cpp
+simulator_out_SOURCES = simulator.cpp options.cpp generator.cpp online.cpp chain.cpp \
+	util.cpp prob.cpp 
+
 AM_CXXFLAGS = -std=c++11
 all: all-am
 
@@ -343,6 +345,7 @@ distclean-compile:
 
 include ./$(DEPDIR)/chain.Po
 include ./$(DEPDIR)/generator.Po
+include ./$(DEPDIR)/online.Po
 include ./$(DEPDIR)/options.Po
 include ./$(DEPDIR)/prob.Po
 include ./$(DEPDIR)/simulator.Po

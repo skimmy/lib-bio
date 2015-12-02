@@ -34,12 +34,30 @@ struct Read {
   // !!! WARNING '>' is used to make the priority queue work in ascending order
   bool operator < (const Read& other) const { return this->j > other.j; }
 };
+
+// used to represent currenct 'under sequence' segment of a large genome (used
+// when simulator is operating in 'online' mode)
+struct GenomeSegment {
+  char* genome;
+
+  size_t length;
+  size_t current_start;
+  size_t total_length;
+  size_t read_length;
+  
+  
+  GenomeSegment(size_t N, size_t m, size_t l);
+  ~GenomeSegment();
+};
   
 void generateIIDGenome(size_t N, char* S);
 void generateOfflineReads(const std::string& s, std::priority_queue<Read>& reads);
 void simulateReadAt(size_t j, size_t m, const char* S, char* r);
 void simpleIIDErrors(std::string& s, double pe);
 char randomMutation(char c);
+
+void generateFirstGenomeSegment(GenomeSegment& g);
+void generateNewGenomeSegment(GenomeSegment& g);
 
 // chain
 void initFalsePositiveMatrix();

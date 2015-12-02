@@ -106,7 +106,20 @@ void offlineSimulation() {
 
 }
 
-void onlineSimulation() {
+void onlineSimulation() {  
+  const size_t MAX_GENOME_LENGTH = 2 << 20;
+
+  size_t N = Options::opts.N;
+  size_t m = Options::opts.m;
+  size_t M = Options::opts.M;
+  
+  GenomeSegment g(N, m, MAX_GENOME_LENGTH);
+  generateFirstGenomeSegment(g);
+
+  size_t generated_reads;
+  while (generated_reads < M) {
+    generated_reads++;
+  }
 }
 
 

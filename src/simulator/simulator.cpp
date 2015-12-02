@@ -113,12 +113,57 @@ void onlineSimulation() {
   size_t m = Options::opts.m;
   size_t M = Options::opts.M;
   
-  GenomeSegment g(N, m, MAX_GENOME_LENGTH);
+  //  GenomeSegment g(N, m, MAX_GENOME_LENGTH);
+  GenomeSegment g(N, m, 20);
   generateFirstGenomeSegment(g);
 
-  size_t generated_reads;
+  size_t generated_reads = 0;
+  size_t current_position = 0;
+  size_t real_position = 0;
+  size_t remaining_genome = g.length;
+  
   while (generated_reads < M) {
+
+    size_t d = generateInterReadDistance();
+
+    // this is artificial however for reasonable values of parameters it should
+    // never happen otherwise we woul need a different way of online generating
+    // the genome.
+    // More specifically if that happens it means that 'd' is higher then a whole
+    // genome segment (which should be no less than 10000 in practical cases) for
+    // reasonable values of N and M this event will have probability zero for
+    // all practical situations and artifically skipping over such 'extreme' values
+    // of d will not appreciably change final results
+    if (d > (g.length - m - 1)) {
+      continue;
+    }
+
+    // if we do not have enough generated genome for another read we generate
+    // a new genome segment
+    if (remaining_genome < d) {
+      
+      
+      // generateNewGenomeSegment(g);
+      current_position = current_position + m - g.length;
+      remaining_genome = g.length;
+      std::cout << "+-+-+-" << "\n\n";
+    }
+
+    std::cout << "Current    " << current_position << std::endl;
+    std::cout << "d          " << d << std::endl;
+
+    
+    current_position += d;
+    remaining_genome -= d;
+
+    
+    // generateOnlineRead(g,current_position);
     generated_reads++;
+    real_position += d;
+
+    std::cout << "Real pos   " << real_position << std::endl;
+
+    std::cout << "\n\n";
   }
 }
 

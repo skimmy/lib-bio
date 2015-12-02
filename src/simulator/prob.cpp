@@ -1,9 +1,12 @@
 #include "common.h"
 
 #include <iostream>
+#include <random>
 
 #include <boost/math/special_functions/binomial.hpp>
 
+// random number generator object for std random library
+std::mt19937 gen;
 
 // probability of equality of two calls of the SAME reference position
 double p_equal_calls = 0.0;
@@ -12,8 +15,15 @@ double p_equal_calls = 0.0;
 // starting at a given position of the reference
 double p_read_start = 0.0;
 
+// geometric distribution for inter-read distance
+std::geometric_distribution<> geom;
+
 void initProbabilities() {
-// convenience variables
+
+  std::random_device rd;
+  gen = std::mt19937(rd());
+  
+  // convenience variables
   double p_err = Options::opts.pe;
   double q_err = 1.0 - p_err;
 
@@ -22,6 +32,9 @@ void initProbabilities() {
 
   // init p_read_start
   p_read_start = (double)Options::opts.M / (double)Options::opts.N;
+
+  // init online inter-read distance distribution (i.e., geomtric)
+  geom = std::geometric_distribution<>(p_read_start);
 }
 
 
@@ -30,7 +43,6 @@ void clearProbabilities() {
 }
 
 double probabilityReads(const std::string& s1, const std::string& s2, size_t d) {
-
   
   // probability of D = d distance between reads
   double p_s = p_read_start * pow(1.0 - p_read_start, d);
@@ -76,4 +88,11 @@ double randomReadsOverlapProbNoErr(const std::string& s1, const std::string& s2,
   }
   double olap_p = overlappingStringsSum(s1,s2) + (double)Options::opts.N - 2 * (double)Options::opts.m + 1.0;
   return ( pow(4,s) / ( olap_p) ) ;
+}
+
+/**
+ * Gets the distance until the next read
+ */
+size_t generateInterReadDistance() {
+  return geom(gen);
 }

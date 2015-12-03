@@ -114,7 +114,7 @@ void onlineSimulation() {
   size_t M = Options::opts.M;
   
   //  GenomeSegment g(N, m, MAX_GENOME_LENGTH);
-  GenomeSegment g(N, m, 20);
+  GenomeSegment g(N, m, 10000);
   generateFirstGenomeSegment(g);
 
   size_t generated_reads = 0;
@@ -140,30 +140,24 @@ void onlineSimulation() {
 
     // if we do not have enough generated genome for another read we generate
     // a new genome segment
-    if (remaining_genome < d) {
-      
-      
-      // generateNewGenomeSegment(g);
+    if (remaining_genome < d + m) {            
+      generateNewGenomeSegment(g);
+      std::cout << '\t' << current_position;
       current_position = current_position + m - g.length;
+      std::cout << '\t' << current_position << '\n';
       remaining_genome = g.length;
-      std::cout << "+-+-+-" << "\n\n";
+      std::cout << "+-+-+-+-\n";
     }
 
-    std::cout << "Current    " << current_position << std::endl;
-    std::cout << "d          " << d << std::endl;
-
-    
+   
     current_position += d;
     remaining_genome -= d;
 
-    
-    // generateOnlineRead(g,current_position);
+    Read current = generateOnlineRead(g.genome,current_position);
+    std::cout << current.r << '\t' << current_position << '\n';
     generated_reads++;
     real_position += d;
-
-    std::cout << "Real pos   " << real_position << std::endl;
-
-    std::cout << "\n\n";
+    current.j = real_position;
   }
 }
 

@@ -76,9 +76,6 @@ void offlineSimulation() {
     if (s <= m) {
       onHole = false;
       double p_ab = randomReadsOverlapProbNoErr(r1.r,r2.r,s);
-      if (p_ab < 0.1) {
-	std::cout << "\n" << p_ab << " (" << s << ")\t\t" << r1.r << '\t' << r2.r << '\n';
-      }
       p_fail += 1.0 - p_ab;
 
     } else {
@@ -106,21 +103,26 @@ void offlineSimulation() {
 
 }
 
-void onlineSimulation() {  
+void onlineSimulation() {
+
+  double p_fail = 0.0;
+  
   const size_t MAX_GENOME_LENGTH = 2 << 20;
 
   size_t N = Options::opts.N;
   size_t m = Options::opts.m;
-  size_t M = Options::opts.M;
+  size_t M = Options::opts.M;  
   
   //  GenomeSegment g(N, m, MAX_GENOME_LENGTH);
-  GenomeSegment g(N, m, 10000);
+  GenomeSegment g(N, m, MAX_GENOME_LENGTH);
   generateFirstGenomeSegment(g);
 
   size_t generated_reads = 0;
   size_t current_position = 0;
   size_t real_position = 0;
   size_t remaining_genome = g.length;
+
+  Read prev_read("", -1);
   
   while (generated_reads < M) {
 
@@ -146,20 +148,51 @@ void onlineSimulation() {
     // a new genome segment
     if (remaining_genome < m) {            
       generateNewGenomeSegment(g);
-      std::cout << '\t' << current_position;
       current_position = current_position + m - g.length;
-      std::cout << '\t' << current_position << '\n';
-      remaining_genome = g.length;
-      std::cout << "+-+-+-+-\n";
     }
 
    
-     Read current = generateOnlineRead(g.genome,current_position);
-     std::cout << current.r << '\t' << current_position << '\t' << d << '\n';
+    Read current = generateOnlineRead(g.genome,current_position);
+
+    // here the probabilities are computed and accumulated
+    if (prev_read.j >= 0) {
+
+      /*   if (s <= m) {
+      onHole = false;
+
+
+    } else {
+      if (onHole == false) {
+	onHole = true;
+	holes++;
+      }
+      addNonOverlapRecord(r2.j - r1.j - m);
+
+    }*/
+      
+      
+      if (d > m) {
+	// non-overlap case...
+	double x = (double)N - 2.0 * (double)m + 1.0
+	  + overlappingStringsSum(prev_read.r, current.r);
+	p_fail += 1.0 - ( 1.0 / x);
+	
+      } else {
+	// overlap case...
+	size_t s = m - d;
+	double p_ab = randomReadsOverlapProbNoErr(prev_read.r,current.r,s);
+	//	std::cout << p_ab << '\t' << s << '\n';
+	p_fail += 1.0 - p_ab;
+      }
+    }
+    
     generated_reads++;
     real_position += d;
     current.j = real_position;
+    prev_read = current;
   }
+
+  std::cout << "P[fail]:    " << p_fail << std::endl;
 }
 
 

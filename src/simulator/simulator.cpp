@@ -137,10 +137,14 @@ void onlineSimulation() {
     if (d > (g.length - m - 1)) {
       continue;
     }
+    
+    current_position += d;
+    remaining_genome -= d;
+
 
     // if we do not have enough generated genome for another read we generate
     // a new genome segment
-    if (remaining_genome < d + m) {            
+    if (remaining_genome < m) {            
       generateNewGenomeSegment(g);
       std::cout << '\t' << current_position;
       current_position = current_position + m - g.length;
@@ -150,11 +154,8 @@ void onlineSimulation() {
     }
 
    
-    current_position += d;
-    remaining_genome -= d;
-
-    Read current = generateOnlineRead(g.genome,current_position);
-    std::cout << current.r << '\t' << current_position << '\n';
+     Read current = generateOnlineRead(g.genome,current_position);
+     std::cout << current.r << '\t' << current_position << '\t' << d << '\n';
     generated_reads++;
     real_position += d;
     current.j = real_position;

@@ -155,21 +155,7 @@ void onlineSimulation() {
     Read current = generateOnlineRead(g.genome,current_position);
 
     // here the probabilities are computed and accumulated
-    if (prev_read.j >= 0) {
-
-      /*   if (s <= m) {
-      onHole = false;
-
-
-    } else {
-      if (onHole == false) {
-	onHole = true;
-	holes++;
-      }
-      addNonOverlapRecord(r2.j - r1.j - m);
-
-    }*/
-      
+    if (prev_read.j != -1) {       
       
       if (d > m) {
 	// non-overlap case...
@@ -181,7 +167,6 @@ void onlineSimulation() {
 	// overlap case...
 	size_t s = m - d;
 	double p_ab = randomReadsOverlapProbNoErr(prev_read.r,current.r,s);
-	//	std::cout << p_ab << '\t' << s << '\n';
 	p_fail += 1.0 - p_ab;
       }
     }

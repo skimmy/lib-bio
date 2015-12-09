@@ -25,10 +25,11 @@ void parseArguments(int argc, char** argv) {
   Options::opts.M = 10;
   Options::opts.pe = 0.01;
   Options::opts.online = false;
+  Options::opts.pipeline = false;
   Options::opts.verbose = false;
   
   char c;
-  while ((c = getopt(argc, argv, "N:m:M:e:ohv")) != -1) {
+  while ((c = getopt(argc, argv, "N:m:M:e:ophv")) != -1) {
     switch(c) {
     case 'N':
       Options::opts.N = atoi(optarg);
@@ -44,6 +45,9 @@ void parseArguments(int argc, char** argv) {
       break;
     case 'o':
       Options::opts.online = true;
+      break;
+    case 'p':
+      Options::opts.pipeline = true;
       break;
     case 'v':
       Options::opts.verbose = true;

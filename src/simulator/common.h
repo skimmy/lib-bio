@@ -17,6 +17,8 @@ struct Options {
 
   double pe;
 
+  bool pipeline;
+
   bool online;
 
   bool verbose;  

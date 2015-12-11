@@ -16,6 +16,8 @@ char bases[] = {'A', 'C', 'G', 'T'};
 char revBases[128];
 Options Options::opts;
 
+double p_fail = 0.0;
+
 void initSimulator() {
   revBases['A'] = revBases['a'] = 0;
   revBases['C'] = revBases['c'] = 1;
@@ -31,6 +33,14 @@ void clearSimulator() {
   clearFalsePositiveMatrix();
   clearChainMatrix();
   clearProbabilities();
+}
+
+void outputResults() {
+  if (Options::opts.pipeline) {
+    std::cout << p_fail << std::endl;
+  } else {
+  }
+  
 }
 
 void offlineSimulation() {
@@ -63,7 +73,6 @@ void offlineSimulation() {
   size_t holes = 0;
   bool onHole = false;
   
-  double p_fail = 0;
   Read r1 = reads.top();
   reads.pop();
   while(!reads.empty()) {
@@ -105,8 +114,6 @@ void offlineSimulation() {
 
 void onlineSimulation() {
 
-  double p_fail = 0.0;
-  
   const size_t MAX_GENOME_LENGTH = 2 << 20;
 
   size_t N = Options::opts.N;
@@ -176,14 +183,10 @@ void onlineSimulation() {
     current.j = real_position;
     prev_read = current;
   }
-
-  std::cout << "P[fail]:    " << p_fail << std::endl;
 }
 
 
-int main(int argc, char** argv) {
-  std::cout << std::endl;
-  
+int main(int argc, char** argv) {   
   // Important NOT invert (init requires argument to be parsed)
   parseArguments(argc,argv);
   initSimulator();
@@ -193,8 +196,7 @@ int main(int argc, char** argv) {
   } else {  
     offlineSimulation();
   }
+  outputResults();
   
-  
-  std::cout << std::endl;
   return 0;
 }

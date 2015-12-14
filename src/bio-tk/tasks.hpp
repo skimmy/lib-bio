@@ -1,10 +1,12 @@
 #ifndef TASKS_H
 #define TASKS_H
 
+#include <cstdint>
+
 #include <string>
 #include <vector>
 
-#include "alignment.h"
+#include "../algorithms.h"
 
 /** \file tasks.hpp
  * \brief Contains definition of functions used to perform different tasks based

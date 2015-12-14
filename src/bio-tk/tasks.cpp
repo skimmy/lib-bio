@@ -6,17 +6,16 @@
 #include <ctime>
 
 #include "tasks.hpp"
-#include "sequence.h"
-#include "io.h"
-#include "alignment.h"
-#include "algorithms.h"
+#include "../core.h"
+#include "../io.h"
+#include "../algorithms.h"
 
-#include "util/io.hpp"
+//#include "util/io.hpp"
 
 // This utilitu function returns the bytes remaining until the end of the file
 // is reached. It should be probably made publicly availale in a separate util
 // section of the library (e.g. util/io.h)
-size_t bytesRemainingToTheEnd(ifstream& ifs) {
+size_t bytesRemainingToTheEnd(std::ifstream& ifs) {
   std::streampos tmp = ifs.tellg();
   ifs.seekg(0, ifs.end);
   size_t totalLength = ifs.tellg();

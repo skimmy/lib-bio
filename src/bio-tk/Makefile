@@ -102,7 +102,8 @@ PROGRAMS = $(bin_PROGRAMS)
 am_bio_tk_out_OBJECTS = main.$(OBJEXT) options.$(OBJEXT) \
 	tasks.$(OBJEXT)
 bio_tk_out_OBJECTS = $(am_bio_tk_out_OBJECTS)
-bio_tk_out_DEPENDENCIES = ../algorithms/
+bio_tk_out_DEPENDENCIES = ../algorithms/libbioalg.a ../io/libbioio.a \
+	../core/libbiocore.a
 AM_V_P = $(am__v_P_$(V))
 am__v_P_ = $(am__v_P_$(AM_DEFAULT_VERBOSITY))
 am__v_P_0 = false
@@ -167,7 +168,7 @@ AR = ar
 AUTOCONF = ${SHELL} /home/skimmy/src/lib-bio/missing autoconf
 AUTOHEADER = ${SHELL} /home/skimmy/src/lib-bio/missing autoheader
 AUTOMAKE = ${SHELL} /home/skimmy/src/lib-bio/missing automake-1.15
-AWK = mawk
+AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
@@ -253,7 +254,7 @@ top_build_prefix = ../../
 top_builddir = ../..
 top_srcdir = ../..
 bio_tk_out_SOURCES = main.cpp options.cpp tasks.cpp
-bio_tk_out_LDADD = -L ../algorithms/ -lbioalg -L../io -lbioio  -L../core -lbiocore -lpthread
+bio_tk_out_LDADD = ../algorithms/libbioalg.a ../io/libbioio.a  ../core/libbiocore.a -lpthread
 AM_CXXFLAGS = -std=c++11
 all: all-am
 

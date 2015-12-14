@@ -1,7 +1,7 @@
-#include <getopt.h>
-#include <stdlib.h>
-
 #include "options.hpp"
+
+#include <getopt.h>
+#include <cstdlib>
 
 #include <string>
 #include <map>

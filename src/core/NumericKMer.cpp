@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "../sequence.h"
+#include "../core.h"
 
 namespace seq
 {

@@ -1,4 +1,4 @@
-#include "../sequence.h"
+#include "../core.h"
 
 map<char, uint64_t> initBasesMap() {
   map<char, uint64_t> basesMap;
@@ -31,7 +31,7 @@ char DNAAlphabet2Bits::intToChar(uint64_t i) {
   return fromInt(i); 
 }
 
-uint64_t DNAAlphabet2Bits:: charToInt(char c) {
+uint64_t DNAAlphabet2Bits::charToInt(char c) {
   return fromChar(c);
 }
 

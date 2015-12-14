@@ -18,5 +18,7 @@ int main(int argc, char** argv) {
   std::cout << std::endl;
   uint64_t D2 = dstats::D2(r1, r2, 4);
   std::cout << D2 << std::endl;
+
+  std::cout << "\n\n" << DNAAlphabet2Bits::charToInt('A') << "\n";
   return 0;
 }

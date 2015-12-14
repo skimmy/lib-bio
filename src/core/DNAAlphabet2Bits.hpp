@@ -8,7 +8,7 @@ public:
   static char intToChar(uint64_t i);
   static uint64_t charToInt(char c);
 
-  static map<char, uint64_t> charToIntMap();
+  static std::map<char, uint64_t> charToIntMap();
 };
 
 #endif

@@ -1,10 +1,8 @@
-#include "Read.hpp"
+#include "../core.h"
 
 #include <iostream>
 
 int main(int argc, char** argv) {
-  Read r;
-  r.setBases("ACG");
-  std::cout << r.getBases() << std::endl;
+  std::cout << DNAAlphabet2Bits::charToInt('A') << std::endl;
   return 0;
 }

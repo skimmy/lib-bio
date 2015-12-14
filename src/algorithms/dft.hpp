@@ -4,7 +4,7 @@
 #include <complex>
 #include <vector>
 
-#include "../sequence.h"
+#include "../core.h"
 
 namespace dft {
   // functions to compute Discrete Fourier Transofmr

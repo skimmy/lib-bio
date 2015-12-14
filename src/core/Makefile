@@ -108,9 +108,9 @@ libbiocore_a_AR = $(AR) $(ARFLAGS)
 libbiocore_a_LIBADD =
 am_libbiocore_a_OBJECTS = Read.$(OBJEXT) KMer.$(OBJEXT) \
 	Reference.$(OBJEXT) CompressedSequence.$(OBJEXT) \
-	NumericKMer.$(OBJEXT) CompressedReadSet.$(OBJEXT) \
-	ColorAlphabet.$(OBJEXT) DNAAlphabet.$(OBJEXT) \
-	DNACompressedSymbol.$(OBJEXT) DNAAlphabet2Bits.$(OBJEXT) \
+	DNAAlphabet2Bits.$(OBJEXT) NumericKMer.$(OBJEXT) \
+	CompressedReadSet.$(OBJEXT) ColorAlphabet.$(OBJEXT) \
+	DNAAlphabet.$(OBJEXT) DNACompressedSymbol.$(OBJEXT) \
 	QualityCommon.$(OBJEXT) PhredQuality.$(OBJEXT) \
 	FullQuality.$(OBJEXT) ProbabilisticQuality.$(OBJEXT)
 libbiocore_a_OBJECTS = $(am_libbiocore_a_OBJECTS)
@@ -183,7 +183,7 @@ AR = ar
 AUTOCONF = ${SHELL} /home/skimmy/src/lib-bio/missing autoconf
 AUTOHEADER = ${SHELL} /home/skimmy/src/lib-bio/missing autoheader
 AUTOMAKE = ${SHELL} /home/skimmy/src/lib-bio/missing automake-1.15
-AWK = mawk
+AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
@@ -269,9 +269,9 @@ top_build_prefix = ../../
 top_builddir = ../..
 top_srcdir = ../..
 noinst_LIBRARIES = libbiocore.a
-libbiocore_a_SOURCES = Read.cpp KMer.cpp Reference.cpp CompressedSequence.cpp \
+libbiocore_a_SOURCES = Read.cpp KMer.cpp Reference.cpp CompressedSequence.cpp  DNAAlphabet2Bits.cpp \
 	NumericKMer.cpp CompressedReadSet.cpp \
-	ColorAlphabet.cpp DNAAlphabet.cpp DNACompressedSymbol.cpp DNAAlphabet2Bits.cpp \
+	ColorAlphabet.cpp DNAAlphabet.cpp DNACompressedSymbol.cpp \
 	QualityCommon.cpp PhredQuality.cpp FullQuality.cpp ProbabilisticQuality.cpp
 
 coretest_out_SOURCES = coretest.cpp

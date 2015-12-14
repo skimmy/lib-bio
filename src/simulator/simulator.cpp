@@ -114,7 +114,7 @@ void offlineSimulation() {
 
 void onlineSimulation() {
 
-  const size_t MAX_GENOME_LENGTH = 2 << 20;
+  const size_t MAX_GENOME_LENGTH = 1 << 20;
 
   size_t N = Options::opts.N;
   size_t m = Options::opts.m;
@@ -147,8 +147,11 @@ void onlineSimulation() {
       continue;
     }
     
-    current_position += d;
+
+    /******************************
+    current_position += d;    
     remaining_genome -= d;
+    std::cout << remaining_genome << '\n';
 
 
     // if we do not have enough generated genome for another read we generate
@@ -156,10 +159,33 @@ void onlineSimulation() {
     if (remaining_genome < m) {            
       generateNewGenomeSegment(g);
       current_position = current_position + m - g.length;
+      std::cout << current_position << '\n';
+    }*****************************/
+
+    if (remaining_genome < m + d) {
+      size_t tmp = current_position + d;
+      if (tmp < g.length) {
+	generateNewGenomeSegment(g, g.length - tmp + 1);
+	current_position = g.length - tmp - 1;
+	remaining_genome = g.length - current_position;
+      } else {
+	generateNewGenomeSegment(g, 0);
+	current_position = 0;
+	remaining_genome = g.length;
+      }
+    } else {
+      current_position += d;    
+      remaining_genome -= d;
     }
 
    
+    //Read current = // randomRead(Options::opts.m);
+    // if (current_position >= g.length) {
+    //   std::cout << current_position << '\t' << g.length << '\n';
+    //   std::cout.flush();
+    // }
     Read current = generateOnlineRead(g.genome,current_position);
+    //    std::cout << current.r << '\t' << current.j << '\n';
 
     // here the probabilities are computed and accumulated
     if (prev_read.j != -1) {       

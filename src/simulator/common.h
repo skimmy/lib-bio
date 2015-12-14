@@ -60,7 +60,7 @@ void simpleIIDErrors(std::string& s, double pe);
 char randomMutation(char c);
 
 void generateFirstGenomeSegment(GenomeSegment& g);
-void generateNewGenomeSegment(GenomeSegment& g);
+void generateNewGenomeSegment(GenomeSegment& g, size_t keep_pref);
 
 // chain
 void initFalsePositiveMatrix();
@@ -88,6 +88,8 @@ void printDoubleMatrix(double** M, size_t n, size_t m);
 double** initDoubleMatrix(size_t n, size_t m);
 void clearDoubleMatrix(double** matrix, size_t n, size_t m);
 double elementsSumDoubleMatrix(double** matrix, size_t n, size_t m);
+
+Read randomRead(size_t m);
 
 // probabilities
 void initProbabilities();

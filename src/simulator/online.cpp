@@ -26,10 +26,10 @@ void generateFirstGenomeSegment(GenomeSegment& g) {
   generateIIDGenome(g.length, g.genome);
 }
 
-void generateNewGenomeSegment(GenomeSegment& g) {
-  // copy the last m character in the first one (to ensure pending reads are
+void generateNewGenomeSegment(GenomeSegment& g, size_t keep_pref) {
+  // copy the last keep_pref character in the first one (to ensure pending reads are
   // corrected generated also after regeneration of the genome
-  strncpy(g.genome, g.genome + (g.length - g.read_length), g.read_length);
+  strncpy(g.genome, g.genome + (g.length - keep_pref), keep_pref);
   // generate new genome
-  generateIIDGenome(g.length - g.read_length, g.genome + g.read_length);
+  generateIIDGenome(g.length - keep_pref, g.genome + keep_pref);
 }

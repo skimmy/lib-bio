@@ -80,3 +80,13 @@ size_t bestHammingOverlap(const std::string& s1, const std::string& s2) {
   }
   return 0;
 }
+
+// Most of these function are used for debug and dev purpose, but they can be
+// useful in other situations (perhaps in the future development of simulator)
+
+Read randomRead(size_t m) {
+  char * tmp = new char[m];
+  generateIIDGenome(m,tmp);
+  Read r(std::string(tmp), 0);
+  delete[] tmp;
+}

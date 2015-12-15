@@ -16,7 +16,9 @@ char bases[] = {'A', 'C', 'G', 'T'};
 char revBases[128];
 Options Options::opts;
 
+// output quantities (common to online and offline)
 double p_fail = 0.0;
+size_t holes = 0;
 
 void initSimulator() {
   revBases['A'] = revBases['a'] = 0;
@@ -39,6 +41,10 @@ void outputResults() {
   if (Options::opts.pipeline) {
     std::cout << p_fail << std::endl;
   } else {
+    std::cout << "P[Fail]    = " << p_fail << std::endl;
+    std::cout << "P[Success] = " << 1.0 - p_fail << std::endl;
+    std::cout << "#[Holes]   = " << holes << std::endl;
+
   }
   
 }
@@ -70,7 +76,6 @@ void offlineSimulation() {
 
   // Temporary variables to count the number of holes, in the future a more
   // sophisticated way (e.g., finite state machine) should be used.
-  size_t holes = 0;
   bool onHole = false;
   
   Read r1 = reads.top();
@@ -101,11 +106,6 @@ void offlineSimulation() {
   }
   std::cout << "[OK]" << std::endl;
 
-  std::cout << "P[Fail]    = " << p_fail << std::endl;
-  std::cout << "P[Success] = " << 1.0 - p_fail << std::endl;
-
-  std::cout << "#[Holes]   = " << holes << std::endl;
-  
   std::cout << "* Cleaning... ";
   delete[] ref;
   std::cout << "[OK]" << std::endl;
@@ -113,6 +113,8 @@ void offlineSimulation() {
 }
 
 void onlineSimulation() {
+
+  bool onHole = false;
 
   const size_t MAX_GENOME_LENGTH = 1 << 20;
 
@@ -148,20 +150,6 @@ void onlineSimulation() {
     }
     
 
-    /******************************
-    current_position += d;    
-    remaining_genome -= d;
-    std::cout << remaining_genome << '\n';
-
-
-    // if we do not have enough generated genome for another read we generate
-    // a new genome segment
-    if (remaining_genome < m) {            
-      generateNewGenomeSegment(g);
-      current_position = current_position + m - g.length;
-      std::cout << current_position << '\n';
-    }*****************************/
-
     if (remaining_genome < m + d) {
       size_t tmp = current_position + d;
       if (tmp < g.length) {
@@ -177,26 +165,24 @@ void onlineSimulation() {
       current_position += d;    
       remaining_genome -= d;
     }
-
    
-    //Read current = // randomRead(Options::opts.m);
-    // if (current_position >= g.length) {
-    //   std::cout << current_position << '\t' << g.length << '\n';
-    //   std::cout.flush();
-    // }
     Read current = generateOnlineRead(g.genome,current_position);
-    //    std::cout << current.r << '\t' << current.j << '\n';
 
     // here the probabilities are computed and accumulated
     if (prev_read.j != -1) {       
       
       if (d > m) {
+	if (!onHole) {
+	  holes++;
+	}
+	onHole = true;
 	// non-overlap case...
 	double x = (double)N - 2.0 * (double)m + 1.0
 	  + overlappingStringsSum(prev_read.r, current.r);
 	p_fail += 1.0 - ( 1.0 / x);
 	
       } else {
+	onHole = false;
 	// overlap case...
 	size_t s = m - d;
 	double p_ab = randomReadsOverlapProbNoErr(prev_read.r,current.r,s);

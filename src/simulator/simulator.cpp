@@ -29,12 +29,14 @@ void initSimulator() {
   initProbabilities();
   initChainMatrix();
   initFalsePositiveMatrix();
+
 }
 
 void clearSimulator() {
   clearFalsePositiveMatrix();
   clearChainMatrix();
   clearProbabilities();
+
 }
 
 void outputResults() {

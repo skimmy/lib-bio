@@ -7,7 +7,7 @@ m=$2
 e=0
 coverage=`seq 1 20`
 
-for c in `seq 1 20`
+for c in `seq 21 30`
 do
     M=$(((N*c)/m))
     ./run100.sh $N $M $m $e

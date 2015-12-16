@@ -1,6 +1,7 @@
 #include "common.h"
 
 #include <iostream>
+#include <fstream>
 
 double** initDoubleMatrix(size_t n, size_t m) {
   double** matrix = new double*[n];
@@ -89,4 +90,9 @@ Read randomRead(size_t m) {
   generateIIDGenome(m,tmp);
   Read r(std::string(tmp), 0);
   delete[] tmp;
+}
+
+std::ifstream openFastaFile(const std::string & path) {
+  std::ifstream ifs(path, std::ifstream::in);
+  return ifs;
 }

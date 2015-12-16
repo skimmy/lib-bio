@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <string>
 #include <queue>
+#include <fstream>
 
 // general variables
 extern char bases[];
@@ -17,8 +18,9 @@ struct Options {
 
   double pe;
 
-  bool pipeline;
+  std::string inputReference;  
 
+  bool pipeline;
   bool online;
 
   bool verbose;  
@@ -83,13 +85,14 @@ size_t prefixSuffixHammingDistance(const std::string& s1, const std::string& s2,
 size_t bestHammingOverlap(const std::string& s1, const std::string& s2);
 
 void printString(char* s, size_t n);
- 
 void printDoubleMatrix(double** M, size_t n, size_t m);
 double** initDoubleMatrix(size_t n, size_t m);
 void clearDoubleMatrix(double** matrix, size_t n, size_t m);
 double elementsSumDoubleMatrix(double** matrix, size_t n, size_t m);
 
 Read randomRead(size_t m);
+
+std::ifstream openFastaFile(const std::string & path);
 
 // probabilities
 void initProbabilities();

@@ -138,6 +138,7 @@ void onlineSimulation() {
   while (generated_reads < M) {
 
     size_t d = generateInterReadDistance();
+    real_position += d;
 
     // this is artificial however for reasonable values of parameters it should
     // never happen otherwise we woul need a different way of online generating
@@ -150,25 +151,25 @@ void onlineSimulation() {
     if (d > (g.length - m - 1)) {
       continue;
     }
-    
 
+    // in this case we need to generate new genome segment...
     if (remaining_genome < m + d) {
       size_t tmp = current_position + d;
       if (tmp < g.length) {
-	generateNewGenomeSegment(g, g.length - tmp + 1);
-	current_position = g.length - tmp - 1;
-	remaining_genome = g.length - current_position;
+	generateNewGenomeSegment(g, g.length - tmp);
       } else {
 	generateNewGenomeSegment(g, 0);
-	current_position = 0;
-	remaining_genome = g.length;
       }
+      current_position = 0;
+      remaining_genome = g.length;
     } else {
+      // ...otherwise we simply update counters
       current_position += d;    
       remaining_genome -= d;
     }
    
     Read current = generateOnlineRead(g.genome,current_position);
+    current.j = real_position;
 
     // here the probabilities are computed and accumulated
     if (prev_read.j != -1) {       
@@ -193,7 +194,6 @@ void onlineSimulation() {
     }
     
     generated_reads++;
-    real_position += d;
     current.j = real_position;
     prev_read = current;
   }

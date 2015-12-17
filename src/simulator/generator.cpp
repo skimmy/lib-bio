@@ -47,12 +47,11 @@ void generateOfflineReads(const std::string& s, std::priority_queue<Read>& reads
 }
 
 /**
- * Generates a noisy read starting at position j of S
+ * Generates a noisy read starting at position j of S for online simulations
  */
 Read generateOnlineRead(char* S, size_t j) {  
   char* r = new char[Options::opts.m+1];
   simulateReadAt(j, Options::opts.m, S, r);
-  //  simulateReadAt(0, Options::opts.m, S, r);
   Read read(std::string(r),j);
   delete[] r;
   return read;

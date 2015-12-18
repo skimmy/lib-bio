@@ -61,12 +61,11 @@ void simulateReadAt(size_t j, size_t m, const char* S, char* r);
 void simpleIIDErrors(std::string& s, double pe);
 char randomMutation(char c);
 
+const size_t MAX_GENOME_SEGMENT_LENGTH = 1 << 20;
 void generateFirstGenomeSegment(GenomeSegment& g);
 void generateNewGenomeSegment(GenomeSegment& g, size_t keep_pref);
 
 // chain
-void initFalsePositiveMatrix();
-void clearFalsePositiveMatrix();
 void printFalsePositiveMatrix();
 
 void initChainMatrix();

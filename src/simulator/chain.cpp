@@ -21,7 +21,7 @@ void computeExpectedFalsePositiveMatrix(double** m) {
   }
 }
 
-void initFalsePositiveMatrix() {
+/*void initFalsePositiveMatrix() {
   double p_no_olap = (double)(Options::opts.N - 2 * Options::opts.m)
     / (double)pow(4,Options::opts.m);
   
@@ -48,7 +48,7 @@ void clearFalsePositiveMatrix() {
     delete[] fpMatrix[i];
   }
   delete[] fpMatrix;
-}
+  }*/
 
 void printFalsePositiveMatrix() {
     std::cout << '\n';
@@ -99,7 +99,6 @@ void printNonOverlapDistribution() {
 void evaluateChainRelation(const Read& r1, const Read& r2, size_t s) {
   if (s < Options::opts.m) {
     size_t e = prefixSuffixHammingDistance(r1.r, r2.r, s);
-    //    std::cout << "(" << s << ", " << e << ")\t\t" << r1.r << " -- " << r2.r << "\n";
     M[s][e]++;
   } 
 }

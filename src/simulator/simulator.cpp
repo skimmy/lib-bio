@@ -28,12 +28,12 @@ void initSimulator() {
   srand(time(NULL));
   initProbabilities();
   initChainMatrix();
-  initFalsePositiveMatrix();
+  // initFalsePositiveMatrix();
 
 }
 
 void clearSimulator() {
-  clearFalsePositiveMatrix();
+  //clearFalsePositiveMatrix();
   clearChainMatrix();
   clearProbabilities();
 
@@ -60,21 +60,16 @@ void offlineSimulation() {
   size_t M = Options::opts.M;
   size_t Nbar = N - m + 1;
   double pe = Options::opts.pe; 
-  std::cout << std::endl;
   
-  std::cout << "\t\t+++++  Starting simulation +++++ \n\n";  
-  std::cout << "* Reference generation... ";
   ref = new char[N];
   generateIIDGenome(N,ref);
   std::string s(ref);
-  std::cout << "[OK]" << std::endl;
 
-  std::cout << "* Read generation... ";
+  // priority queue is used with position as key so that while extractin reads at
+  // once (i.e., emptying the queue) reads will be presented in ordered by
+  // position on the reference sequence
   std::priority_queue<Read> reads;
   generateOfflineReads(s, reads);
-  std::cout << "[OK]" << std::endl;
-
-  std::cout << "* Processing reads... ";
 
   // Temporary variables to count the number of holes, in the future a more
   // sophisticated way (e.g., finite state machine) should be used.
@@ -106,26 +101,19 @@ void offlineSimulation() {
     }
     r1 = r2;
   }
-  std::cout << "[OK]" << std::endl;
 
-  std::cout << "* Cleaning... ";
   delete[] ref;
-  std::cout << "[OK]" << std::endl;
-
 }
 
 void onlineSimulation() {
 
   bool onHole = false;
 
-  const size_t MAX_GENOME_LENGTH = 1 << 20;
-
   size_t N = Options::opts.N;
   size_t m = Options::opts.m;
   size_t M = Options::opts.M;  
   
-  //  GenomeSegment g(N, m, MAX_GENOME_LENGTH);
-  GenomeSegment g(N, m, MAX_GENOME_LENGTH);
+  GenomeSegment g(N, m, MAX_GENOME_SEGMENT_LENGTH);
   generateFirstGenomeSegment(g);
 
   size_t generated_reads = 0;

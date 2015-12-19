@@ -19,6 +19,7 @@ Options Options::opts;
 // output quantities (common to online and offline)
 double p_fail = 0.0;
 size_t holes = 0;
+double scoreSum = 0.0;
 
 void initSimulator() {
   revBases['A'] = revBases['a'] = 0;
@@ -88,6 +89,7 @@ void offlineSimulation() {
       onHole = false;
       double p_ab = randomReadsOverlapProbNoErr(r1.r,r2.r,s);
       p_fail += 1.0 - p_ab;
+      scoreSum += p_ab;
 
     } else {
       if (onHole == false) {
@@ -98,6 +100,7 @@ void offlineSimulation() {
       double x = (double)Options::opts.N - 2.0 * (double)Options::opts.m + 1.0
 	+ overlappingStringsSum(r1.r, r2.r);
       p_fail += 1.0 - ( 1.0 / x);
+      scoreSum += ( 1.0 / x);
     }
     r1 = r2;
   }
@@ -171,6 +174,7 @@ void onlineSimulation() {
 	double x = (double)N - 2.0 * (double)m + 1.0
 	  + overlappingStringsSum(prev_read.r, current.r);
 	p_fail += 1.0 - ( 1.0 / x);
+	scoreSum += ( 1.0 / x);
 	
       } else {
 	onHole = false;
@@ -178,6 +182,7 @@ void onlineSimulation() {
 	size_t s = m - d;
 	double p_ab = randomReadsOverlapProbNoErr(prev_read.r,current.r,s);
 	p_fail += 1.0 - p_ab;
+	scoreSum += p_ab;
       }
     }
     

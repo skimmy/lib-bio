@@ -134,7 +134,7 @@ Makefile.in
 /stamp-h1
 .deps/
 # uncomment when porting to autotools is finished
-# Makefile
+Makefile
 config.h.in
 config.status
 ar-lib

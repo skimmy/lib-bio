@@ -204,6 +204,13 @@ int main(int argc, char** argv) {
     offlineSimulation();
   }
   outputResults();
-  
+
   return 0;
+}
+
+EmpiricalDistribution::EmpiricalDistribution(double a, double b, size_t N)
+  : f(N,0.0) {
+  xa = a;
+  xb = b;
+  n = N;
 }

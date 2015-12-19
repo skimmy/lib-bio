@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <string>
 #include <queue>
+#include <vector>
 #include <fstream>
 
 // general variables
@@ -95,8 +96,15 @@ std::ifstream openFastaFile(const std::string & path);
 
 // probabilities
 
-class EmpiricalCDF {
+class EmpiricalDistribution {
+public:
+  EmpiricalDistribution(double a, double b, size_t N);
   
+private:
+  std::vector<double> f;
+  size_t n;
+  double xa;
+  double xb;
 };
 
 void initProbabilities();

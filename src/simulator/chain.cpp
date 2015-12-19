@@ -1,4 +1,4 @@
-#include "common.h"
+#include "common.hpp"
 
 #include <cstdint>
 #include <cmath>

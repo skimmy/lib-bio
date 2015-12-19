@@ -94,6 +94,11 @@ Read randomRead(size_t m);
 std::ifstream openFastaFile(const std::string & path);
 
 // probabilities
+
+class EmpiricalCDF {
+  
+};
+
 void initProbabilities();
 void clearProbabilities();
 double randomReadsOverlapProbNoErr(const std::string& s1, const std::string& s2, size_t s);

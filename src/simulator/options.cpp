@@ -1,4 +1,4 @@
-#include "common.h"
+#include "common.hpp"
 
 #include <getopt.h>
 #include <cstdlib>

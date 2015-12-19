@@ -4,7 +4,7 @@
  * of a library rather then efficient stand alon tools.
  */
 
-#include "common.h"
+#include "common.hpp"
 
 #include <cstdlib>
 #include <ctime>

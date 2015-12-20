@@ -98,11 +98,11 @@ size_t generateInterReadDistance() {
 }
 
 EmpiricalDistribution::EmpiricalDistribution(double a, double b, size_t N)
-  : f(N,0.0)
+  : f(N+1,0.0)
 {
   this->xa = a;
   this->xb = b;
-  this->n = N;
+  this->n = N+1;
   this->step = (b-a) / (double)N;
   this->total = 0;
 }

@@ -20,6 +20,7 @@ Options Options::opts;
 double p_fail = 0.0;
 size_t holes = 0;
 double scoreSum = 0.0;
+EmpiricalDistribution scoreDist(0,1,8);
 
 void initSimulator() {
   revBases['A'] = revBases['a'] = 0;
@@ -48,8 +49,18 @@ void outputResults() {
     std::cout << "P[Success] = " << 1.0 - p_fail << std::endl;
     std::cout << "#[Holes]   = " << holes << std::endl;
 
+    for (size_t i = 0; i < scoreDist.getIntervalCount(); ++i) {
+      std::cout << scoreDist.valueAtIndex(i) << ' ' << scoreDist.countAtIndex(i) << '\n';
+    }
   }
   
+  
+}
+
+void recordScore(double p_ab) {
+  p_fail += 1.0 - p_ab;
+  scoreSum += p_ab;
+  scoreDist.addSample(p_ab);
 }
 
 void offlineSimulation() {
@@ -88,8 +99,7 @@ void offlineSimulation() {
     if (s <= m) {
       onHole = false;
       double p_ab = randomReadsOverlapProbNoErr(r1.r,r2.r,s);
-      p_fail += 1.0 - p_ab;
-      scoreSum += p_ab;
+      recordScore(p_ab);
 
     } else {
       if (onHole == false) {
@@ -99,8 +109,9 @@ void offlineSimulation() {
       addNonOverlapRecord(r2.j - r1.j - m);
       double x = (double)Options::opts.N - 2.0 * (double)Options::opts.m + 1.0
 	+ overlappingStringsSum(r1.r, r2.r);
-      p_fail += 1.0 - ( 1.0 / x);
-      scoreSum += ( 1.0 / x);
+      recordScore(1.0 / x);
+      //      p_fail += 1.0 - ( 1.0 / x);
+      //      scoreSum += ( 1.0 / x);
     }
     r1 = r2;
   }
@@ -173,16 +184,18 @@ void onlineSimulation() {
 	// non-overlap case...
 	double x = (double)N - 2.0 * (double)m + 1.0
 	  + overlappingStringsSum(prev_read.r, current.r);
-	p_fail += 1.0 - ( 1.0 / x);
-	scoreSum += ( 1.0 / x);
+	recordScore(1.0 / x);
+	//	p_fail += 1.0 - ( 1.0 / x);
+	//	scoreSum += ( 1.0 / x);
 	
       } else {
 	onHole = false;
 	// overlap case...
 	size_t s = m - d;
 	double p_ab = randomReadsOverlapProbNoErr(prev_read.r,current.r,s);
-	p_fail += 1.0 - p_ab;
-	scoreSum += p_ab;
+	recordScore(p_ab);
+	//p_fail += 1.0 - p_ab;
+	//	scoreSum += p_ab;
       }
     }
     
@@ -205,15 +218,15 @@ int main(int argc, char** argv) {
   }
   outputResults();
 
-  EmpiricalDistribution pdf(1,2,4);
-  pdf.addSample(1.33);
-  pdf.addSample(1.9999);
-  pdf.addSample(1.9999);
-  pdf.addSample(1.5);
-  for (int i = 0; i < 4; i++) {
-    std::cout << pdf.valueAtIndex(i) << ' ';
-  }
-  std::cout << '\n';
+  // EmpiricalDistribution pdf(1,2,4);
+  // pdf.addSample(1.33);
+  // pdf.addSample(1.9999);
+  // pdf.addSample(1.9999);
+  // pdf.addSample(1.5);
+  // for (int i = 0; i < 4; i++) {
+  //   std::cout << pdf.valueAtIndex(i) << ' ';
+  // }
+  // std::cout << '\n';
 
   return 0;
 }

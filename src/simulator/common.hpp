@@ -105,9 +105,14 @@ public:
   size_t indexForSample(double x) const;
   // returns the relative frequenxy (i.e., count[i] / total) for the i-th index
   double valueAtIndex(size_t i) const;
+  // returns the number of elements at the i-th index
+  double countAtIndex(size_t i) const { return f[i]; }
+
+  // returns the number of intervals 'n'
+  double getIntervalCount() const { return n; }
   
   // add a new sample x to the distribution
-  void addSample(double x);
+  void addSample(double x);  
   
 private:
   std::vector<double> f;

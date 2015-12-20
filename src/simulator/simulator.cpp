@@ -205,12 +205,15 @@ int main(int argc, char** argv) {
   }
   outputResults();
 
-  return 0;
-}
+  EmpiricalDistribution pdf(1,2,4);
+  pdf.addSample(1.33);
+  pdf.addSample(1.9999);
+  pdf.addSample(1.9999);
+  pdf.addSample(1.5);
+  for (int i = 0; i < 4; i++) {
+    std::cout << pdf.valueAtIndex(i) << ' ';
+  }
+  std::cout << '\n';
 
-EmpiricalDistribution::EmpiricalDistribution(double a, double b, size_t N)
-  : f(N,0.0) {
-  xa = a;
-  xb = b;
-  n = N;
+  return 0;
 }

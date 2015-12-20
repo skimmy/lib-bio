@@ -96,15 +96,26 @@ std::ifstream openFastaFile(const std::string & path);
 
 // probabilities
 
-class EmpiricalDistribution {
+// Class representing empirical distribution as histogram array
+class EmpiricalDistribution {  
 public:
   EmpiricalDistribution(double a, double b, size_t N);
+
+  // given a sample x in [a,b] returns the index where x must be counted
+  size_t indexForSample(double x) const;
+  // returns the relative frequenxy (i.e., count[i] / total) for the i-th index
+  double valueAtIndex(size_t i) const;
+  
+  // add a new sample x to the distribution
+  void addSample(double x);
   
 private:
   std::vector<double> f;
   size_t n;
   double xa;
   double xb;
+  double step; // defined as (b-a)/n
+  double total;
 };
 
 void initProbabilities();

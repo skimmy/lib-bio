@@ -96,3 +96,28 @@ double randomReadsOverlapProbNoErr(const std::string& s1, const std::string& s2,
 size_t generateInterReadDistance() {
   return geom(gen);
 }
+
+EmpiricalDistribution::EmpiricalDistribution(double a, double b, size_t N)
+  : f(N,0.0)
+{
+  this->xa = a;
+  this->xb = b;
+  this->n = N;
+  this->step = (b-a) / (double)N;
+  this->total = 0;
+}
+
+size_t EmpiricalDistribution::indexForSample(double x) const {
+  return floor( (x - xa) / step);
+}
+
+
+double EmpiricalDistribution::valueAtIndex(size_t i) const {
+  return (f[i] / (double)total);
+}
+  
+void EmpiricalDistribution::addSample(double x) {
+  total++;
+  size_t i = indexForSample(x);
+  f[i] += 1;
+}

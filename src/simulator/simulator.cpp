@@ -52,7 +52,7 @@ void outputResults() {
   if (!Options::opts.outputDistribution.empty()) {
     std::ofstream ofs(Options::opts.outputDistribution, std::ofstream::out);
     for (size_t i = 0; i < scoreDist.getIntervalCount(); ++i) {
-      ofs << scoreDist.valueAtIndex(i) << ' ' << scoreDist.countAtIndex(i) << '\n';
+      ofs << scoreDist.valueAtIndex(i) << '\n';
     }
     ofs.close();
   }

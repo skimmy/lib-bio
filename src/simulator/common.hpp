@@ -19,7 +19,8 @@ struct Options {
 
   double pe;
 
-  std::string inputReference;  
+  std::string inputReference;
+  std::string outputDistribution;
 
   bool pipeline;
   bool online;

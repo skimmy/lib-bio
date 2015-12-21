@@ -48,12 +48,14 @@ void outputResults() {
     std::cout << "P[Fail]    = " << p_fail << std::endl;
     std::cout << "P[Success] = " << 1.0 - p_fail << std::endl;
     std::cout << "#[Holes]   = " << holes << std::endl;
-
-    for (size_t i = 0; i < scoreDist.getIntervalCount(); ++i) {
-      std::cout << scoreDist.valueAtIndex(i) << ' ' << scoreDist.countAtIndex(i) << '\n';
-    }
   }
-  
+  if (!Options::opts.outputDistribution.empty()) {
+    std::ofstream ofs(Options::opts.outputDistribution, std::ofstream::out);
+    for (size_t i = 0; i < scoreDist.getIntervalCount(); ++i) {
+      ofs << scoreDist.valueAtIndex(i) << ' ' << scoreDist.countAtIndex(i) << '\n';
+    }
+    ofs.close();
+  }
   
 }
 

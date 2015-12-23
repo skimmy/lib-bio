@@ -24,11 +24,12 @@ void parseArguments(int argc, char** argv) {
   Options::opts.m = 50;
   Options::opts.M = 10;
   Options::opts.pe = 0.01;
+  Options::opts.empiricalDistributionStep = 100;
   Options::opts.inputReference = "";
   Options::opts.outputDistribution = "";
   Options::opts.online = false;
   Options::opts.pipeline = false;
-  Options::opts.verbose = false;
+  Options::opts.verbose = false;  
   
   char c;
   while ((c = getopt(argc, argv, "N:m:M:e:i:D:ophv")) != -1) {

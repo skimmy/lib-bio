@@ -16,8 +16,9 @@ struct Options {
   size_t N;
   size_t m;
   size_t M;
-
   double pe;
+
+  size_t empiricalDistributionStep;
 
   std::string inputReference;
   std::string outputDistribution;

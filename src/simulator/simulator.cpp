@@ -20,16 +20,18 @@ Options Options::opts;
 double p_fail = 0.0;
 size_t holes = 0;
 double scoreSum = 0.0;
-EmpiricalDistribution scoreDist(0,1,8);
+EmpiricalDistribution scoreDist(0,1,10);
 
 void initSimulator() {
   revBases['A'] = revBases['a'] = 0;
   revBases['C'] = revBases['c'] = 1;
   revBases['G'] = revBases['g'] = 2;
   revBases['T'] = revBases['t'] = 3;
+  scoreDist = EmpiricalDistribution(0,1,Options::opts.empiricalDistributionStep);
   srand(time(NULL));
   initProbabilities();
   initChainMatrix();
+
   // initFalsePositiveMatrix();
 
 }

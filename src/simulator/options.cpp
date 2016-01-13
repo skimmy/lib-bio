@@ -5,8 +5,21 @@
 #include <iostream>
 
 void printUsage() {
+  std::cout << std::endl;
   std::cout << "USAGE\n";
-  std::cout << "\tsimulator -N [ref_len] -m [read_len] -M [read_count]\n\n";
+  std::cout << "\tsimulator [<OPTIONS>]\n\n";
+  std::cout << " OPTIONS\n\n";
+  std::cout << "\t-N <length>  Length of reference sequence\n";
+  std::cout << "\t-M <length>  Length of reads  [1,2,...]\n";
+  std::cout << "\t-m <count>   Number of reads  [1,2,...]\n";
+  std::cout << "\t-e <error>   Error probability for base call [0.0,1.0]\n";
+  std::cout << "\t-i <path>    Path of a fasta file for the reference\n";
+  std::cout << "\t-D <path>    Path of a output file for distribution of scores\n";
+  std::cout << "\t-o           Executes online generation of reference\n";
+  std::cout << "\t-p           Outputs on standard out for pipelining\n";
+  std::cout << "\t-h           Shows help\n";
+  std::cout << "\t-v           Activate verbose mode\n";
+  std::cout << std::endl;
 }
 
 void printArguments() {

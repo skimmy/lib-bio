@@ -22,6 +22,7 @@ struct Options {
 
   std::string inputReference;
   std::string outputDistribution;
+  std::string outputCDF;
 
   bool pipeline;
   bool online;
@@ -114,7 +115,12 @@ public:
   double getIntervalCount() const { return n; }
   
   // add a new sample x to the distribution
-  void addSample(double x);  
+  void addSample(double x);
+
+  // returns the emprical cumulative distribution derived from
+  // currently stored samples.
+  void getCDF(std::vector<double>& cdf)  const;
+    
   
 private:
   std::vector<double> f;

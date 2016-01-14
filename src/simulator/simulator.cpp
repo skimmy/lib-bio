@@ -58,6 +58,16 @@ void outputResults() {
     }
     ofs.close();
   }
+
+  if (!Options::opts.outputCDF.empty()) {
+    std::ofstream ofs(Options::opts.outputCDF, std::ofstream::out);
+    std::vector<double> cdf(scoreDist.getIntervalCount());
+    scoreDist.getCDF(cdf);
+    for (size_t i = 0; i < scoreDist.getIntervalCount(); ++i) {
+      ofs << cdf[i] << "\n";
+    }
+    ofs.close();
+  }
   
 }
 
@@ -189,8 +199,6 @@ void onlineSimulation() {
 	double x = (double)N - 2.0 * (double)m + 1.0
 	  + overlappingStringsSum(prev_read.r, current.r);
 	recordScore(1.0 / x);
-	//	p_fail += 1.0 - ( 1.0 / x);
-	//	scoreSum += ( 1.0 / x);
 	
       } else {
 	onHole = false;
@@ -198,8 +206,6 @@ void onlineSimulation() {
 	size_t s = m - d;
 	double p_ab = randomReadsOverlapProbNoErr(prev_read.r,current.r,s);
 	recordScore(p_ab);
-	//p_fail += 1.0 - p_ab;
-	//	scoreSum += p_ab;
       }
     }
     
@@ -221,16 +227,5 @@ int main(int argc, char** argv) {
     offlineSimulation();
   }
   outputResults();
-
-  // EmpiricalDistribution pdf(1,2,4);
-  // pdf.addSample(1.33);
-  // pdf.addSample(1.9999);
-  // pdf.addSample(1.9999);
-  // pdf.addSample(1.5);
-  // for (int i = 0; i < 4; i++) {
-  //   std::cout << pdf.valueAtIndex(i) << ' ';
-  // }
-  // std::cout << '\n';
-
   return 0;
 }

@@ -15,6 +15,7 @@ void printUsage() {
   std::cout << "\t-e <error>   Error probability for base call [0.0,1.0]\n";
   std::cout << "\t-i <path>    Path of a fasta file for the reference\n";
   std::cout << "\t-D <path>    Path of a output file for distribution of scores\n";
+  std::cout << "\t-C <path>    Path of a output file for CDF (cumulative distribution) of scores\n";
   std::cout << "\t-o           Executes online generation of reference\n";
   std::cout << "\t-p           Outputs on standard out for pipelining\n";
   std::cout << "\t-h           Shows help\n";
@@ -40,12 +41,13 @@ void parseArguments(int argc, char** argv) {
   Options::opts.empiricalDistributionStep = 100;
   Options::opts.inputReference = "";
   Options::opts.outputDistribution = "";
+  Options::opts.outputCDF = "";
   Options::opts.online = false;
   Options::opts.pipeline = false;
   Options::opts.verbose = false;  
   
   char c;
-  while ((c = getopt(argc, argv, "N:m:M:e:i:D:ophv")) != -1) {
+  while ((c = getopt(argc, argv, "N:m:M:e:i:D:C:ophv")) != -1) {
     switch(c) {
     case 'N':
       Options::opts.N = atoi(optarg);
@@ -64,6 +66,9 @@ void parseArguments(int argc, char** argv) {
       break;
     case 'D':
       Options::opts.outputDistribution = optarg;
+      break;
+    case 'C':
+      Options::opts.outputCDF = optarg;
       break;
     case 'o':
       Options::opts.online = true;

@@ -121,3 +121,18 @@ void EmpiricalDistribution::addSample(double x) {
   size_t i = indexForSample(x);
   f[i] += 1;
 }
+
+void EmpiricalDistribution::getCDF(std::vector<double>& cdf) const {
+  if (this->n == 0) {
+    return;
+  }
+  cdf.reserve(this->n);
+  cdf[0] = this->f[0];
+  for (size_t i = 1; i < this->n; ++i) {
+    cdf[i] = cdf[i-1] + f[i];
+  }
+  // normalize between 0 and 1
+  for (size_t i = 0; i < this->n; ++i) {
+    cdf[i] /= cdf[this->n - 1];
+  }
+}

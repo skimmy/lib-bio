@@ -137,4 +137,6 @@ double randomReadsOverlapProbNoErr(const std::string& s1, const std::string& s2,
 double overlappingStringsSum(const std::string & s1, const std::string& s2);
 size_t generateInterReadDistance();
 
+size_t percentileIndex(const std::vector<double>& cdf, double perc);
+
 #endif

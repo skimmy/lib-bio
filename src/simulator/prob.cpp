@@ -136,3 +136,15 @@ void EmpiricalDistribution::getCDF(std::vector<double>& cdf) const {
     cdf[i] /= cdf[this->n - 1];
   }
 }
+
+size_t percentileIndex(const std::vector<double>& cdf, double perc) {
+  size_t idx = 0;
+  size_t n = cdf.size();
+  for (size_t i = 0; i < n; ++i) {
+    if(cdf[i] >= perc) {
+      break;
+    }
+    ++idx;
+  }
+  return idx;
+}

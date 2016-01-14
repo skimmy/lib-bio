@@ -67,6 +67,7 @@ void outputResults() {
       ofs << cdf[i] << "\n";
     }
     ofs.close();
+    std::cout << scoreDist.valueAtIndex(percentileIndex(cdf,0.001)) << "\n";
   }
   
 }

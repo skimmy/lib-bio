@@ -65,7 +65,7 @@ double probabilityReads(const std::string& s1, const std::string& s2, size_t d) 
  * Compute
  *  \sum_{s}{I(A,B,s)4^s}
  */
-double overlappingStringsSum(const std::string & s1, const std::string& s2) {
+double overlappingStringsSum(const std::string& s1, const std::string& s2) {
   size_t m = Options::opts.m;
   double sum = 0.0;
   for (size_t s = 1; s <= m-1; ++s) {
@@ -75,6 +75,22 @@ double overlappingStringsSum(const std::string & s1, const std::string& s2) {
   }
   size_t indic_m = (prefixSuffixHammingDistance(s2,s1,m) == 0) ? 1 : 0;
   sum += indic_m * pow(4,m);
+  return sum;
+}
+
+double overlappingStringSumWithErr(const std::string& s1, const std::string& s2) {
+  double sum = 0.0;
+  size_t m = Options::opts.m;
+  double peq = p_equal_calls;
+  double qeq = 1.0 - p_equal_calls;
+  for (size_t s = 1; s <= m-1; ++s) {
+    double iab = prefixSuffixHammingDistance(s2,s1,s);
+    double iba = prefixSuffixHammingDistance(s1,s2,s);
+    // WARNING: If needed here we can use lookup tables to make things faster
+    double tab = pow(peq, iab) * pow(qeq, iab);
+    double tba = pow(qeq, iba) * pow(qeq, iba);
+    sum += pow(4,s) * tab * tba;
+  }
   return sum;
 }
 

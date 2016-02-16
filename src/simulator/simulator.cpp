@@ -197,16 +197,18 @@ void onlineSimulation() {
 	}
 	onHole = true;
 	// non-overlap case...
-	double x = (double)N - 2.0 * (double)m + 1.0
-	  + overlappingStringsSum(prev_read.r, current.r);
-	recordScore(1.0 / x);
-	
+	double sc = score(prev_read.r, current.r , 0);
+	recordScore(sc);
+		
       } else {
 	onHole = false;
 	// overlap case...
 	size_t s = m - d;
-	double p_ab = randomReadsOverlapProbNoErr(prev_read.r,current.r,s);
-	recordScore(p_ab);
+	double sc = score(prev_read.r, current.r , s);
+	recordScore(sc);
+
+	
+
       }
     }
     

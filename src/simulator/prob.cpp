@@ -10,6 +10,7 @@ std::mt19937 gen;
 
 // probability of equality of two calls of the SAME reference position
 double p_equal_calls = 0.0;
+double q_equal_calls = 0.0;
 
 // probability of 'sequenced position' which represents the probability of a read
 // starting at a given position of the reference
@@ -27,8 +28,9 @@ void initProbabilities() {
   double p_err = Options::opts.pe;
   double q_err = 1.0 - p_err;
 
-  // init p_equal_calls
+  // init p_equal_calls and q_equal_call
   p_equal_calls = q_err * q_err + (1.0 / 3.0) * ( p_err * p_err );
+  q_equal_calls = 1.0 - p_equal_calls;
 
   // init p_read_start
   p_read_start = (double)Options::opts.M / (double)Options::opts.N;
@@ -40,6 +42,20 @@ void initProbabilities() {
 
 void clearProbabilities() {
 
+}
+
+double indicatorErr(const std::string& r1, const std::string& r2, size_t s) {
+  if (s > 0) {
+    size_t hamm_d = prefixSuffixHammingDistance(r1, r2, s);
+    //::cout << pow(p_equal_calls, s - hamm_d) * pow(q_equal_calls, hamm_d) << "\t";
+    return ( pow(p_equal_calls, s - hamm_d) * pow(q_equal_calls, hamm_d) ) ;
+  } 
+  return 1.0;
+    
+}
+
+double indicatorNoErr(const std::string& r1, const std::string& r2, size_t s) {
+  return (prefixSuffixHammingDistance(r1, r2, s) == 0 );
 }
 
 double probabilityReads(const std::string& s1, const std::string& s2, size_t d) {
@@ -78,19 +94,18 @@ double overlappingStringsSum(const std::string& s1, const std::string& s2) {
   return sum;
 }
 
-double overlappingStringSumWithErr(const std::string& s1, const std::string& s2) {
+double overlappingStringsSumWithErr(const std::string& s1, const std::string& s2) {
   double sum = 0.0;
   size_t m = Options::opts.m;
   double peq = p_equal_calls;
   double qeq = 1.0 - p_equal_calls;
   for (size_t s = 1; s <= m-1; ++s) {
-    double iab = prefixSuffixHammingDistance(s2,s1,s);
-    double iba = prefixSuffixHammingDistance(s1,s2,s);
     // WARNING: If needed here we can use lookup tables to make things faster
-    double tab = pow(peq, iab) * pow(qeq, iab);
-    double tba = pow(qeq, iba) * pow(qeq, iba);
-    sum += pow(4,s) * tab * tba;
+    double tab = indicatorErr(s1, s2, s);
+    double tba = indicatorErr(s2, s1, s);
+    sum += pow(4,s) * (tab + tba);
   }
+  sum += pow(4,m) * indicatorErr(s1, s2, m);
   return sum;
 }
 
@@ -163,4 +178,28 @@ size_t percentileIndex(const std::vector<double>& cdf, double perc) {
     ++idx;
   }
   return idx;
+}
+
+
+double score(const std::string& r1, const std::string& r2, size_t s) {
+  
+  double num = 1.0;
+  double den = 1.0;
+  // error case
+  if (Options::opts.pe > 0) {
+    den = (double)Options::opts.N - 2.0 * (double)Options::opts.m + 1.0
+      + overlappingStringsSumWithErr(r1,r2);
+    
+    num = indicatorErr(r1, r2, s) *pow(4,s);
+    //std::cout << indicatorErr(r1, r2, s) << "\n";
+    //    std::cout << den << "\t" << num << "\t" << (num/den) << "\n";
+    
+  }
+  // no error case
+  else {
+    den = (double)Options::opts.N - 2.0 * (double)Options::opts.m + 1.0
+      + overlappingStringsSum(r1,r2);
+    num = pow(4,s);
+  }
+  return num / den;
 }

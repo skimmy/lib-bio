@@ -19,6 +19,7 @@ Options Options::opts;
 // output quantities (common to online and offline)
 double p_fail = 0.0;
 size_t holes = 0;
+size_t actually_produced_reads = 0;
 double scoreSum = 0.0;
 EmpiricalDistribution scoreDist(0,1,10);
 
@@ -50,6 +51,7 @@ void outputResults() {
     std::cout << "P[Fail]    = " << p_fail << std::endl;
     std::cout << "P[Success] = " << 1.0 - p_fail << std::endl;
     std::cout << "#[Holes]   = " << holes << std::endl;
+    std::cout << "#[Reads]   = " << actually_produced_reads << std::endl;
   }
   if (!Options::opts.outputDistribution.empty()) {
     std::ofstream ofs(Options::opts.outputDistribution, std::ofstream::out);
@@ -130,7 +132,7 @@ void offlineSimulation() {
     }
     r1 = r2;
   }
-
+  
   delete[] ref;
 }
 
@@ -150,9 +152,11 @@ void onlineSimulation() {
   size_t real_position = 0;
   size_t remaining_genome = g.length;
 
+  size_t actual_M = 0;
+
   Read prev_read("", -1);
   
-  while (generated_reads < M) {
+  while (real_position < N - m) {
 
     size_t d = generateInterReadDistance();
     real_position += d;
@@ -186,6 +190,7 @@ void onlineSimulation() {
     }
    
     Read current = generateOnlineRead(g.genome,current_position);
+    actual_M++;
     current.j = real_position;
 
     // here the probabilities are computed and accumulated
@@ -206,9 +211,6 @@ void onlineSimulation() {
 	size_t s = m - d;
 	double sc = score(prev_read.r, current.r , s);
 	recordScore(sc);
-
-	
-
       }
     }
     
@@ -216,6 +218,7 @@ void onlineSimulation() {
     current.j = real_position;
     prev_read = current;
   }
+  actually_produced_reads = actual_M;
 }
 
 

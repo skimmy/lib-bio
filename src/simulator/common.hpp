@@ -27,7 +27,8 @@ struct Options {
   bool pipeline;
   bool online;
 
-  bool verbose;  
+  bool verbose;
+  bool test;
 
   static  Options opts;
 };
@@ -141,5 +142,8 @@ size_t generateInterReadDistance();
 size_t percentileIndex(const std::vector<double>& cdf, double perc);
 
 double score(const std::string& r1, const std::string& r2, size_t s);
+
+// testing functions
+void testAll();
 
 #endif

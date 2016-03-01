@@ -44,10 +44,11 @@ void parseArguments(int argc, char** argv) {
   Options::opts.outputCDF = "";
   Options::opts.online = false;
   Options::opts.pipeline = false;
-  Options::opts.verbose = false;  
+  Options::opts.verbose = false;
+  Options::opts.test = false;
   
   char c;
-  while ((c = getopt(argc, argv, "N:m:M:e:i:D:C:ophv")) != -1) {
+  while ((c = getopt(argc, argv, "N:m:M:e:i:D:C:ophvT")) != -1) {
     switch(c) {
     case 'N':
       Options::opts.N = atoi(optarg);
@@ -78,6 +79,9 @@ void parseArguments(int argc, char** argv) {
       break;
     case 'v':
       Options::opts.verbose = true;
+      break;
+    case 'T':
+      Options::opts.test = true;
       break;
     case 'h':
       printUsage();

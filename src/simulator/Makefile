@@ -101,7 +101,7 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_simulator_out_OBJECTS = simulator.$(OBJEXT) options.$(OBJEXT) \
 	generator.$(OBJEXT) online.$(OBJEXT) chain.$(OBJEXT) \
-	util.$(OBJEXT) prob.$(OBJEXT)
+	util.$(OBJEXT) prob.$(OBJEXT) test.$(OBJEXT)
 simulator_out_OBJECTS = $(am_simulator_out_OBJECTS)
 simulator_out_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_$(V))
@@ -168,7 +168,7 @@ AR = ar
 AUTOCONF = ${SHELL} /home/skimmy/src/lib-bio/missing autoconf
 AUTOHEADER = ${SHELL} /home/skimmy/src/lib-bio/missing autoheader
 AUTOMAKE = ${SHELL} /home/skimmy/src/lib-bio/missing automake-1.15
-AWK = mawk
+AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
@@ -254,7 +254,7 @@ top_build_prefix = ../../
 top_builddir = ../..
 top_srcdir = ../..
 simulator_out_SOURCES = simulator.cpp options.cpp generator.cpp online.cpp chain.cpp \
-	util.cpp prob.cpp 
+	util.cpp prob.cpp test.cpp
 
 AM_CXXFLAGS = -std=c++11
 all: all-am
@@ -349,6 +349,7 @@ include ./$(DEPDIR)/online.Po
 include ./$(DEPDIR)/options.Po
 include ./$(DEPDIR)/prob.Po
 include ./$(DEPDIR)/simulator.Po
+include ./$(DEPDIR)/test.Po
 include ./$(DEPDIR)/util.Po
 
 .cpp.o:

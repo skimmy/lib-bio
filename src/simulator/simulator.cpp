@@ -227,11 +227,17 @@ int main(int argc, char** argv) {
   parseArguments(argc,argv);
   initSimulator();
 
-  if (Options::opts.online) {
-    onlineSimulation();
-  } else {  
-    offlineSimulation();
+  if (Options::opts.test) {
+    testAll();
+  } else {
+
+    if (Options::opts.online) {
+      onlineSimulation();
+    } else {  
+      offlineSimulation();
+    }
+    outputResults();
+    
   }
-  outputResults();
   return 0;
 }

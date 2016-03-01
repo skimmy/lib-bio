@@ -22,6 +22,12 @@ void generateIIDGenome(size_t N, char* S) {
   }		
 }
 
+void generateConstantGenome(size_t N, char* S, char b) {
+  for (size_t i = 0; i < N; ++i) {
+    S[i] = b;
+  }
+}
+
 void simulateReadAt(size_t j, size_t m, const char* S, char* r) {
   for (size_t l = 0; l < m; ++l) {
     r[l] = S[j+l];

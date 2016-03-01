@@ -60,6 +60,7 @@ struct GenomeSegment {
 };
   
 void generateIIDGenome(size_t N, char* S);
+void generateConstantGenome(size_t N, char* S, char b);
 void generateOfflineReads(const std::string& s, std::priority_queue<Read>& reads);
 Read generateOnlineRead(char* S, size_t j);
 void simulateReadAt(size_t j, size_t m, const char* S, char* r);

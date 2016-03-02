@@ -66,6 +66,8 @@ Read generateOnlineRead(char* S, size_t j);
 void simulateReadAt(size_t j, size_t m, const char* S, char* r);
 void simpleIIDErrors(std::string& s, double pe);
 char randomMutation(char c);
+void complementBases(char* S, size_t n);
+char baseComplement(char b);
 
 const size_t MAX_GENOME_SEGMENT_LENGTH = 1 << 20;
 void generateFirstGenomeSegment(GenomeSegment& g);

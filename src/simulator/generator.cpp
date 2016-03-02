@@ -2,6 +2,24 @@
 
 #include <iostream>
 
+char baseComplement(char b) {
+  switch(b) {
+  case 'A': case 'a':
+    return 'T';
+
+  case 'C': case 'c':
+    return 'G';
+
+  case 'G': case 'g':
+    return 'C';
+
+  case 'T': case 't':
+    return 'A';
+
+    
+  }
+}
+
 char randomMutation(char c) { 
   return bases[(revBases[c] + ((rand() % 3) + 1) ) & 0x3];
 }
@@ -61,4 +79,14 @@ Read generateOnlineRead(char* S, size_t j) {
   Read read(std::string(r),j);
   delete[] r;
   return read;
+}
+
+/**
+ * Change all bases of a string substituting the original with the complement
+ * (A <-> T C <-> G)
+ */
+void complementBases(char* S, size_t n) {
+  for (size_t i = 0; i < n; ++i) {
+    S[i] = baseComplement(S[i]);
+  }
 }

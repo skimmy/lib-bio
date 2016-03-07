@@ -47,7 +47,6 @@ void clearProbabilities() {
 double indicatorErr(const std::string& r1, const std::string& r2, size_t s) {
   if (s > 0) {
     size_t hamm_d = prefixSuffixHammingDistance(r1, r2, s);
-    //::cout << pow(p_equal_calls, s - hamm_d) * pow(q_equal_calls, hamm_d) << "\t";
     return ( pow(p_equal_calls, s - hamm_d) * pow(q_equal_calls, hamm_d) ) ;
   } 
   return 1.0;
@@ -191,8 +190,6 @@ double score(const std::string& r1, const std::string& r2, size_t s) {
       + overlappingStringsSumWithErr(r1,r2);
     
     num = indicatorErr(r1, r2, s) *pow(4,s);
-    //std::cout << indicatorErr(r1, r2, s) << "\n";
-    //    std::cout << den << "\t" << num << "\t" << (num/den) << "\n";
     
   }
   // no error case

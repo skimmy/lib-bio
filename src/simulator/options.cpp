@@ -16,10 +16,12 @@ void printUsage() {
   std::cout << "\t-i <path>    Path of a fasta file for the reference\n";
   std::cout << "\t-D <path>    Path of a output file for distribution of scores\n";
   std::cout << "\t-C <path>    Path of a output file for CDF (cumulative distribution) of scores\n";
+  std::cout << "\t-A <approx>  Set approximation levels (default no approx)\n";
   std::cout << "\t-o           Executes online generation of reference\n";
   std::cout << "\t-p           Outputs on standard out for pipelining\n";
   std::cout << "\t-h           Shows help\n";
   std::cout << "\t-v           Activate verbose mode\n";
+  std::cout << "\t-T           perform test (every other option is ignored)\n";
   std::cout << std::endl;
 }
 
@@ -42,13 +44,14 @@ void parseArguments(int argc, char** argv) {
   Options::opts.inputReference = "";
   Options::opts.outputDistribution = "";
   Options::opts.outputCDF = "";
+  Options::opts.approxLevel = -1;
   Options::opts.online = false;
   Options::opts.pipeline = false;
   Options::opts.verbose = false;
   Options::opts.test = false;
   
   char c;
-  while ((c = getopt(argc, argv, "N:m:M:e:i:D:C:ophvT")) != -1) {
+  while ((c = getopt(argc, argv, "N:m:M:e:i:D:C:A:ophvT")) != -1) {
     switch(c) {
     case 'N':
       Options::opts.N = atoi(optarg);
@@ -70,6 +73,9 @@ void parseArguments(int argc, char** argv) {
       break;
     case 'C':
       Options::opts.outputCDF = optarg;
+      break;
+    case 'A':
+      Options::opts.approxLevel = atoi(optarg);
       break;
     case 'o':
       Options::opts.online = true;

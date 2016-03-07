@@ -24,6 +24,8 @@ struct Options {
   std::string outputDistribution;
   std::string outputCDF;
 
+  int approxLevel;
+
   bool pipeline;
   bool online;
 

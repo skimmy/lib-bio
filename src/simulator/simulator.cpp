@@ -202,8 +202,10 @@ void onlineSimulation() {
 	}
 	onHole = true;
 	// non-overlap case...
-	double sc = score(prev_read.r, current.r , 0);
-	recordScore(sc);
+	if (Options::opts.approxLevel < 0) {
+	  double sc = score(prev_read.r, current.r , 0);	  
+	  recordScore(sc);
+	}
 		
       } else {
 	onHole = false;

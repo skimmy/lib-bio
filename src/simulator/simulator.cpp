@@ -30,18 +30,16 @@ void initSimulator() {
   revBases['T'] = revBases['t'] = 3;
   scoreDist = EmpiricalDistribution(0,1,Options::opts.empiricalDistributionStep);
   srand(time(NULL));
+  initUtil();
   initProbabilities();
   initChainMatrix();
-
-  // initFalsePositiveMatrix();
-
 }
 
 void clearSimulator() {
   //clearFalsePositiveMatrix();
   clearChainMatrix();
   clearProbabilities();
-
+  clearUtil();  
 }
 
 void outputResults() {

@@ -10,6 +10,7 @@
 // general variables
 extern char bases[];
 extern char revBases[128];
+extern double* power4_lookup;
 
 // options parsing
 struct Options {
@@ -88,6 +89,9 @@ void addNonOverlapRecord(size_t d);
 void computeExpectedFalsePositiveMatrix(double** m);
 
 // util
+void initUtil();
+void clearUtil();
+
 size_t hammingDistance(const char* s1, const char* s2, size_t m);
 size_t hammingDistance(const std::string& s1, const std::string& s2, size_t m);
 size_t prefixSuffixHammingDistance(const std::string& s1, const std::string& s2, size_t k);

@@ -5,6 +5,16 @@
 #define TEST_GENOME_LENGTH 65536
 #define TEST_READ_LENGTH 100
 
+void testLookupTables() {
+  clearUtil();
+  initUtil();
+  std::cout << "LOOKUP TABLES TEST\n";
+  std::cout << "4^{-(m-s)}\n";
+  for (size_t i = 0; i <= Options::opts.m; ++i) {
+    std::cout << "s: " << i << "\t" << power4_lookup[i] << std::endl;
+  }
+}
+
 void testScoreFunctionNoError() {
   // Test (i) two reads with complete prefix suffix overlap   
   std::cout << "NO ERRORS\n";
@@ -81,4 +91,5 @@ void testAll() {
   std::cout << "          TESTING MODE          \n";
   std::cout << "--------------------------------\n";
   testScoreFunction();
+  testLookupTables();
 }

@@ -86,10 +86,10 @@ double overlappingStringsSum(const std::string& s1, const std::string& s2) {
   for (size_t s = 1; s <= m-1; ++s) {
     size_t indicator_ab = (prefixSuffixHammingDistance(s2,s1,s) == 0) ? 1 : 0;
     size_t indicator_ba = (prefixSuffixHammingDistance(s1,s2,s) == 0) ? 1 : 0;
-    sum += pow(4,s) * ( indicator_ab + indicator_ba );
+    sum += power4_lookup[s] * ( indicator_ab + indicator_ba );
   }
   size_t indic_m = (prefixSuffixHammingDistance(s2,s1,m) == 0) ? 1 : 0;
-  sum += indic_m * pow(4,m);
+  sum += indic_m * power4_lookup[m];
   return sum;
 }
 
@@ -102,9 +102,9 @@ double overlappingStringsSumWithErr(const std::string& s1, const std::string& s2
     // WARNING: If needed here we can use lookup tables to make things faster
     double tab = indicatorErr(s1, s2, s);
     double tba = indicatorErr(s2, s1, s);
-    sum += pow(4,s) * (tab + tba);
+    sum += power4_lookup[s] * (tab + tba);
   }
-  sum += pow(4,m) * indicatorErr(s1, s2, m);
+  sum += power4_lookup[m] * indicatorErr(s1, s2, m);
   return sum;
 }
 
@@ -181,22 +181,20 @@ size_t percentileIndex(const std::vector<double>& cdf, double perc) {
 
 
 double score(const std::string& r1, const std::string& r2, size_t s) {
+
+  static double iidTerm = power4_lookup[0] *
+    ((double)Options::opts.N - 2.0 * (double)Options::opts.m + 1.0);
   
-  double num = 1.0;
-  double den = 1.0;
-  // error case
+  double den = iidTerm  + overlappingStringsSumWithErr(r1,r2);
+  double num = indicatorErr(r1, r2, s) * power4_lookup[s];
+
+  /*  // error case
   if (Options::opts.pe > 0) {
-    den = (double)Options::opts.N - 2.0 * (double)Options::opts.m + 1.0
-      + overlappingStringsSumWithErr(r1,r2);
-    
-    num = indicatorErr(r1, r2, s) *pow(4,s);
-    
   }
   // no error case
   else {
-    den = (double)Options::opts.N - 2.0 * (double)Options::opts.m + 1.0
-      + overlappingStringsSum(r1,r2);
-    num = pow(4,s);
-  }
+    den = iidTerm + overlappingStringsSum(r1,r2);
+    num = power4_lookup[s];
+    }*/
   return num / den;
 }

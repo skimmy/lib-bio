@@ -12,7 +12,7 @@ void initUtil() {
   int m = Options::opts.m;
   power4_lookup = new double[m+1];
   for (int s = 0; s <= m; ++s) {
-    power4_lookup[s] = pow(4, -(m-s));
+    power4_lookup[s] = pow(4, s-m);
   }
 }
 

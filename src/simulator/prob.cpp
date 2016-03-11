@@ -19,6 +19,11 @@ double p_read_start = 0.0;
 // geometric distribution for inter-read distance
 std::geometric_distribution<> geom;
 
+// lookup tables for probability of the form
+// p^x * (1-p)^{m-s}
+double * power_peq_lookup = NULL; // p^i
+double * power_qeq_lookup = NULL; // q^i = (1-p)^i
+
 void initProbabilities() {
 
   std::random_device rd;
@@ -37,17 +42,29 @@ void initProbabilities() {
 
   // init online inter-read distance distribution (i.e., geomtric)
   geom = std::geometric_distribution<>(p_read_start);
+
+  // lookup tables
+  int m = Options::opts.m;
+  power_peq_lookup = new double[m+1];
+  power_qeq_lookup = new double[m+1];
+  for (size_t s = 0; s <= m; ++s) {
+    power_peq_lookup[s] = pow(p_equal_calls, s);
+    power_qeq_lookup[s] = pow(q_equal_calls, s);
+  }
 }
 
 
 void clearProbabilities() {
+  delete[] power_qeq_lookup;
+  delete[] power_peq_lookup;
 
 }
 
 double indicatorErr(const std::string& r1, const std::string& r2, size_t s) {
   if (s > 0) {
     size_t hamm_d = prefixSuffixHammingDistance(r1, r2, s);
-    return ( pow(p_equal_calls, s - hamm_d) * pow(q_equal_calls, hamm_d) ) ;
+    return (power_peq_lookup[s - hamm_d] * power_qeq_lookup[hamm_d]);
+    //	    pow(p_equal_calls, s - hamm_d) * pow(q_equal_calls, hamm_d) ) ;
   } 
   return 1.0;
     

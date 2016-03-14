@@ -35,7 +35,7 @@ void initProbabilities() {
 
   // init p_equal_calls and q_equal_call
   p_equal_calls = q_err * q_err + (1.0 / 3.0) * ( p_err * p_err );
-  q_equal_calls = 1.0 - p_equal_calls;
+  q_equal_calls = (1.0 - p_equal_calls) / 3.0;
 
   // init p_read_start
   p_read_start = (double)Options::opts.M / (double)Options::opts.N;

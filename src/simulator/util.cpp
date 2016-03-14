@@ -109,8 +109,3 @@ Read randomRead(size_t m) {
   Read r(std::string(tmp), 0);
   delete[] tmp;
 }
-
-std::ifstream openFastaFile(const std::string & path) {
-  std::ifstream ifs(path, std::ifstream::in);
-  return ifs;
-}

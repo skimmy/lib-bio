@@ -105,8 +105,6 @@ double elementsSumDoubleMatrix(double** matrix, size_t n, size_t m);
 
 Read randomRead(size_t m);
 
-std::ifstream openFastaFile(const std::string & path);
-
 // probabilities
 
 // Class representing empirical distribution as histogram array

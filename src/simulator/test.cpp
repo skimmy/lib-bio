@@ -5,6 +5,45 @@
 #define TEST_GENOME_LENGTH 65536
 #define TEST_READ_LENGTH 100
 
+const int MC_SAMPLES = 2 << 20;
+
+// tests the value of p_eq by simulating 
+void testPeq() {
+
+  double pe = Options::opts.pe;
+  char tBase = 'A'; // true base
+  double jointProb[4][4];
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j <4; j++) {
+      jointProb[i][j] = 0;
+    }    
+  }
+  // joint probability distribution (R1 = x, R2 = y | R0 = tBase)
+  double x = 0;
+  size_t i,j;
+  char R1,R2;
+  for (int i = 0; i < MC_SAMPLES; ++i) {
+    R1 = R2 = tBase;
+    x = (double)rand() / RAND_MAX;
+    if (x < pe) {
+      R1 = randomMutation(tBase);
+    }
+    x = (double)rand() / RAND_MAX;
+    if (x < pe) {
+      R2 = randomMutation(tBase);
+    }
+    jointProb[revBases[R1]][revBases[R2]]++;
+  }
+  std::cout << "\n";
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j <4; j++) {
+      std::cout << jointProb[i][j] / (double)MC_SAMPLES << '\t';
+    }
+    std::cout << '\n';
+  }
+}
+
+
 void testLookupTables() {
   clearUtil();
   initUtil();
@@ -90,6 +129,7 @@ void testAll() {
   std::cout << "--------------------------------\n";
   std::cout << "          TESTING MODE          \n";
   std::cout << "--------------------------------\n";
-  testScoreFunction();
-  testLookupTables();
+  //  testScoreFunction();
+  //  testLookupTables();
+  testPeq();
 }

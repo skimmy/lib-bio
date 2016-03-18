@@ -227,6 +227,7 @@ int main(int argc, char** argv) {
   parseArguments(argc,argv);
   initSimulator();
 
+  std::cout << "---" << Options::opts.pe << "\n";
   if (Options::opts.test) {
     testAll();
   } else {

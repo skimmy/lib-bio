@@ -227,18 +227,21 @@ int main(int argc, char** argv) {
   parseArguments(argc,argv);
   initSimulator();
 
-  std::cout << "---" << Options::opts.pe << "\n";
-  if (Options::opts.test) {
+  switch (Options::opts.mode) {
+  case (OpMode::Test):
     testAll();
-  } else {
-
-    if (Options::opts.online) {
-      onlineSimulation();
-    } else {  
-      offlineSimulation();
-    }
-    outputResults();
-    
+    exit(0);
+  case (OpMode::Offline):
+    offlineSimulation();
+    break;
+  case (OpMode::Online):
+    onlineSimulation();
+    break;
+  default:
+    std::cout << "Unrecognized operation mode " <<
+      Options::opts.mode << "\nAborting..\n";
+    exit(1);
   }
+  outputResults();
   return 0;
 }

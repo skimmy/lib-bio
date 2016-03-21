@@ -12,6 +12,8 @@ extern char bases[];
 extern char revBases[128];
 extern double* power4_lookup;
 
+enum OpMode { Test, Offline, Online, Oracle };
+
 // options parsing
 struct Options {
   size_t N;
@@ -26,6 +28,8 @@ struct Options {
   std::string outputCDF;
 
   int approxLevel;
+
+  OpMode mode;
 
   bool pipeline;
   bool online;

@@ -5,13 +5,12 @@
 #define TEST_GENOME_LENGTH 65536
 #define TEST_READ_LENGTH 100
 
-const int MC_SAMPLES = 2 << 20;
+const int MC_SAMPLES = 2 << 22;
 
 // tests the value of p_eq by simulating 
 void testPeq() {
 
   double pe = Options::opts.pe;
-  char tBase = 'A'; // true base
   double jointProb[4][4];
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j <4; j++) {
@@ -23,6 +22,7 @@ void testPeq() {
   size_t i,j;
   char R1,R2;
   for (int i = 0; i < MC_SAMPLES; ++i) {
+    char tBase = bases[rand() & 0x03];
     R1 = R2 = tBase;
     x = (double)rand() / RAND_MAX;
     if (x < pe) {

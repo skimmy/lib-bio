@@ -21,7 +21,7 @@ double p_fail = 0.0;
 size_t holes = 0;
 size_t actually_produced_reads = 0;
 double scoreSum = 0.0;
-double* scoreDistOverlap;
+ScoreSumFreq* scoreDistOverlap;
 EmpiricalDistribution scoreDist(0,1,10);
 
 void initSimulator() {
@@ -34,9 +34,10 @@ void initSimulator() {
   initUtil();
   initProbabilities();
   initChainMatrix();
-  scoreDistOverlap = new double[Options::opts.m];
+  scoreDistOverlap = new ScoreSumFreq[Options::opts.m + 1];
   for (size_t i = 0; i < Options::opts.m; ++i) {
-    scoreDistOverlap[i] = 0.0;
+    scoreDistOverlap[i].sSum = 0.0;
+    scoreDistOverlap[i].sFreq = 0;
   }
 }
 
@@ -51,7 +52,8 @@ void outputResults() {
   if (Options::opts.pipeline) {
     if (Options::opts.mode == OpMode::Oracle) {
       for (size_t i = 0; i < Options::opts.m; ++i) {
-	std::cout << i << "\t" << scoreDistOverlap[i] << "\n";
+	std::cout << i << "\t" <<
+	  scoreDistOverlap[i].sSum << "\t" << scoreDistOverlap[i].sFreq << "\n";
       }
       return;
     }
@@ -249,17 +251,19 @@ void oracleSimulation() {
     size_t d = generateInterReadDistance();
     // generate second reads at position d
     if (d >= m) {
-      scoreDistOverlap[0] += alpha;
+      
+      scoreDistOverlap[0].sSum += alpha;
+      scoreDistOverlap[0].sFreq++;
     } else {
       Read r2 = generateOnlineRead(genome, d);
       size_t s = m - d;
       double sc = score(r1.r, r2.r, s);
-      scoreDistOverlap[s] += sc;
+      //      std::cout << sc << "\t" << s << std::endl;
+      scoreDistOverlap[s].sSum += sc;
+      scoreDistOverlap[s].sFreq++;
     }
-    // normalized values in [0,1]
-    for (size_t i = 0; i < m; ++i) {
-      scoreDistOverlap[i] /= (double)(Options::opts.M - 1);
-    }
+
+
   }
   delete[] genome;
 }
@@ -289,5 +293,6 @@ int main(int argc, char** argv) {
     exit(1);
   }
   outputResults();
+  clearSimulator();
   return 0;
 }

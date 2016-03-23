@@ -143,6 +143,12 @@ private:
   double total;
 };
 
+struct ScoreSumFreq
+{
+  double sSum;
+  int sFreq;
+};
+
 void initProbabilities();
 void clearProbabilities();
 double randomReadsOverlapProbNoErr(const std::string& s1, const std::string& s2, size_t s);

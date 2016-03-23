@@ -21,6 +21,7 @@ double p_fail = 0.0;
 size_t holes = 0;
 size_t actually_produced_reads = 0;
 double scoreSum = 0.0;
+double* scoreDistOverlap;
 EmpiricalDistribution scoreDist(0,1,10);
 
 void initSimulator() {
@@ -33,10 +34,14 @@ void initSimulator() {
   initUtil();
   initProbabilities();
   initChainMatrix();
+  scoreDistOverlap = new double[Options::opts.m];
+  for (size_t i = 0; i < Options::opts.m; ++i) {
+    scoreDistOverlap[i] = 0.0;
+  }
 }
 
 void clearSimulator() {
-  //clearFalsePositiveMatrix();
+  delete[] scoreDistOverlap;
   clearChainMatrix();
   clearProbabilities();
   clearUtil();  
@@ -44,6 +49,12 @@ void clearSimulator() {
 
 void outputResults() {
   if (Options::opts.pipeline) {
+    if (Options::opts.mode == OpMode::Oracle) {
+      for (size_t i = 0; i < Options::opts.m; ++i) {
+	std::cout << i << "\t" << scoreDistOverlap[i] << "\n";
+      }
+      return;
+    }
     std::cout << p_fail << std::endl;
   } else {
     std::cout << "P[Fail]    = " << p_fail << std::endl;
@@ -69,7 +80,9 @@ void outputResults() {
     ofs.close();
     std::cout << scoreDist.valueAtIndex(percentileIndex(cdf,0.001)) << "\n";
   }
-  
+}
+
+void recordScoreWithOverlap(double sc, size_t s) {
 }
 
 void recordScore(double p_ab) {
@@ -221,6 +234,36 @@ void onlineSimulation() {
   actually_produced_reads = actual_M;
 }
 
+void oracleSimulation() {
+  size_t N = 2 * Options::opts.m;
+  int m = Options::opts.m;
+  double alpha = 1.0 / ((double)N - 2.0 * m + 1);
+  char* genome = new char[N];  
+  // Oracle simulation loops to produce exactly M-1 consecutive pairs
+  for (size_t i = 0; i < Options::opts.M - 1; ++i) {
+    // generate 2m bases of genome
+    generateIIDGenome(N, genome);
+    // generate first reads at position 0
+    Read r1 = generateOnlineRead(genome, 0);
+    // generate inter-arrival d
+    size_t d = generateInterReadDistance();
+    // generate second reads at position d
+    if (d >= m) {
+      scoreDistOverlap[0] += alpha;
+    } else {
+      Read r2 = generateOnlineRead(genome, d);
+      size_t s = m - d;
+      double sc = score(r1.r, r2.r, s);
+      scoreDistOverlap[s] += sc;
+    }
+    // normalized values in [0,1]
+    for (size_t i = 0; i < m; ++i) {
+      scoreDistOverlap[i] /= (double)(Options::opts.M - 1);
+    }
+  }
+  delete[] genome;
+}
+
 
 int main(int argc, char** argv) {   
   // Important NOT invert (init requires argument to be parsed)
@@ -236,6 +279,9 @@ int main(int argc, char** argv) {
     break;
   case (OpMode::Online):
     onlineSimulation();
+    break;
+  case (OpMode::Oracle):
+    oracleSimulation();
     break;
   default:
     std::cout << "Unrecognized operation mode " <<

@@ -205,13 +205,16 @@ double score(const std::string& r1, const std::string& r2, size_t s) {
   double den = iidTerm  + overlappingStringsSumWithErr(r1,r2);
   double num = indicatorErr(r1, r2, s) * power4_lookup[s];
 
-  /*  // error case
-  if (Options::opts.pe > 0) {
-  }
-  // no error case
-  else {
-    den = iidTerm + overlappingStringsSum(r1,r2);
-    num = power4_lookup[s];
-    }*/
   return num / den;
+}
+
+double scoreExt(const std::string& r1, const std::string& r2, size_t s, double* num_den) {
+
+  static double iidTerm = power4_lookup[0] *
+    ((double)Options::opts.N - 2.0 * (double)Options::opts.m + 1.0);
+  
+  num_den[0] = iidTerm  + overlappingStringsSumWithErr(r1,r2);
+  num_den[1] = indicatorErr(r1, r2, s) * power4_lookup[s];
+
+  return num_den[0] / num_den[1];
 }

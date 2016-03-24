@@ -12,7 +12,7 @@ extern char bases[];
 extern char revBases[128];
 extern double* power4_lookup;
 
-enum OpMode { Test, Offline, Online, Oracle };
+enum OpMode { Test, Offline, Online, Oracle, ScoreEst };
 
 // options parsing
 struct Options {
@@ -159,6 +159,7 @@ size_t generateInterReadDistance();
 size_t percentileIndex(const std::vector<double>& cdf, double perc);
 
 double score(const std::string& r1, const std::string& r2, size_t s);
+double scoreExt(const std::string& r1, const std::string& r2, size_t s, double* num_den);
 
 // testing functions
 void testAll();

@@ -9,20 +9,20 @@ void printUsage() {
   std::cout << "USAGE\n";
   std::cout << "\tsimulator [<OPTIONS>]\n\n";
   std::cout << " OPTIONS\n\n";
-  std::cout << "\t-N <length>  Length of reference sequence\n";
-  std::cout << "\t-M <length>  Length of reads  [1,2,...]\n";
-  std::cout << "\t-m <count>   Number of reads  [1,2,...]\n";
-  std::cout << "\t-e <error>   Error probability for base call [0.0,1.0]\n";
-  std::cout << "\t-i <path>    Path of a fasta file for the reference\n";
-  std::cout << "\t-D <path>    Path of a output file for distribution of scores\n";
-  std::cout << "\t-C <path>    Path of a output file for CDF (cumulative distribution) of scores\n";
-  std::cout << "\t-A <approx>  Set approximation levels (default no approx)\n";
-  std::cout << "\t-O <op_mode> Set operation mode of the simulator [0,2]\n";
-  std::cout << "\t-o           Executes online generation of reference\n";
-  std::cout << "\t-p           Outputs on standard out for pipelining\n";
-  std::cout << "\t-h           Shows help\n";
-  std::cout << "\t-v           Activate verbose mode\n";
-  std::cout << "\t-T           perform test (every other option is ignored)\n";
+  std::cout << "\t-N <length>   Length of reference sequence\n";
+  std::cout << "\t-M <length>   Length of reads  [1,2,...]\n";
+  std::cout << "\t-m <count>    Number of reads  [1,2,...]\n";
+  std::cout << "\t-e <error>    Error probability for base call [0.0,1.0]\n";
+  std::cout << "\t-i <path>     Path of a fasta file for the reference\n";
+  std::cout << "\t-D <path>     Path of a output file for distribution of scores\n";
+  std::cout << "\t-C <path>     Path of a output file for CDF (cumulative distribution) of scores\n";
+  std::cout << "\t-A <approx>   Set approximation levels (default no approx)\n";
+  std::cout << "\t-O <op_mode>  Set operation mode of the simulator [0,4] (run -h for details)\n";
+  std::cout << "\t-o            Executes online generation of reference. Deprecated use -O 2 instead\n";
+  std::cout << "\t-p            Outputs on standard out for pipelining\n";
+  std::cout << "\t-h            Shows extended help\n";
+  std::cout << "\t-v            Activate verbose mode\n";
+  std::cout << "\t-T            perform test (every other option is ignored). Deprecated use -O 0 instead\n";
   std::cout << std::endl;
 }
 
@@ -32,6 +32,15 @@ void printArguments() {
   std::cout << "Reads length (m)             " << Options::opts.m << std::endl;
   std::cout << "Reads count (M)              " << Options::opts.M << std::endl;
   std::cout << "Base error probability (pe)  " << Options::opts.pe << std::endl;
+}
+
+void printOperationModeDescription() {
+  std::cout << " OPERATION MODES\n\n";
+  std::cout << "\t 0 (Test)     Performs several tests of quantities\n";
+  std::cout << "\t 1 (Offline)  Offline simulation: all genome and reads generated before scoring (Defualt)\n";
+  std::cout << "\t 2 (Online)   Online simulation: genome and reads are generated 'on-demand'\n";
+  std::cout << "\t 3 (Oracle)   Simulation of M-1 independent pairs\n";
+  std::cout << "\t 4 (ScoreEst) Tests the approximation E[score] ~= E[num]/E[den]\n\n";
 }
 
 void parseArguments(int argc, char** argv) {
@@ -99,6 +108,7 @@ void parseArguments(int argc, char** argv) {
       break;
     case 'h':
       printUsage();
+      printOperationModeDescription();
       exit(0);
     default:
       printUsage();

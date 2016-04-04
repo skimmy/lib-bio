@@ -239,7 +239,7 @@ void onlineSimulation() {
 void oracleSimulation() {
   size_t N = 2 * Options::opts.m;
   int m = Options::opts.m;
-  double alpha = 1.0 / ((double)N - 2.0 * m + 1);
+  double alpha = 1.0 / ((double)Options::opts.N - 2.0 * m + 1);
   char* genome = new char[N];  
   // Oracle simulation loops to produce exactly M-1 consecutive pairs
   for (size_t i = 0; i < Options::opts.M - 1; ++i) {

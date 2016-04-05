@@ -237,33 +237,31 @@ void onlineSimulation() {
 }
 
 void oracleSimulation() {
-  size_t N = 2 * Options::opts.m;
+  size_t n = 2 * Options::opts.m;
   int m = Options::opts.m;
   double alpha = 1.0 / ((double)Options::opts.N - 2.0 * m + 1);
-  char* genome = new char[N];  
+  char* genome = new char[n];  
   // Oracle simulation loops to produce exactly M-1 consecutive pairs
   for (size_t i = 0; i < Options::opts.M - 1; ++i) {
     // generate 2m bases of genome
-    generateIIDGenome(N, genome);
+    generateIIDGenome(n, genome);
+
     // generate first reads at position 0
     Read r1 = generateOnlineRead(genome, 0);
     // generate inter-arrival d
     size_t d = generateInterReadDistance();
+
     // generate second reads at position d
-    if (d >= m) {
-      
+    if (d >= m) {      
       scoreDistOverlap[0].sSum += alpha;
       scoreDistOverlap[0].sFreq++;
     } else {
       Read r2 = generateOnlineRead(genome, d);
       size_t s = m - d;
       double sc = score(r1.r, r2.r, s);
-      //      std::cout << sc << "\t" << s << std::endl;
       scoreDistOverlap[s].sSum += sc;
       scoreDistOverlap[s].sFreq++;
     }
-
-
   }
   delete[] genome;
 }

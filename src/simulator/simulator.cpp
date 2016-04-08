@@ -23,6 +23,26 @@ size_t actually_produced_reads = 0;
 double scoreSum = 0.0;
 ScoreSumFreq* scoreDistOverlap;
 EmpiricalDistribution scoreDist(0,1,10);
+// output quantities for oracle simulations
+
+/* 
+   An estimation point contains for each s=0,...,m
+     - sum of all scores
+     - sum of all denominators
+     - sum of all denominators
+     - number of observations of 's'
+   This can then be used to compute average quantities and compare
+   them (i.e., esitmated) with the theoretical one (possibly
+   approximated).
+*/ 
+struct EstimationPoint
+{  
+  double sumNum;
+  double sumDen;
+  double sumScore;
+  int count;
+};
+EstimationPoint * oraclePoints;
 
 void initSimulator() {
   revBases['A'] = revBases['a'] = 0;
@@ -34,15 +54,24 @@ void initSimulator() {
   initUtil();
   initProbabilities();
   initChainMatrix();
-  scoreDistOverlap = new ScoreSumFreq[Options::opts.m + 1];
+  // init for oracle points
+  oraclePoints = new EstimationPoint[Options::opts.m + 1];
+  
+  scoreDistOverlap = new ScoreSumFreq[Options::opts.m + 1]; // TO-REMOVE
   for (size_t i = 0; i < Options::opts.m; ++i) {
-    scoreDistOverlap[i].sSum = 0.0;
-    scoreDistOverlap[i].sFreq = 0;
+    oraclePoints[i].sumNum = 0.0;
+    oraclePoints[i].sumDen = 0.0;
+    oraclePoints[i].sumScore = 0.0;
+    oraclePoints[i].count = 0;
+    
+    scoreDistOverlap[i].sSum = 0.0; // TO-REMOVE
+    scoreDistOverlap[i].sFreq = 0; // TO-REMOVE
   }
 }
 
 void clearSimulator() {
-  delete[] scoreDistOverlap;
+  delete[] oraclePoints;
+  delete[] scoreDistOverlap; // TO-REMOVE
   clearChainMatrix();
   clearProbabilities();
   clearUtil();  
@@ -53,7 +82,8 @@ void outputResults() {
     if (Options::opts.mode == OpMode::Oracle) {
       for (size_t i = 0; i < Options::opts.m; ++i) {
 	std::cout << i << "\t" <<
-	  scoreDistOverlap[i].sSum << "\t" << scoreDistOverlap[i].sFreq << "\n";
+	  oraclePoints[i].sumScore << "\t" << oraclePoints[i].count << "\t" <<
+	  oraclePoints[i].sumNum << "\t" << oraclePoints[i].sumDen << "\n";		    
       }
       return;
     }
@@ -236,10 +266,12 @@ void onlineSimulation() {
   actually_produced_reads = actual_M;
 }
 
-void oracleSimulation() {
+void oracleSimulation() {  
   size_t n = 2 * Options::opts.m;
   int m = Options::opts.m;
   double alpha = 1.0 / ((double)Options::opts.N - 2.0 * m + 1);
+  double numDen[2];
+  
   char* genome = new char[n];  
   // Oracle simulation loops to produce exactly M-1 consecutive pairs
   for (size_t i = 0; i < Options::opts.M - 1; ++i) {
@@ -253,14 +285,25 @@ void oracleSimulation() {
 
     // generate second reads at position d
     if (d >= m) {      
-      scoreDistOverlap[0].sSum += alpha;
-      scoreDistOverlap[0].sFreq++;
+      scoreDistOverlap[0].sSum += alpha; // TO-REMOVE
+      scoreDistOverlap[0].sFreq++; // TO-REMOVE
+
+      oraclePoints[0].sumNum += 1.0;
+      oraclePoints[0].sumDen += (1.0 / alpha);
+      oraclePoints[0].sumScore += alpha;
+      oraclePoints[0].count++;
     } else {
       Read r2 = generateOnlineRead(genome, d);
       size_t s = m - d;
-      double sc = score(r1.r, r2.r, s);
-      scoreDistOverlap[s].sSum += sc;
-      scoreDistOverlap[s].sFreq++;
+      double sc = scoreExt(r1.r, r2.r, s,numDen);
+      oraclePoints[s].sumNum = numDen[1];
+      oraclePoints[s].sumDen = numDen[0];
+      oraclePoints[s].sumScore += sc;
+      oraclePoints[s].count++;
+      
+      
+      scoreDistOverlap[s].sSum += sc; // TO-REMOVE
+      scoreDistOverlap[s].sFreq++; // TO-REMOVE
     }
   }
   delete[] genome;

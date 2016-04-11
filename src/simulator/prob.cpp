@@ -233,5 +233,5 @@ double scoreExt(const std::string& r1, const std::string& r2, size_t s, double* 
   num_den[0] = iidTerm  + overlappingStringsSumWithErr(r1,r2);
   num_den[1] = indicatorErr(r1, r2, s) * power4_lookup[s];
 
-  return num_den[0] / num_den[1];
+  return num_den[1] / num_den[0];
 }

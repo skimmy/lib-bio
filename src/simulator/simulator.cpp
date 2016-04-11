@@ -21,7 +21,6 @@ double p_fail = 0.0;
 size_t holes = 0;
 size_t actually_produced_reads = 0;
 double scoreSum = 0.0;
-ScoreSumFreq* scoreDistOverlap;
 EmpiricalDistribution scoreDist(0,1,10);
 // output quantities for oracle simulations
 
@@ -57,21 +56,17 @@ void initSimulator() {
   // init for oracle points
   oraclePoints = new EstimationPoint[Options::opts.m + 1];
   
-  scoreDistOverlap = new ScoreSumFreq[Options::opts.m + 1]; // TO-REMOVE
   for (size_t i = 0; i < Options::opts.m; ++i) {
     oraclePoints[i].sumNum = 0.0;
     oraclePoints[i].sumDen = 0.0;
     oraclePoints[i].sumScore = 0.0;
     oraclePoints[i].count = 0;
     
-    scoreDistOverlap[i].sSum = 0.0; // TO-REMOVE
-    scoreDistOverlap[i].sFreq = 0; // TO-REMOVE
   }
 }
 
 void clearSimulator() {
   delete[] oraclePoints;
-  delete[] scoreDistOverlap; // TO-REMOVE
   clearChainMatrix();
   clearProbabilities();
   clearUtil();  
@@ -80,10 +75,11 @@ void clearSimulator() {
 void outputResults() {
   if (Options::opts.pipeline) {
     if (Options::opts.mode == OpMode::Oracle) {
-      for (size_t i = 0; i < Options::opts.m; ++i) {
+      for (size_t i = 0; i < Options::opts.m+1; ++i) {
 	std::cout << i << "\t" <<
 	  oraclePoints[i].sumScore << "\t" << oraclePoints[i].count << "\t" <<
-	  oraclePoints[i].sumNum << "\t" << oraclePoints[i].sumDen << "\n";		    
+	  oraclePoints[i].sumNum << "\t" << oraclePoints[i].sumDen << "\t" <<
+	  approximatedScore(i) << "\n";
       }
       return;
     }
@@ -170,8 +166,6 @@ void offlineSimulation() {
       double x = (double)Options::opts.N - 2.0 * (double)Options::opts.m + 1.0
 	+ overlappingStringsSum(r1.r, r2.r);
       recordScore(1.0 / x);
-      //      p_fail += 1.0 - ( 1.0 / x);
-      //      scoreSum += ( 1.0 / x);
     }
     r1 = r2;
   }
@@ -285,8 +279,8 @@ void oracleSimulation() {
 
     // generate second reads at position d
     if (d >= m) {      
-      scoreDistOverlap[0].sSum += alpha; // TO-REMOVE
-      scoreDistOverlap[0].sFreq++; // TO-REMOVE
+      //      scoreDistOverlap[0].sSum += alpha; // TO-REMOVE
+      //scoreDistOverlap[0].sFreq++; // TO-REMOVE
 
       oraclePoints[0].sumNum += 1.0;
       oraclePoints[0].sumDen += (1.0 / alpha);
@@ -296,14 +290,12 @@ void oracleSimulation() {
       Read r2 = generateOnlineRead(genome, d);
       size_t s = m - d;
       double sc = scoreExt(r1.r, r2.r, s,numDen);
+      //      sc = score(r1.r, r2.r, s);
       oraclePoints[s].sumNum = numDen[1];
       oraclePoints[s].sumDen = numDen[0];
       oraclePoints[s].sumScore += sc;
       oraclePoints[s].count++;
       
-      
-      scoreDistOverlap[s].sSum += sc; // TO-REMOVE
-      scoreDistOverlap[s].sFreq++; // TO-REMOVE
     }
   }
   delete[] genome;

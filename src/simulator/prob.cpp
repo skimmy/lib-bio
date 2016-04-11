@@ -24,6 +24,13 @@ std::geometric_distribution<> geom;
 double * power_peq_lookup = NULL; // p^i
 double * power_qeq_lookup = NULL; // q^i = (1-p)^i
 
+/* lookup tables for the approximated expected score defined as:
+                         4^s * tildeI(s, peq)
+     tildeE(A,B,s) =  ----------------------------
+                      4^s * tildeI(s, peq) + N - 1
+ */
+double * approxExpScore = NULL;
+
 void initProbabilities() {
 
   std::random_device rd;
@@ -45,16 +52,23 @@ void initProbabilities() {
 
   // lookup tables
   int m = Options::opts.m;
+  int N = Options::opts.N;
   power_peq_lookup = new double[m+1];
   power_qeq_lookup = new double[m+1];
+  approxExpScore = new double[m+1];
   for (size_t s = 0; s <= m; ++s) {
     power_peq_lookup[s] = pow(p_equal_calls, s);
     power_qeq_lookup[s] = pow(q_equal_calls, s);
+
+    double tildeI = pow(p_equal_calls, s * p_equal_calls) *
+      pow( 1 - p_equal_calls, s * ( 1 - p_equal_calls ));
+    approxExpScore[s] = ( pow(4,s) * tildeI ) / ( (pow(4,s) * tildeI ) + N - 1);
   }
 }
 
 
 void clearProbabilities() {
+  delete[] approxExpScore;
   delete[] power_qeq_lookup;
   delete[] power_peq_lookup;
 
@@ -196,6 +210,9 @@ size_t percentileIndex(const std::vector<double>& cdf, double perc) {
   return idx;
 }
 
+double approximatedScore(size_t s) {
+  return approxExpScore[s];
+}
 
 double score(const std::string& r1, const std::string& r2, size_t s) {
 

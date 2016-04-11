@@ -7,6 +7,12 @@
 
 const int MC_SAMPLES = 2 << 22;
 
+void testApproximatedExpectedScore() {
+  for (int s = 0; s < Options::opts.m + 1; ++s) {
+    std::cout << s << "\t" << approximatedScore(s) << "\n";
+  }
+}
+
 // tests the value of p_eq by simulating 
 void testPeq() {
 
@@ -131,5 +137,6 @@ void testAll() {
   std::cout << "--------------------------------\n";
   //  testScoreFunction();
   //  testLookupTables();
-  testPeq();
+  //testPeq();
+  testApproximatedExpectedScore();
 }

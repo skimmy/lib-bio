@@ -29,7 +29,9 @@ double * power_qeq_lookup = NULL; // q^i = (1-p)^i
      tildeE(A,B,s) =  ----------------------------
                       4^s * tildeI(s, peq) + N - 1
  */
-double * approxExpScore = NULL;
+//double * approxExpScore = NULL;
+double * approxExpScoreNum = NULL;
+double * approxExpScoreDen = NULL;
 
 void initProbabilities() {
 
@@ -55,20 +57,25 @@ void initProbabilities() {
   int N = Options::opts.N;
   power_peq_lookup = new double[m+1];
   power_qeq_lookup = new double[m+1];
-  approxExpScore = new double[m+1];
+  //  approxExpScore = new double[m+1];
+  approxExpScoreNum = new double[m+1];
+  approxExpScoreDen = new double[m+1];
   for (size_t s = 0; s <= m; ++s) {
     power_peq_lookup[s] = pow(p_equal_calls, s);
     power_qeq_lookup[s] = pow(q_equal_calls, s);
 
     double tildeI = pow(p_equal_calls, s * p_equal_calls) *
       pow( 1 - p_equal_calls, s * ( 1 - p_equal_calls ));
-    approxExpScore[s] = ( pow(4,s) * tildeI ) / ( (pow(4,s) * tildeI ) + N - 1);
+    approxExpScoreNum[s] = pow(4,s) * tildeI;
+    approxExpScoreDen[s] = (pow(4,s) * tildeI ) + N - 1;
   }
 }
 
 
 void clearProbabilities() {
-  delete[] approxExpScore;
+  delete[] approxExpScoreNum;
+  delete[] approxExpScoreDen;
+  // delete[] approxExpScore;
   delete[] power_qeq_lookup;
   delete[] power_peq_lookup;
 
@@ -78,7 +85,6 @@ double indicatorErr(const std::string& r1, const std::string& r2, size_t s) {
   if (s > 0) {
     size_t hamm_d = prefixSuffixHammingDistance(r1, r2, s);
     return (power_peq_lookup[s - hamm_d] * power_qeq_lookup[hamm_d]);
-    //	    pow(p_equal_calls, s - hamm_d) * pow(q_equal_calls, hamm_d) ) ;
   } 
   return 1.0;
     
@@ -210,8 +216,14 @@ size_t percentileIndex(const std::vector<double>& cdf, double perc) {
   return idx;
 }
 
+double approximatedScore(size_t s, double* num_den) {
+  num_den[0] = approxExpScoreNum[s];
+  num_den[1] = approxExpScoreDen[s];
+  return approxExpScoreNum[s] / approxExpScoreDen[s];
+}
+
 double approximatedScore(size_t s) {
-  return approxExpScore[s];
+  return approxExpScoreNum[s] / approxExpScoreDen[s];
 }
 
 double score(const std::string& r1, const std::string& r2, size_t s) {

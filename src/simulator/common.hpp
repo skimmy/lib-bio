@@ -158,6 +158,7 @@ size_t generateInterReadDistance();
 
 size_t percentileIndex(const std::vector<double>& cdf, double perc);
 
+double approximatedScore(size_t s, double* num_den);
 double approximatedScore(size_t s);
 
 double score(const std::string& r1, const std::string& r2, size_t s);

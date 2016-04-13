@@ -75,11 +75,13 @@ void clearSimulator() {
 void outputResults() {
   if (Options::opts.pipeline) {
     if (Options::opts.mode == OpMode::Oracle) {
+      double appNumDen[2];
       for (size_t i = 0; i < Options::opts.m+1; ++i) {
+	double appE = approximatedScore(i, appNumDen);
 	std::cout << i << "\t" <<
 	  oraclePoints[i].sumScore << "\t" << oraclePoints[i].count << "\t" <<
 	  oraclePoints[i].sumNum << "\t" << oraclePoints[i].sumDen << "\t" <<
-	  approximatedScore(i) << "\n";
+	  appNumDen[0] << "\t" << appNumDen[1] << "\n";
       }
       return;
     }

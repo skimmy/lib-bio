@@ -29,7 +29,6 @@ double * power_qeq_lookup = NULL; // q^i = (1-p)^i
      tildeE(A,B,s) =  ----------------------------
                       4^s * tildeI(s, peq) + N - 1
  */
-//double * approxExpScore = NULL;
 double * approxExpScoreNum = NULL;
 double * approxExpScoreDen = NULL;
 
@@ -57,7 +56,6 @@ void initProbabilities() {
   int N = Options::opts.N;
   power_peq_lookup = new double[m+1];
   power_qeq_lookup = new double[m+1];
-  //  approxExpScore = new double[m+1];
   approxExpScoreNum = new double[m+1];
   approxExpScoreDen = new double[m+1];
   for (size_t s = 0; s <= m; ++s) {
@@ -75,7 +73,6 @@ void initProbabilities() {
 void clearProbabilities() {
   delete[] approxExpScoreNum;
   delete[] approxExpScoreDen;
-  // delete[] approxExpScore;
   delete[] power_qeq_lookup;
   delete[] power_peq_lookup;
 

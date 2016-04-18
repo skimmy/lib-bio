@@ -22,6 +22,7 @@ size_t holes = 0;
 size_t actually_produced_reads = 0;
 double scoreSum = 0.0;
 EmpiricalDistribution scoreDist(0,1,10);
+
 // output quantities for oracle simulations
 
 /* 
@@ -40,6 +41,7 @@ struct EstimationPoint
   double sumDen;
   double sumScore;
   int count;
+  int hammDist;
 };
 EstimationPoint * oraclePoints;
 
@@ -61,7 +63,7 @@ void initSimulator() {
     oraclePoints[i].sumDen = 0.0;
     oraclePoints[i].sumScore = 0.0;
     oraclePoints[i].count = 0;
-    
+    oraclePoints[i].hammDist = 0;
   }
 }
 
@@ -81,7 +83,7 @@ void outputResults() {
 	std::cout << i << "\t" <<
 	  oraclePoints[i].sumScore << "\t" << oraclePoints[i].count << "\t" <<
 	  oraclePoints[i].sumNum << "\t" << oraclePoints[i].sumDen << "\t" <<
-	  appNumDen[0] << "\t" << appNumDen[1] << "\n";
+	  appNumDen[0] << "\t" << appNumDen[1] << "\t" << oraclePoints[i].hammDist << "\n";
       }
       return;
     }
@@ -281,9 +283,6 @@ void oracleSimulation() {
 
     // generate second reads at position d
     if (d >= m) {      
-      //      scoreDistOverlap[0].sSum += alpha; // TO-REMOVE
-      //scoreDistOverlap[0].sFreq++; // TO-REMOVE
-
       oraclePoints[0].sumNum += 1.0;
       oraclePoints[0].sumDen += (1.0 / alpha);
       oraclePoints[0].sumScore += alpha;
@@ -291,8 +290,9 @@ void oracleSimulation() {
     } else {
       Read r2 = generateOnlineRead(genome, d);
       size_t s = m - d;
+      //      std::cout << s << '\t' << r1.r << ' ' << r2.r<<'\t' << prefixSuffixHammingDistance(r1.r, r2.r, s) << "\n";
+      oraclePoints[s].hammDist += prefixSuffixHammingDistance(r1.r, r2.r, s);
       double sc = scoreExt(r1.r, r2.r, s,numDen);
-      //      sc = score(r1.r, r2.r, s);
       oraclePoints[s].sumNum = numDen[1];
       oraclePoints[s].sumDen = numDen[0];
       oraclePoints[s].sumScore += sc;

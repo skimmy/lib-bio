@@ -78,6 +78,7 @@ size_t hammingDistance(const std::string& s1, const std::string& s2, size_t m) {
   return hammingDistance(s1.c_str(), s2.c_str(), m);
 }
 
+// Calculates Hamming distance between k suffix of s1 and k prefix of s2
 size_t prefixSuffixHammingDistance(const std::string& s1, const std::string& s2, size_t k) {
   size_t d = 0;
   size_t md = s2.length() - k;

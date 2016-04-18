@@ -66,6 +66,7 @@ void initProbabilities() {
       pow( q_equal_calls, s * ( 1 - p_equal_calls ));
     approxExpScoreNum[s] = pow(4,s) * tildeI;
     approxExpScoreDen[s] = (pow(4,s) * tildeI ) + N - 1;
+
   }
 }
 

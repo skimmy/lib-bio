@@ -25,11 +25,13 @@ char randomMutation(char c) {
 }
 
 void simpleIIDErrors(std::string& s, double pe) {
-  size_t m = s.length();
-  for (size_t i = 0; i < m; ++i) {
-    double x = (double)rand() / RAND_MAX;
-    if (x < pe) {
-      s[i] = randomMutation(s[i]);      
+  if (pe >0) {
+    size_t m = s.length();
+    for (size_t i = 0; i < m; ++i) {
+      double x = (double)rand() / RAND_MAX;
+      if (x < pe) {
+	s[i] = randomMutation(s[i]);      
+      }
     }
   }
 }
@@ -77,6 +79,7 @@ Read generateOnlineRead(char* S, size_t j) {
   char* r = new char[Options::opts.m+1];
   simulateReadAt(j, Options::opts.m, S, r);
   Read read(std::string(r),j);
+  simpleIIDErrors(read.r, Options::opts.pe);
   delete[] r;
   return read;
 }

@@ -62,8 +62,11 @@ void initProbabilities() {
     power_peq_lookup[s] = pow(p_equal_calls, s);
     power_qeq_lookup[s] = pow(q_equal_calls, s);
 
-    double tildeI = pow(p_equal_calls, s * p_equal_calls) *
-      pow( q_equal_calls, s * ( 1 - p_equal_calls ));
+    //    double tildeI = pow(p_equal_calls, s * p_equal_calls) *
+    //      pow( q_equal_calls, s * ( 1 - p_equal_calls ));
+
+    double tmp = p_equal_calls * p_equal_calls + q_equal_calls* ( 1 - p_equal_calls );
+    double tildeI = pow(tmp, s );
     approxExpScoreNum[s] = pow(4,s) * tildeI;
     approxExpScoreDen[s] = (pow(4,s) * tildeI ) + N - 1;
 

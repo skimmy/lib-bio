@@ -19,6 +19,9 @@ def listSignInvert(v):
     for i in range(len(v)):
         v[i] = -v[i]
 
+def ListRemoveZeros(v):
+    return [x !=0 for x in v if x != 0]
+
 # This function calculates multinomial coefficient of
 # ks = [k1, k2, ..., kn] by keeping the factorized versione
 # of numerator and denumerator. This allows the calculation
@@ -93,6 +96,49 @@ def multiplicities(ks):
     mus.append(mu)
     return mus
 
+def SafeProbabilityComputing(ks, eps):
+    k = sum(ks)
+    t = k
+    PSI = [] + ks
+    PSI = ListRemoveZeros(PSI)
+    listSignInvert(PSI)
+    heapq.heapify(PSI)
+    mus = multiplicities(ks)
+    p = [1] * 4
+    # compute each term of summation
+    for i in range(4):
+        V = []
+        n = ks[i]
+        while n > 0:            
+            nu = 1 - eps
+            while (nu < 1) and PSI:
+                psi = -heapq.heappop(PSI)
+                if (psi > 1):
+                    heapq.heappush(PSI,-(psi-1))
+                nu *= float(t)/psi
+                t -= 1
+                if (t < 1):
+                    t = 1
+            V.append(nu)
+            n -= 1
+        n = k - ks[i]
+        while n > 0:
+            nu = eps / 3
+            while(nu < 1) and PSI:
+                psi = -heapq.heappop(PSI)
+                if (psi > 1):
+                    heapq.heappush(PSI,-(psi-1))
+                nu *= float(t)/psi
+                t -= 1
+                if (t < 1):
+                    t = 1
+            V.append(nu)
+            n -= 1
+        mn = product(multinomial(mus)[0]) * product(range(1,t+1))
+        print("{0} {1} \t {2}\n").format(product(V), V, mn)
+        p[i] = 0.25 * mn * product(V)
+    return sum(p)
+
 # Tests the partition algorithm by summing all 4^k observations
 def testPartition(P):
     s = 0
@@ -116,6 +162,7 @@ if __name__ == "__main__":
         n = int(sys.argv[2])
     P = recPart(k,n)
     print("There are {0} {1}-partitions of {2}:").format(len(P),n,k)
-    print(testPartition(P))
-    print(math.pow(4,k))
+    p = [4,1,0,0]
+    print(SafeProbabilityComputing(p,0.1))
+    
     

@@ -15,12 +15,15 @@ def product(v):
 
 # Inverts all the signs of elements of v
 #    v[i] = -v[i]
-def listSignInvert(v):
+def ListSignInvert(v):
     for i in range(len(v)):
         v[i] = -v[i]
 
 def ListRemoveZeros(v):
-    return [x !=0 for x in v if x != 0]
+    return [x for x in v if x != 0]
+
+def ListRemoveOnes(v):
+    return [x for x in v if x != 1]
 
 # This function calculates multinomial coefficient of
 # ks = [k1, k2, ..., kn] by keeping the factorized versione
@@ -56,8 +59,8 @@ def multinomial(ks):
         max_den = -heapq.heappop(h_den)
         new_fact = float(max_num) / float(max_den)
         heapq.heappush(h_num,-new_fact)
-    listSignInvert(h_num)
-    listSignInvert(h_den)
+    ListSignInvert(h_num)
+    ListSignInvert(h_den)
     return (h_num,h_den)
 
 
@@ -96,53 +99,67 @@ def multiplicities(ks):
     mus.append(mu)
     return mus
 
+########## MULTINOMIAL FACTORS PROCEDURES ##########
+def MultinomialFactors(ks):
+    q = [] + ListRemoveOnes(ListRemoveZeros(ks))
+    ListSignInvert(q)
+    heapq.heapify(q)
+    return [sum(ks), q]
+
+def Next(Q):
+    if Q[0] <= 1:
+        return 1
+    d = 1
+    if (Q[1]):
+        d = -heapq.heappop(Q[1])
+        if d-1 > 1:
+            heapq.heappush(Q[1],-(d-1))
+    Q[0] = Q[0] - 1    
+    return float(Q[0] + 1) / float(d)
+            
+def IsEmpty(Q):
+    return (Q[0] <= 1 and (not Q[1]))
+
 def SafeProbabilityComputing(ks, eps):
     k = sum(ks)
-    t = k
-    PSI = [] + ks
-    PSI = ListRemoveZeros(PSI)
-    listSignInvert(PSI)
-    heapq.heapify(PSI)
-    mus = multiplicities(ks)
-    p = [1] * 4
-    # compute each term of summation
+    S = 0
     for i in range(4):
-        V = []
-        n = ks[i]
-        while n > 0:            
-            nu = 1 - eps
-            while (nu < 1) and PSI:
-                psi = -heapq.heappop(PSI)
-                if (psi > 1):
-                    heapq.heappush(PSI,-(psi-1))
-                nu *= float(t)/psi
-                t -= 1
-                if (t < 1):
-                    t = 1
-            V.append(nu)
-            n -= 1
-        n = k - ks[i]
-        while n > 0:
-            nu = eps / 3
-            while(nu < 1) and PSI:
-                psi = -heapq.heappop(PSI)
-                if (psi > 1):
-                    heapq.heappush(PSI,-(psi-1))
-                nu *= float(t)/psi
-                t -= 1
-                if (t < 1):
-                    t = 1
-            V.append(nu)
-            n -= 1
-        mn = product(multinomial(mus)[0]) * product(range(1,t+1))
-        print("{0} {1} \t {2}\n").format(product(V), V, mn)
-        p[i] = 0.25 * mn * product(V)
-    return sum(p)
+        Q = MultinomialFactors(ks)
+        P = 1.0
+        ki = ks[i]
+        # go trhough (1-eps)
+        for i in range(ki):
+            P *= 1.0-eps
+            while(P < 1) and (not IsEmpty(Q)):
+                P *= Next(Q)
+        # go through eps/3
+        for i in range(k-ki):
+            P *= eps/3.0
+            while(P < 1) and (not IsEmpty(Q)):
+                P *= Next(Q)
+        S += P
+    mu = 0.25 * product(multinomial(multiplicities(ks))[0] )
+#    print("{0} {1} {2} {3}").format(S,mu, product(multiplicities(ks)), ks)
+    return S *mu
+    
+   
 
+
+def TestMultinomialFactorsCalculator(ks):
+    Q = MultinomialFactors(ks)   
+    print(Q)
+    p = 1
+    while (not IsEmpty(Q)):
+        x = Next(Q)
+        p *= x
+        print("{0} - {1}").format(x,p)
+    mn = product(multinomial(ks)[0])
+    return (int(mn) == int(p))
+
+       
 # Tests the partition algorithm by summing all 4^k observations
 def testPartition(P):
-    s = 0
-    
+    s = 0    
     for p in P:
         (c1,tmp1) = (multinomial(p))    
         (c2,tmp2) = multinomial(multiplicities(p))        
@@ -160,9 +177,13 @@ if __name__ == "__main__":
     k = int(sys.argv[1])
     if len(sys.argv) > 2:
         n = int(sys.argv[2])
+    prob = 0
     P = recPart(k,n)
     print("There are {0} {1}-partitions of {2}:").format(len(P),n,k)
-    p = [4,1,0,0]
-    print(SafeProbabilityComputing(p,0.1))
-    
+    #    p = [10,1,0,0]
+    #    p = [1,1,1,1]
+    #    print(TestMultinomialFactorsCalculator(p))
+    for p in P:
+        prob += float(SafeProbabilityComputing(p,0.21))
+    print("{0}").format(prob)
     

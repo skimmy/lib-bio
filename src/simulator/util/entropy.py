@@ -5,6 +5,10 @@ import math
 import heapq
 import scipy.special as spe
 
+# usage
+def PrintUsage():
+    print("Usage:\n\t python entropy.py k epsilon [nparts]")
+
 # calculates the product of elements in v
 #    p = \prod_{f \in v}{f}
 def product(v):
@@ -187,11 +191,13 @@ def testPartition(P):
 #      k    integer to be partitioned
 #      n    number of parts (optional, default value: 4)
 if __name__ == "__main__":
-    epsilon = 0.21
-    n = 4
+    if len(sys.argv) < 3:
+        PrintUsage()
+    n = 4    
     k = int(sys.argv[1])
-    if len(sys.argv) > 2:
-        n = int(sys.argv[2])
+    epsilon = float(sys.argv[2])    
+    if len(sys.argv) > 3:
+        n = int(sys.argv[3])
     prob = 0
     entropy = 0
     P = recPart(k,n)

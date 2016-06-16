@@ -141,7 +141,18 @@ def SafeProbabilityComputing(ks, eps):
     mu = 0.25 * product(multinomial(multiplicities(ks))[0] )
 #    print("{0} {1} {2} {3}").format(S,mu, product(multiplicities(ks)), ks)
     return S *mu
-    
+
+
+########## ENTROPY CALCULATION ##########
+def SimplePartitionEntropy(ks, eps):
+    H = 0    
+    for s in range(len(ks)):
+        etas = 0;
+        for t in range(len(ks)):
+            if (t != s):
+                etas += math.pow(1-eps,ks[t]-ks[s]) * math.pow(eps/3, ks[s]-ks[t])
+        H += 1 / (1 + etas) * (math.log(1 + etas) / math.log(2) )
+    return H
    
 
 
@@ -155,6 +166,9 @@ def TestMultinomialFactorsCalculator(ks):
         print("{0} - {1}").format(x,p)
     mn = product(multinomial(ks)[0])
     return (int(mn) == int(p))
+
+def TestSimpleEntropy(ks, eps):
+    print(SimplePartitionEntropy(ks, eps))
 
        
 # Tests the partition algorithm by summing all 4^k observations
@@ -173,17 +187,22 @@ def testPartition(P):
 #      k    integer to be partitioned
 #      n    number of parts (optional, default value: 4)
 if __name__ == "__main__":
+    epsilon = 0.21
     n = 4
     k = int(sys.argv[1])
     if len(sys.argv) > 2:
         n = int(sys.argv[2])
     prob = 0
+    entropy = 0
     P = recPart(k,n)
-    print("There are {0} {1}-partitions of {2}:").format(len(P),n,k)
+    #    print("There are {0} {1}-partitions of {2}:").format(len(P),n,k)
     #    p = [10,1,0,0]
     #    p = [1,1,1,1]
     #    print(TestMultinomialFactorsCalculator(p))
+    #    TestSimpleEntropy([2,1,1,0],0.21)
     for p in P:
-        prob += float(SafeProbabilityComputing(p,0.21))
-    print("{0}").format(prob)
-    
+        pr = float(SafeProbabilityComputing(p,epsilon))
+        prob += pr
+        entropy += pr * SimplePartitionEntropy(p, epsilon)
+    print("{0}").format(entropy)
+

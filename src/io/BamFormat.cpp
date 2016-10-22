@@ -13,7 +13,7 @@ BamFormat::open(const std::string& filePath)
 {
   #ifdef HAVE_HTSLIB
   inFile = sam_open(filePath.c_str(), "r");
-  #elif
+  #else
   std::cout << "Error undefined htslib" << std::endl;
   exit(1);
   #endif
@@ -28,7 +28,6 @@ BamFormat::close()
       sam_close(inFile);
       inFile = NULL;
     }
-  #elif
   #endif
 }
 
@@ -36,6 +35,8 @@ std::unique_ptr<UIntList>
 BamFormat::getAlignmentPositions()
 {
   std::unique_ptr<UIntList> pList(new UIntList());
+
+  #ifdef HAVE_HTSLIB
   bam_hdr_t* head = sam_hdr_read(inFile);
   bam1_t* content = bam_init1();
   while(sam_read1(inFile, head, content) >= 0) {
@@ -43,6 +44,8 @@ BamFormat::getAlignmentPositions()
   }
   bam_destroy1(content);
   bam_hdr_destroy(head);
+  #endif
+  
   return pList;
 }
 

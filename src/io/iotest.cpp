@@ -24,11 +24,16 @@ int main(int argc, char** argv) {
 
   lbiobam::BamFormat bam;
   bam.open("/tmp/sample.bam");
-  pUIntList pList = bam.getAlignmentPositions();
+  IdPos idPos = bam.getNext();
+  while (idPos.first != "EOF") {
+    std::cout << idPos.first << " " << idPos.second << "\n";
+    idPos = bam.getNext();
+  }
+  /*  pUIntList pList = bam.getAlignmentPositions();
   std::cout << "Found " << pList->size() << " alignments\n";
   for (uint64_t align : *pList) {
     std::cout << align << "\n";
-  }
+    }*/
   std::cout << std::endl;
   bam.close();
   

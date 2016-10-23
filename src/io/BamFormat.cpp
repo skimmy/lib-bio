@@ -3,7 +3,7 @@
 using namespace lbiobam;
 
 BamFormat::BamFormat()
-  : Format("BAM")
+  : Format("BAM"), inFilePath("")
 {
   
 }
@@ -11,8 +11,13 @@ BamFormat::BamFormat()
 void
 BamFormat::open(const std::string& filePath)
 {
+  inFilePath = filePath;
+  
   #ifdef HAVE_HTSLIB
-  inFile = sam_open(filePath.c_str(), "r");
+  inFile = sam_open(inFilePath.c_str(), "r");
+  head = sam_hdr_read(inFile);
+  content = bam_init1();
+  
   #else
   std::cout << "Error undefined htslib" << std::endl;
   exit(1);
@@ -22,7 +27,16 @@ BamFormat::open(const std::string& filePath)
 void
 BamFormat::close()
 {
-  #ifdef HAVE_HTSLIB
+  inFilePath = "";
+  #ifdef HAVE_HTSLIB  
+  if (head)
+    {
+        bam_hdr_destroy(head);
+    }
+  if (content)
+    {
+        bam_destroy1(content);
+    }
   if (inFile)
     {
       sam_close(inFile);
@@ -34,19 +48,36 @@ BamFormat::close()
 std::unique_ptr<UIntList>
 BamFormat::getAlignmentPositions()
 {
+  
   std::unique_ptr<UIntList> pList(new UIntList());
 
   #ifdef HAVE_HTSLIB
-  bam_hdr_t* head = sam_hdr_read(inFile);
-  bam1_t* content = bam_init1();
+  
+
   while(sam_read1(inFile, head, content) >= 0) {
     pList->push_back(content->core.pos);
   }
-  bam_destroy1(content);
-  bam_hdr_destroy(head);
+
   #endif
   
   return pList;
+}
+
+IdPos
+BamFormat::getNext() {
+  IdPos idPos;
+  #ifdef HAVE_HTSLIB
+  if (sam_read1(inFile, head, content) >= 0) { 
+    idPos.first = std::string(bam_get_qname(content));
+    idPos.second = content->core.pos;
+  }
+  else
+    {
+      idPos.first = "EOF";
+      idPos.second = -2;
+    }
+  #endif
+  return idPos;
 }
 
 std::string

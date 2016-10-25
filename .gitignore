@@ -137,4 +137,5 @@ Makefile.in
 Makefile
 config.h.in
 config.status
+configgure.scan
 ar-lib

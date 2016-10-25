@@ -1,8 +1,8 @@
 #ifndef SMITH_WATERMAN_DP
 #define SMITH_WATERMAN_DP
 
-#include "../algorithms.h"
-
+#include "DynamicProgramming.hpp"
+#include "aligndef.hpp"
 #include <string>
 
 /**

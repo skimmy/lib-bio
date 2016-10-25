@@ -30,7 +30,7 @@ typedef uint64_t NumericKmer;
    The fact that mapped positions are implicitly ordered on a `vector` structure
    can be used to map consecutive kmers of the input sequence. 
  */
-typedef std::vector< size_t > KmersMap;
+typedef std::vector< std::size_t > KmersMap;
 
 /**
    \brief The k-mer score type defined as a long (may change in the future)
@@ -45,7 +45,7 @@ typedef double KmerScoreType;
    used to indicate the position(s) where the k-mer maps.
 
  */
-typedef std::unordered_map< NumericKmer, std::list< size_t > > NumericKmerIndex;
+typedef std::unordered_map< NumericKmer, std::list< std::size_t > > NumericKmerIndex;
 
 /**
    \brief Map taking `uint64_t` as both key and value.

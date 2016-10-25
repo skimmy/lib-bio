@@ -1,7 +1,8 @@
 #ifndef MATCH_SIMILARITY_H
 #define MATCH_SIMILARITY_H
 
-#include "../algorithms.h"
+#include "DynamicProgramming.hpp"
+#include "aligndef.hpp"
 
 #include <string>
 using namespace std;

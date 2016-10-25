@@ -2,6 +2,7 @@
 #define ALIGN_DEF_H
 
 #include "../core.h"
+#include "Position.hpp"
 
 #include <vector>
 #include <string>

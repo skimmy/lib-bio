@@ -36,11 +36,12 @@ void printArguments() {
 
 void printOperationModeDescription() {
   std::cout << " OPERATION MODES\n\n";
-  std::cout << "\t 0 (Test)     Performs several tests of quantities\n";
-  std::cout << "\t 1 (Offline)  Offline simulation: all genome and reads generated before scoring (Defualt)\n";
-  std::cout << "\t 2 (Online)   Online simulation: genome and reads are generated 'on-demand'\n";
-  std::cout << "\t 3 (Oracle)   Simulation of M-1 independent pairs\n";
-  std::cout << "\t 4 (ScoreEst) Tests the approximation E[score] ~= E[num]/E[den]\n\n";
+  std::cout << "\t 0 (Test)        Performs several tests of quantities\n";
+  std::cout << "\t 1 (Offline)     Offline simulation: all genome and reads generated before scoring (Defualt)\n";
+  std::cout << "\t 2 (Online)      Online simulation: genome and reads are generated 'on-demand'\n";
+  std::cout << "\t 3 (Oracle)      Simulation of M-1 independent pairs\n";
+  std::cout << "\t 4 (ScoreEst)    Tests the approximation E[score] ~= E[num]/E[den]\n";
+  std::cout << "\t 5 (AlignScore)  Given a SAM files and a reference evaluate the score\n";
 }
 
 void parseArguments(int argc, char** argv) {
@@ -52,6 +53,7 @@ void parseArguments(int argc, char** argv) {
   Options::opts.pe = 0.01;
   Options::opts.empiricalDistributionStep = 100;
   Options::opts.inputReference = "";
+  Options::opts.inputSAM = "";
   Options::opts.outputDistribution = "";
   Options::opts.outputCDF = "";
   Options::opts.approxLevel = -1;
@@ -63,7 +65,7 @@ void parseArguments(int argc, char** argv) {
   Options::opts.test = false;
   
   char c;
-  while ((c = getopt(argc, argv, "N:m:M:e:i:D:C:A:O:ophvT")) != -1) {
+  while ((c = getopt(argc, argv, "N:m:M:e:i:S:D:C:A:O:ophvT")) != -1) {
     switch(c) {
     case 'N':
       Options::opts.N = atoi(optarg);
@@ -79,6 +81,9 @@ void parseArguments(int argc, char** argv) {
       break;
     case 'i':
       Options::opts.inputReference = optarg;
+      break;
+    case 'S':
+      Options::opts.inputSAM = optarg;
       break;
     case 'D':
       Options::opts.outputDistribution = optarg;

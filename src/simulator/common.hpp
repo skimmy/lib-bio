@@ -14,12 +14,12 @@
 #include "chain.hpp"
 #include "prob.hpp"
 #include "util.hpp"
-
-// probabilities
-
-
+#include "align.hpp"
+#include "io.hpp"
 
 // testing functions
 void testAll();
+
+void fatal_error(const std::string &msg, int exit_code = 1);
 
 #endif

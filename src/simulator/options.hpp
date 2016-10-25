@@ -1,7 +1,7 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
-enum OpMode { Test, Offline, Online, Oracle, ScoreEst };
+enum OpMode { Test, Offline, Online, Oracle, ScoreEst, AlignScore };
 
 // options parsing
 struct Options {
@@ -13,6 +13,7 @@ struct Options {
   size_t empiricalDistributionStep;
 
   std::string inputReference;
+  std::string inputSAM;
   std::string outputDistribution;
   std::string outputCDF;
 

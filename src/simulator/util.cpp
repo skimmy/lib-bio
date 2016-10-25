@@ -110,3 +110,12 @@ Read randomRead(size_t m) {
   Read r(std::string(tmp), 0);
   delete[] tmp;
 }
+
+// Error
+
+void
+fatal_error(const std::string &msg, int exit_code)
+{
+  std::cerr << "[ERROR]  " + msg << std::endl;
+  exit(exit_code);
+}

@@ -322,6 +322,9 @@ int main(int argc, char** argv) {
   case (OpMode::Oracle):
     oracleSimulation();
     break;
+  case (OpMode::AlignScore):
+    evaluateAlignmentScore(Options::opts);
+    break;
   default:
     std::cout << "Unrecognized operation mode " <<
       Options::opts.mode << "\nAborting..\n";

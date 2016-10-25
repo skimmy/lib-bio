@@ -1,6 +1,3 @@
-#ifndef CORE_H
-#define CORE_H
-
 /**
  * All the inclusions for sequence representation
  */
@@ -16,8 +13,8 @@
 #include "core/Reference.hpp"
 #include "core/KMer.hpp"
 
-/* #include "core/QualifiedSequence.hpp" */
-/* #include "core/FullyQualifiedSequence.hpp" */
+#include "core/QualifiedSequence.hpp"
+#include "core/FullyQualifiedSequence.hpp"
 
 #include "core/DNAAlphabet2Bits.hpp"
 
@@ -27,6 +24,6 @@
 #include "core/DNAAlphabet2Bits.hpp"
 
 #include "core/Quality.hpp"
+#include "core/PhredQuality.hpp"
 #include "core/ProbabilisticQuality.hpp"
 
-#endif

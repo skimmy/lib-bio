@@ -1,13 +1,8 @@
 #ifndef CSFAST_READ_H
 #define CSFAST_READ_H
 
-#include "../sequence/Read.hpp"
-#include "../sequence/KMer.hpp"
-#include "../sequence/ColorAlphabet.hpp"
-#include "../sequence/FullyQualifiedSequence.hpp"
 
-#include "../quality/PhredQuality.hpp"
-
+#include "../core.h"
 
 #include <iostream>
 #include <list>

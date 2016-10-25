@@ -63,6 +63,9 @@ auto-save-list
 tramp
 .\#*
 
+# VIM section
+*.swp
+
 # Org-mode
 .org-id-locations
 *_archive
@@ -136,6 +139,7 @@ Makefile.in
 # uncomment when porting to autotools is finished
 Makefile
 config.h.in
+config.h
 config.status
 configgure.scan
 ar-lib

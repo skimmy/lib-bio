@@ -1,15 +1,3 @@
-/*#include "sequence.h"
-#include "io.h"
-#include "util.h"
-#include "alignment.h"
-#include "quality.h"
-#include "adt.h"
-#include "tasks.hpp"
-#include "algorithms.h"
-//#include "generator.h"
-//#include "filtering.h"
-*/
-
 #include "options.hpp"
 #include "tasks.hpp"
 
@@ -99,46 +87,7 @@ void test() {
     "  This is a Test Release \n" << 
     "***************************** \n" <<  std::endl;
 
-  size_t k = 13;
-  FastFormat fast("/home/skimmy/biodft/data/seq_iid.fasta");
-  Reference s = fast.toReference();
-  std::list<KMer> kmers = s.getKMerList(k);
 
-
-  std::priority_queue< std::pair< double, size_t > > dftVsHamming;
-  std::vector< double > dftMods(kmers.size());
-  
-  size_t i = 0, j = 0;
-  double epsilon = 0.5;
-  std::vector< uint64_t > hammDist(k);
-
-  // pre-compute all the modules for dft components
-  for (std::list<KMer>::iterator it = kmers.begin(); it != kmers.end(); it++) {
-    double mod = std::abs(dft::dftComponent(dft::basesToComplexVector(*it), 1, k ));    
-    dftMods[i++] = mod;
-  }
-
-
-  // all VS all N^2 scan
-  i = j = 0;
-  //  size_t MAX_Q = 1 << 22;
-  for (std::list<KMer>::iterator it = kmers.begin(); std::next(it) != kmers.end(); it++) {    
-    j = i+1;
-    for (std::list<KMer>::iterator it2 = std::next(it); it2 != kmers.end(); it2++) {
-      
-      double d_dft = std::abs(dftMods[i] - dftMods[j]);
-      size_t d_h = bio::hammingDistance(*it, *it2);
-      if (d_dft < epsilon) {
-	hammDist[d_h]++;
-      }
-      j++;
-    }
-    i++;
-  }
-
-  for (i = 0; i < k; ++i) {
-    std::cout << i << " " << hammDist[i] << std::endl;
-  }
 
   
 }

@@ -1,6 +1,3 @@
-#ifndef IO_H
-#define IO_H
-
 /**
  * All I/O related inclusions here
  */
@@ -10,9 +7,6 @@
 #include "io/FastqRead.hpp"
 #include "io/FastqFormat.hpp"
 
-/*#include "io/CSFastRead.hpp"
+#include "io/CSFastRead.hpp"
 #include "io/CSFastFormat.hpp"
 #include "io/FastqLazyLoader.hpp"
-*/
-
-#endif

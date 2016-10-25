@@ -1,4 +1,4 @@
-#include "../io.h"
+#include "FastqLazyLoader.hpp"
 
 FastqLazyLoader::FastqLazyLoader(const string& filePath) 
   : input(filePath) {

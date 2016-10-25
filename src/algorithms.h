@@ -1,18 +1,3 @@
-/*
-
-
-#include "algorithms/types.hpp"
-
-
-
-
-
-#include "adt/KeyValuePair.hpp"
-#include "adt/Index.hpp"
-#include "adt/HybridIndex.hpp"
-
-*/
-
 #include "algorithms/types.hpp"
 
 #include "algorithms/DynamicProgramming.hpp"
@@ -28,4 +13,3 @@
 #include "algorithms/dstats.hpp"
 
 #include "algorithms/kmerscore.hpp"
-

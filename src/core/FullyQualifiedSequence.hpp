@@ -1,7 +1,7 @@
-#ifndef FULLY_QUALIFIED_SEQUENCE
-#define FULLY_QUALIFIED_SEQUENCE
+#ifndef FULLY_QUALIFIED_SEQUENCE_H
+#define FULLY_QUALIFIED_SEQUENCE_H
 
-#include "../quality/FullQuality.hpp"
+#include "FullQuality.hpp"
 
 /**
  * \brief This class is actually a container for a Sequence

@@ -2,7 +2,7 @@
 #define CS_FAST_FORMAT_H
 
 #include "CSFastRead.hpp"
-#include "Format.h"
+#include "Format.hpp"
 
 #include <fstream>
 using namespace std;

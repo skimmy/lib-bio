@@ -39,8 +39,11 @@ int main(int argc, char** argv) {
   lbiobam::BamFormat oBam;
   oBam.open("/tmp/out.sam", lbiobam::BamOpenWrite);
   // ... DO STUFF ...
+  oBam.copyHeader(bam);
+  oBam.writeBamHeader();
+
   oBam.close();
-  
+
   std::cout << std::endl;
   bam.close();
   

@@ -3,7 +3,7 @@
 using namespace lbiobam;
 
 BamFormat::BamFormat()
-  : Format("BAM"), hFilePath("")
+  : Format("BAM"), hFilePath(""), mode(NotOpened)
 {
   
 }
@@ -16,6 +16,7 @@ BamFormat::open(const std::string& filePath, BamOpenMode opMode)
   // Read only case
   if (opMode == BamOpenRead)
     {
+      mode = BamOpenRead;
       std::cout << hFilePath << " -->  READ\n";
 #ifdef HAVE_HTSLIB
 
@@ -32,6 +33,7 @@ BamFormat::open(const std::string& filePath, BamOpenMode opMode)
   // (Over)write only case
   if (opMode == BamOpenWrite)
     {
+      mode = BamOpenWrite;
       std::cout << hFilePath << " -->  WRITE\n";      
 #ifdef HAVE_HTSLIB
       hFile = sam_open(hFilePath.c_str(), "w");
@@ -69,6 +71,10 @@ BamFormat::getAlignmentPositions()
 {
   
   std::unique_ptr<UIntList> pList(new UIntList());
+  if (mode != BamOpenRead)
+    {     
+      return NULL;
+    }
 
   #ifdef HAVE_HTSLIB
   
@@ -85,6 +91,12 @@ BamFormat::getAlignmentPositions()
 IdPos
 BamFormat::getNext() {
   IdPos idPos;
+  if (mode != BamOpenRead)
+    {
+      idPos.first = "ERR";
+      idPos.second = -10;
+      return idPos;
+    }
   #ifdef HAVE_HTSLIB
   if (sam_read1(hFile, head, content) >= 0) { 
     idPos.first = std::string(bam_get_qname(content));
@@ -99,21 +111,32 @@ BamFormat::getNext() {
   return idPos;
 }
 
-std::string
-BamFormat::loadFromFile(const std::string& fileName)
-{
-  open(fileName);
-  return "";
+
+void
+BamFormat::setBamHeader()
+{  
 }
 
-std::string
-BamFormat::getSequence() const
+void
+BamFormat::copyHeader(const BamFormat& other)
 {
-  return "";
+#ifdef HAVE_HTSLIB
+  
+  this->head = bam_hdr_dup(other.head);
+
+#else
+    
+#endif
+    
 }
 
-std::string
-BamFormat::getHeader() const
+void
+BamFormat::writeBamHeader()
 {
-  return "";
+#ifdef HAVE_HTSLIB
+  int hdrWriteRes = sam_hdr_write(hFile, head);
+
+#else
+  
+#endif
 }

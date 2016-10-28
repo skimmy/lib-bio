@@ -16,20 +16,22 @@ typedef std::pair<std::string,int64_t> IdPos;
 
 namespace lbiobam
 {
+  
+  enum BamOpenMode { BamOpenRead, BamOpenWrite, BamOpenAppend };
 
   class BamFormat : public Format {
   private:
     #ifdef HAVE_HTSLIB
-    htsFile* inFile = NULL;
+    htsFile* hFile = NULL;
     bam_hdr_t* head = NULL;
     bam1_t* content = NULL;
 
     #endif
 
-    std::string inFilePath;
+    std::string hFilePath;
   public:
     BamFormat();
-    void open(const std::string& filePath);
+    void open(const std::string& filePath, BamOpenMode opMode = BamOpenRead);
     void close();
 
     std::unique_ptr<UIntList> getAlignmentPositions();

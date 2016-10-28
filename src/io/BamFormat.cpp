@@ -3,31 +3,50 @@
 using namespace lbiobam;
 
 BamFormat::BamFormat()
-  : Format("BAM"), inFilePath("")
+  : Format("BAM"), hFilePath("")
 {
   
 }
 
 void
-BamFormat::open(const std::string& filePath)
+BamFormat::open(const std::string& filePath, BamOpenMode opMode)
 {
-  inFilePath = filePath;
+  hFilePath = filePath;
+
+  // Read only case
+  if (opMode == BamOpenRead)
+    {
+      std::cout << hFilePath << " -->  READ\n";
+#ifdef HAVE_HTSLIB
+
+      hFile = sam_open(hFilePath.c_str(), "r");
+      head = sam_hdr_read(hFile);
+      content = bam_init1();
   
-  #ifdef HAVE_HTSLIB
-  inFile = sam_open(inFilePath.c_str(), "r");
-  head = sam_hdr_read(inFile);
-  content = bam_init1();
-  
-  #else
-  std::cout << "Error undefined htslib" << std::endl;
-  exit(1);
-  #endif
+#else
+      std::cout << "Error undefined htslib" << std::endl;
+      exit(1);
+#endif
+    }
+
+  // (Over)write only case
+  if (opMode == BamOpenWrite)
+    {
+      std::cout << hFilePath << " -->  WRITE\n";      
+#ifdef HAVE_HTSLIB
+      hFile = sam_open(hFilePath.c_str(), "w");
+      
+#else
+      std::cout << "Error undefined htslib" << std::endl;
+      exit(1);
+#endif
+    }
 }
 
 void
 BamFormat::close()
 {
-  inFilePath = "";
+  hFilePath = "";
   #ifdef HAVE_HTSLIB  
   if (head)
     {
@@ -37,10 +56,10 @@ BamFormat::close()
     {
         bam_destroy1(content);
     }
-  if (inFile)
+  if (hFile)
     {
-      sam_close(inFile);
-      inFile = NULL;
+      sam_close(hFile);
+      hFile = NULL;
     }
   #endif
 }
@@ -54,7 +73,7 @@ BamFormat::getAlignmentPositions()
   #ifdef HAVE_HTSLIB
   
 
-  while(sam_read1(inFile, head, content) >= 0) {
+  while(sam_read1(hFile, head, content) >= 0) {
     pList->push_back(content->core.pos);
   }
 
@@ -67,7 +86,7 @@ IdPos
 BamFormat::getNext() {
   IdPos idPos;
   #ifdef HAVE_HTSLIB
-  if (sam_read1(inFile, head, content) >= 0) { 
+  if (sam_read1(hFile, head, content) >= 0) { 
     idPos.first = std::string(bam_get_qname(content));
     idPos.second = content->core.pos;
   }

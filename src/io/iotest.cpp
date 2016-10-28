@@ -34,6 +34,13 @@ int main(int argc, char** argv) {
   for (uint64_t align : *pList) {
     std::cout << align << "\n";
     }*/
+
+  // BAM write tests
+  lbiobam::BamFormat oBam;
+  oBam.open("/tmp/out.sam", lbiobam::BamOpenWrite);
+  // ... DO STUFF ...
+  oBam.close();
+  
   std::cout << std::endl;
   bam.close();
   

@@ -101,6 +101,38 @@ size_t bestHammingOverlap(const std::string& s1, const std::string& s2) {
   return 0;
 }
 
+// Edit distance functions
+size_t
+editDistance(const std::string& s1, const std::string& s2) {
+  size_t n = s1.size();
+  size_t m = s2.size();
+  size_t** dpMatrix = new size_t*[n+1];
+  for (size_t i = 0; i < n+1; ++i) {
+    dpMatrix[i] = new size_t[m+1];
+  }
+
+  // initialization of first row and column
+  for (size_t i = 0; i < n+1; ++i) {
+    dpMatrix[i][0] = 0;
+  }
+  for (size_t j = 0; j < m+1; ++j) {
+    dpMatrix[0][j] = 0;
+  }
+
+  for (int i = 1; i < n+1; ++i) {
+    for(int j = 1; j < m+1; ++j) {
+      size_t delta = (s1[i] == s2[j]) ? 0 : 1;
+      dpMatrix[i][j] = MIN( MIN(dpMatrix[i-1][j]+1, dpMatrix[i][j-1]+1) , dpMatrix[i-1][j-1] + delta ) ;
+    }
+  }
+  size_t dist = dpMatrix[n][m];
+  for (int i = 0; i < n+1; ++i) {
+    delete[] dpMatrix[i];   
+  }
+  delete[] dpMatrix;
+  return dist;
+}
+
 // Most of these function are used for debug and dev purpose, but they can be
 // useful in other situations (perhaps in the future development of simulator)
 

@@ -42,6 +42,12 @@ void generateIIDGenome(size_t N, char* S) {
   }		
 }
 
+void generateIIDString(std::string& s) {
+  for (size_t i = 0; i < s.size(); ++i) {
+    s[i] = bases[rand() & 0x03];
+  }
+}
+
 void generateConstantGenome(size_t N, char* S, char b) {
   for (size_t i = 0; i < N; ++i) {
     S[i] = b;

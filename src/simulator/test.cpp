@@ -128,7 +128,32 @@ void testScoreFunction() {
   testScoreFunctionNoError();
   std::cout << std::endl;
   testScoreFunctionError();
- 
+
+}
+
+void testEditDistance() {
+  std::cout << "* Edit distance tests\n\n";
+  std::string s1 = "ACCGTT";
+  std::string s2 = "ACTTCT";
+  size_t ed = editDistance(s1,s2);
+  std::cout << ed << "\n\n";
+}
+
+void
+editDistanceEstimations(size_t n_min, size_t n_max, size_t n_step, size_t k_max) {
+  std::cout << std::endl;
+  for (size_t n = n_min; n <= n_max; n += n_step) {
+    std::string s1(n,'N');
+    std::string s2(n,'N');
+    double AED = 0;
+    for (size_t k = 1; k <= k_max; ++k) {
+      generateIIDString(s1);
+      generateIIDString(s2);
+      AED += editDistance(s1,s2);
+    }
+    std::cout << n << "\t" << ( AED / k_max) << std::endl;
+  }
+  std::cout << std::endl;
 }
 
 void testAll() {
@@ -138,5 +163,6 @@ void testAll() {
   //  testScoreFunction();
   //  testLookupTables();
   //testPeq();
-  testApproximatedExpectedScore();
+  //testApproximatedExpectedScore();
+  editDistanceEstimations(250,10000,25,1000);
 }

@@ -113,15 +113,15 @@ editDistance(const std::string& s1, const std::string& s2) {
 
   // initialization of first row and column
   for (size_t i = 0; i < n+1; ++i) {
-    dpMatrix[i][0] = 0;
+    dpMatrix[i][0] = i;
   }
   for (size_t j = 0; j < m+1; ++j) {
-    dpMatrix[0][j] = 0;
+    dpMatrix[0][j] = j;
   }
 
   for (int i = 1; i < n+1; ++i) {
     for(int j = 1; j < m+1; ++j) {
-      size_t delta = (s1[i] == s2[j]) ? 0 : 1;
+      size_t delta = (s1[i-1] == s2[j-1]) ? 0 : 1;
       dpMatrix[i][j] = MIN( MIN(dpMatrix[i-1][j]+1, dpMatrix[i][j-1]+1) , dpMatrix[i-1][j-1] + delta ) ;
     }
   }

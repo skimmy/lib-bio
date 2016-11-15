@@ -1,6 +1,7 @@
 #include "common.hpp"
 
 #include <iostream>
+#include <cmath>
 
 #define TEST_GENOME_LENGTH 65536
 #define TEST_READ_LENGTH 100
@@ -156,6 +157,54 @@ editDistanceEstimations(size_t n_min, size_t n_max, size_t n_step, size_t k_max)
   std::cout << std::endl;
 }
 
+
+// returns the average edit distance between ALL strings with length exactly n
+double
+testEditDistanceExhaustive(size_t n) {
+  double dist = 0;
+  char bases[] = {'A','C','G','T'};
+  std::string s1(n,'A');
+  std::string s2(n,'A');
+  s1[1] = 'T';
+  for (int i = 0; i < n; ++i) {
+    for (int bi = 0; bi < 4; ++bi) {
+      s2[i] = bases[bi];
+      size_t d = editDistance(s1,s2);
+      dist += d;
+    }
+  }
+  return dist;
+}
+
+double
+recursiveExhEditDistance(std::string s1, std::string s2, size_t n) {
+  if (s1.size() == n) {
+    double d = editDistance(s1,s2);
+    std::cout << s1 << '\t' << d << '\n';
+    return d;
+  } else {
+    double ed =
+      recursiveExhEditDistance(s1 + "A", s2, n) +
+      recursiveExhEditDistance(s1 + "C", s2, n) +
+      recursiveExhEditDistance(s1 + "G", s2, n) +
+      recursiveExhEditDistance(s1 + "T", s2, n);
+    return ed;
+  }
+}
+
+double recursiveEditDistAllPairs(std::string s1, std::string s2, size_t n) {
+  if (s2.size() == n) {
+    return recursiveExhEditDistance(s1,s2,n);
+  } else {
+    double ed =
+      recursiveEditDistAllPairs("", s2 + "A", n) +
+      recursiveEditDistAllPairs("", s2 + "C", n) +
+      recursiveEditDistAllPairs("", s2 + "G", n) +
+      recursiveEditDistAllPairs("", s2 + "T", n);
+    return ed;
+  }
+}
+
 void testAll() {
   std::cout << "--------------------------------\n";
   std::cout << "          TESTING MODE          \n";
@@ -164,5 +213,10 @@ void testAll() {
   //  testLookupTables();
   //testPeq();
   //testApproximatedExpectedScore();
-  editDistanceEstimations(250,10000,25,1000);
+  //editDistanceEstimations(50,1000,5,100);
+  //  std::cout << testEditDistanceExhaustive(4) << "\n";
+  //std::cout << recursiveExhEditDistance("","AA",3) << "\n";
+  size_t n = 4;
+  std::cout << recursiveEditDistAllPairs("","", n) / pow(4,n) << "\n";
+  //std::cout << editDistance("AA","AAA") << "\n";
 }

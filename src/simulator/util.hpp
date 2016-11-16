@@ -16,7 +16,7 @@ size_t prefixSuffixHammingDistance(const std::string& s1, const std::string& s2,
 size_t bestHammingOverlap(const std::string& s1, const std::string& s2);
 
 size_t editDistance(const std::string& s1, const std::string& s2);
-size_t editDistanceEncoded(uint64_t s1, size_t n1, uint64_t s2, size_t n2);
+size_t editDistanceEncoded(uint64_t s1, size_t n1, uint64_t s2, size_t n2, size_t** dpMatrix);
 
 void printString(char* s, size_t n);
 void printDoubleMatrix(double** M, size_t n, size_t m);

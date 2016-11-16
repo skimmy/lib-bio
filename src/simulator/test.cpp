@@ -217,13 +217,22 @@ void test2bitsEncoding() {
   }
 }
 
-void testEncodedEditDistance() {
-  std::cout << editDistanceEncoded(string2Encode("AAA"), 3, string2Encode("GA"), 2) << '\n';
-  std::cout << editDistanceEncoded(string2Encode("ACCTTA"), 6, string2Encode("ATTCCA"), 6) << '\n';
-  std::cout << editDistanceEncoded(string2Encode("ATTCCA"), 6, string2Encode("ACCTTA"), 6) << '\n'; 
-}
 
 void testExhaustiveEditDistanceEncoded(size_t n) {
+  size_t** dpMatrix = new size_t*[n+1];
+  for (int i = 0; i < n+1; ++i) {
+    dpMatrix[i] = new size_t[n+1];
+  }
+
+
+  // initialization of first row and column
+  for (size_t i = 0; i < n+1; ++i) {
+    dpMatrix[i][0] = i;
+  }
+  for (size_t j = 0; j < n+1; ++j) {
+    dpMatrix[0][j] = j;
+  }
+
   uint64_t N = pow(4,n);
   double ed = 0;
   for (uint64_t i = 0; i < N; ++i) {
@@ -231,11 +240,17 @@ void testExhaustiveEditDistanceEncoded(size_t n) {
       if (i == j) {
 	continue;
       }
-      ed += 2*editDistanceEncoded(i, n, j, n);
+      ed += 2*editDistanceEncoded(i, n, j, n, dpMatrix);
       
     }
   }
   std::cout << ed / ( (double) N*N ) << '\n';
+
+  for (int i = 0; i < n+1; ++i) {
+    delete[] dpMatrix[i];
+  }
+  delete[] dpMatrix;
+
 }
 
 void testAll() {
@@ -250,7 +265,7 @@ void testAll() {
   //  std::cout << testEditDistanceExhaustive(4) << "\n";
   //std::cout << recursiveExhEditDistance("","AA",3) << "\n";
   //  size_t n = 5;
-  for (int i = 1; i < 6; ++i) {
+  for (int i = 1; i < 9; ++i) {
     size_t n = i;
     std::cout << n << '\t';
     testExhaustiveEditDistanceEncoded(n);

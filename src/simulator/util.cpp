@@ -125,6 +125,8 @@ size_t bestHammingOverlap(const std::string& s1, const std::string& s2) {
 }
 
 // Edit distance functions
+
+
 size_t
 editDistance(const std::string& s1, const std::string& s2) {
   size_t n = s1.size();
@@ -160,20 +162,7 @@ editDistance(const std::string& s1, const std::string& s2) {
 // for bits input integers (strings can't be longer than 32 characters). The
 // actual lengths of the strings are given as parameters
 size_t
-editDistanceEncoded(uint64_t s1, size_t n1, uint64_t s2, size_t n2) {
-  size_t** dpMatrix = new size_t*[n1+1];
-  for (int i = 0; i < n1+1; ++i) {
-    dpMatrix[i] = new size_t[n2+1];
-  }
-
-
-  // initialization of first row and column
-  for (size_t i = 0; i < n1+1; ++i) {
-    dpMatrix[i][0] = i;
-  }
-  for (size_t j = 0; j < n2+1; ++j) {
-    dpMatrix[0][j] = j;
-  }
+editDistanceEncoded(uint64_t s1, size_t n1, uint64_t s2, size_t n2, size_t** dpMatrix) {
 
   for (int i = 1; i < n1+1; ++i) {
     for(int j = 1; j < n2+1; ++j) {
@@ -184,14 +173,7 @@ editDistanceEncoded(uint64_t s1, size_t n1, uint64_t s2, size_t n2) {
       dpMatrix[i][j] = MIN( MIN(dpMatrix[i-1][j]+1, dpMatrix[i][j-1]+1) , dpMatrix[i-1][j-1] + delta ) ;
     }
   }
-  size_t d = dpMatrix[n1][n2];
-  
-  for (int i = 0; i < n1+1; ++i) {
-    delete[] dpMatrix[i];
-  }
-  delete[] dpMatrix;
-
-  return d;
+  return dpMatrix[n1][n2];
 }
 
 // Most of these function are used for debug and dev purpose, but they can be

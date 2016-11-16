@@ -64,6 +64,29 @@ void printDoubleMatrix(double** M, size_t n, size_t m) {
   }
 }
 
+// FUNCTIONS FOR 2-BITS ENCODING CONVERSION
+uint64_t string2Encode(const std::string&s) {
+  size_t n = MAX(32, s.size());
+  uint64_t mask = 0;
+  uint64_t enc = 0;
+  for (int i = 0; i < n; ++i) {
+    uint64_t b = revBases[s[i]];
+    enc = enc | ( (b & 0x3) << 2*i );
+    mask = mask | (0x3 << 2*i);
+  }
+  //  std::cout << "\n++ " << enc << '\t' << mask << '\t' << (enc & mask) << '\n';
+  return (enc & mask);// ( ((uint64_t)-1) >> (64 - 2*n));
+}
+
+std::string encoding2String(uint64_t e, size_t n) {
+  std::string s;
+  for (int i = 0; i < n; ++i) {
+    s += bases[e & 0x03];
+    e = e >> 2;
+  }
+  return s;
+}
+
 size_t hammingDistance(const char* s1, const char* s2, size_t m) {
   size_t d = 0;
   for (int i = 0; i < m; ++i) {
@@ -131,6 +154,44 @@ editDistance(const std::string& s1, const std::string& s2) {
   }
   delete[] dpMatrix;
   return dist;
+}
+
+// returns the edit distance between strings encoded in two bits form on the 64
+// for bits input integers (strings can't be longer than 32 characters). The
+// actual lengths of the strings are given as parameters
+size_t
+editDistanceEncoded(uint64_t s1, size_t n1, uint64_t s2, size_t n2) {
+  size_t** dpMatrix = new size_t*[n1+1];
+  for (int i = 0; i < n1+1; ++i) {
+    dpMatrix[i] = new size_t[n2+1];
+  }
+
+
+  // initialization of first row and column
+  for (size_t i = 0; i < n1+1; ++i) {
+    dpMatrix[i][0] = i;
+  }
+  for (size_t j = 0; j < n2+1; ++j) {
+    dpMatrix[0][j] = j;
+  }
+
+  for (int i = 1; i < n1+1; ++i) {
+    for(int j = 1; j < n2+1; ++j) {
+      uint64_t x = s1 & (0x3 << 2*(i-1));
+      uint64_t y = s2 & (0x3 << 2*(j-1));
+      size_t delta = (x == y) ? 0 : 1;
+      
+      dpMatrix[i][j] = MIN( MIN(dpMatrix[i-1][j]+1, dpMatrix[i][j-1]+1) , dpMatrix[i-1][j-1] + delta ) ;
+    }
+  }
+  size_t d = dpMatrix[n1][n2];
+  
+  for (int i = 0; i < n1+1; ++i) {
+    delete[] dpMatrix[i];
+  }
+  delete[] dpMatrix;
+
+  return d;
 }
 
 // Most of these function are used for debug and dev purpose, but they can be

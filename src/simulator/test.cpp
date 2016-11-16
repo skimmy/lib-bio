@@ -180,7 +180,7 @@ double
 recursiveExhEditDistance(std::string s1, std::string s2, size_t n) {
   if (s1.size() == n) {
     double d = editDistance(s1,s2);
-    std::cout << s1 << '\t' << d << '\n';
+    //    std::cout << s1 << '\t' << s2 << '\t' << d << '\n';
     return d;
   } else {
     double ed =
@@ -205,6 +205,39 @@ double recursiveEditDistAllPairs(std::string s1, std::string s2, size_t n) {
   }
 }
 
+void test2bitsEncoding() {
+  std::string tests[] = { "ACCTC", "GGG", "", "AAA", "TTTT", "AAGTT", "TTGAA",
+			  "AACCCTGTGGACGTGTGACGTGTTGCAAAGCA" };
+  for (int  i = 0; i <8; ++i) {
+    std::string s = tests[i];
+    size_t n = s.size();
+    uint64_t e  = string2Encode(s);
+    std::string rev_e = encoding2String(e,n);
+    std::cout << s << "\t" << e << '\t' << rev_e << '\t' << (rev_e == s) << '\n';
+  }
+}
+
+void testEncodedEditDistance() {
+  std::cout << editDistanceEncoded(string2Encode("AAA"), 3, string2Encode("GA"), 2) << '\n';
+  std::cout << editDistanceEncoded(string2Encode("ACCTTA"), 6, string2Encode("ATTCCA"), 6) << '\n';
+  std::cout << editDistanceEncoded(string2Encode("ATTCCA"), 6, string2Encode("ACCTTA"), 6) << '\n'; 
+}
+
+void testExhaustiveEditDistanceEncoded(size_t n) {
+  uint64_t N = pow(4,n);
+  double ed = 0;
+  for (uint64_t i = 0; i < N; ++i) {
+    for (uint64_t j = i; j <N; ++j) {
+      if (i == j) {
+	continue;
+      }
+      ed += 2*editDistanceEncoded(i, n, j, n);
+      
+    }
+  }
+  std::cout << ed / ( (double) N*N ) << '\n';
+}
+
 void testAll() {
   std::cout << "--------------------------------\n";
   std::cout << "          TESTING MODE          \n";
@@ -216,7 +249,12 @@ void testAll() {
   //editDistanceEstimations(50,1000,5,100);
   //  std::cout << testEditDistanceExhaustive(4) << "\n";
   //std::cout << recursiveExhEditDistance("","AA",3) << "\n";
-  size_t n = 4;
-  std::cout << recursiveEditDistAllPairs("","", n) / pow(4,n) << "\n";
+  //  size_t n = 5;
+  for (int i = 1; i < 11; ++i) {
+    size_t n = i;
+    std::cout << n << '\t';
+    testExhaustiveEditDistanceEncoded(n);
+  }
   //std::cout << editDistance("AA","AAA") << "\n";
+
 }

@@ -177,9 +177,9 @@ editDistanceEncoded(uint64_t s1, size_t n1, uint64_t s2, size_t n2) {
 
   for (int i = 1; i < n1+1; ++i) {
     for(int j = 1; j < n2+1; ++j) {
-      uint64_t x = s1 & (0x3 << 2*(i-1));
-      uint64_t y = s2 & (0x3 << 2*(j-1));
-      size_t delta = (x == y) ? 0 : 1;
+      uint64_t x = ( s1 >> 2*(i-1) ) & 0x3; // pre compute matrix {A,C,G,T} x [1...n]
+      uint64_t y = ( s2 >> 2*(j-1) ) & 0x3;
+      size_t delta = (x == y) ? 0 : 1; // try to find an alternative not involving if
       
       dpMatrix[i][j] = MIN( MIN(dpMatrix[i-1][j]+1, dpMatrix[i][j-1]+1) , dpMatrix[i-1][j-1] + delta ) ;
     }

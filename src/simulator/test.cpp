@@ -250,7 +250,7 @@ void testAll() {
   //  std::cout << testEditDistanceExhaustive(4) << "\n";
   //std::cout << recursiveExhEditDistance("","AA",3) << "\n";
   //  size_t n = 5;
-  for (int i = 1; i < 11; ++i) {
+  for (int i = 1; i < 6; ++i) {
     size_t n = i;
     std::cout << n << '\t';
     testExhaustiveEditDistanceEncoded(n);

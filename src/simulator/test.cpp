@@ -140,6 +140,17 @@ void testEditDistance() {
   std::cout << ed << "\n\n";
 }
 
+
+/**
+ * Use a Monte-Carlo sampling technique to estimate the edit distance between
+ * random strings of same length.
+ *
+ * \param n_min The minimum length to be tested
+ * \param n_max The maximum lengths to be tested
+ * \param n_step The incremente on length 
+ * \param k_max The number of samples for each length
+ * 
+ */
 void
 editDistanceEstimations(size_t n_min, size_t n_max, size_t n_step, size_t k_max) {
   std::cout << std::endl;
@@ -250,7 +261,25 @@ void testExhaustiveEditDistanceEncoded(size_t n) {
     delete[] dpMatrix[i];
   }
   delete[] dpMatrix;
+}
 
+#define EDIT_DISTANCE_MONTE_CARLO 1
+#define EDIT_DISTANCE_EXHAUSTIVE_ENC 2
+
+void
+editDistanceTests(int ops) {
+  std::cout << "\nEDIT DISTANCE TESTS" << std::endl;
+  // Monte-Carlo estimation of the edit distance
+  if (ops & EDIT_DISTANCE_MONTE_CARLO) {
+    editDistanceEstimations(1505,2000,5,5000);
+  }
+  
+  // performes an exhaustive O(n^2 4^n) algorithm to find the average
+  // edit distance between all strings of same length given as paramater.
+
+  if (ops & EDIT_DISTANCE_EXHAUSTIVE_ENC) {
+    testExhaustiveEditDistanceEncoded(3);
+  }
 }
 
 void testAll() {
@@ -261,15 +290,7 @@ void testAll() {
   //  testLookupTables();
   //testPeq();
   //testApproximatedExpectedScore();
-  //editDistanceEstimations(50,1000,5,100);
-  //  std::cout << testEditDistanceExhaustive(4) << "\n";
-  //std::cout << recursiveExhEditDistance("","AA",3) << "\n";
-  //  size_t n = 5;
-  for (int i = 1; i < 9; ++i) {
-    size_t n = i;
-    std::cout << n << '\t';
-    testExhaustiveEditDistanceEncoded(n);
-  }
-  //std::cout << editDistance("AA","AAA") << "\n";
+
+  editDistanceTests(EDIT_DISTANCE_MONTE_CARLO);
 
 }

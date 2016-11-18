@@ -271,7 +271,7 @@ editDistanceTests(int ops) {
   std::cout << "\nEDIT DISTANCE TESTS" << std::endl;
   // Monte-Carlo estimation of the edit distance
   if (ops & EDIT_DISTANCE_MONTE_CARLO) {
-    editDistanceEstimations(1505,2000,5,5000);
+    editDistanceEstimations(5000,7500,100,5000);
   }
   
   // performes an exhaustive O(n^2 4^n) algorithm to find the average

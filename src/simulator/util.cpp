@@ -126,6 +126,14 @@ size_t bestHammingOverlap(const std::string& s1, const std::string& s2) {
 
 // Edit distance functions
 
+/*
+ * FUTURE WORK: This should choose the proper algorithm for calculation
+ * of the edit distance.
+ */
+size_t editDistanceAdpative(const std::string& s1, const std::string& s2) {
+  rturn editDistance(s1,s2);
+}
+			    
 
 size_t
 editDistance(const std::string& s1, const std::string& s2) {
@@ -156,6 +164,18 @@ editDistance(const std::string& s1, const std::string& s2) {
   }
   delete[] dpMatrix;
   return dist;
+}
+
+/**
+ * \brief Conputes the edit distance between strings s1 and s2 using only
+ * linear space (the vecotors passed as parameters)
+ */
+size_t
+editDistanceLinSpace(const std::string& s1, const std::string& s2, size_t* v1, size_t* v2) {
+  size_t n1 = s1.size();
+  size_t n2 = s2.size();
+  //  for (size_t 
+
 }
 
 // returns the edit distance between strings encoded in two bits form on the 64

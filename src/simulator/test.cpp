@@ -294,8 +294,8 @@ editDistanceTests(int ops) {
  }
 
   std::cout << "* Edit script test\n\n";
-  std::string sa = "CACT";
-  std::string sb = "ACCTA";
+  std::string sa = "ACCG";
+  std::string sb = "CACCGG";
   EditDistanceInfo info;
   editDistanceWithInfo(sa, sb, info);
   std::cout << info.edit_script << '\n';

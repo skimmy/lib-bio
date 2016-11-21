@@ -5,6 +5,16 @@
 #include <cstring>
 
 void
+printDPMatrix(size_t** dpMatrix, size_t n, size_t m) {
+  for (size_t i = 0; i <= n; ++i) {
+    for (size_t j = 0; j <=m; ++j) {
+      std::cout << dpMatrix[i][j] << '\t';
+    }
+    std::cout << std::endl;
+  }
+}
+
+void
 editDistanceMat(const std::string& s1, const std::string& s2, size_t** dpMatrix) {
   size_t n = s1.size();
   size_t m = s2.size();
@@ -85,33 +95,39 @@ editDistSamples(size_t n, size_t k_samples) {
 void
 editDistanceBacktrack(size_t** dpMatrix, size_t n, size_t m, EditDistanceInfo& info) {
   info.edit_script = "";
-  size_t i = n+1;
-  size_t j = m+1;
+  size_t i = n;
+  size_t j = m;  
   while( i > 0 && j > 0) {
-    if (dpMatrix[i][j] == dpMatrix[i-1][j-1]) {
-      info.edit_script = "M" + info.edit_script;
-      continue;
-    } 
+    if (dpMatrix[i-1][j-1] <= dpMatrix[i-1][j]) {
+      
+      if(dpMatrix[i-1][j-1] <= dpMatrix[i][j-1]) {
 
-    if (dpMatrix[i][j] == (1 + dpMatrix[i-1][j-1])) {
-      info.edit_script = "S" + info.edit_script;
-      continue;
+	if (dpMatrix[i-1][j-1] == dpMatrix[i][j]) { 
+	  info.edit_script = "M" + info.edit_script;
+	} else {
+	  info.edit_script = "S" + info.edit_script;
+	}	
+	i--; j--;
+	continue;
+	
+      } else {
+	info.edit_script = "I" + info.edit_script;
+	j--;
+	continue;
+      }
     }
-
-    if (dpMatrix[i-1][j] <= dpMatrix[i][j-1]) {
-      info.edit_script = "D" + info.edit_script;
-      continue;
-    }
-
-    info.edit_script = "I" + info.edit_script;
-  }
-
-  while (i >= 0) {
     info.edit_script = "D" + info.edit_script;
+    i--;
   }
 
-  while(j >= 0) {
+  while (i > 0) {
+    info.edit_script = "D" + info.edit_script;
+    i--;
+  }
+
+  while(j > 0) {
     info.edit_script = "I" + info.edit_script;
+    j--;
   }
 }
 

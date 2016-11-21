@@ -2,6 +2,49 @@
 
 #include <iostream>
 #include <memory>
+#include <cstring>
+
+void
+editDistanceMat(const std::string& s1, const std::string& s2, size_t** dpMatrix) {
+  size_t n = s1.size();
+  size_t m = s2.size();
+
+  // initialization of first row and column
+  for (size_t i = 0; i < n+1; ++i) {
+    dpMatrix[i][0] = i;
+  }
+  for (size_t j = 0; j < m+1; ++j) {
+    dpMatrix[0][j] = j;
+  }
+  
+  for (int i = 1; i < n+1; ++i) {
+    for(int j = 1; j < m+1; ++j) {
+      size_t delta = (s1[i-1] == s2[j-1]) ? 0 : 1;
+      dpMatrix[i][j] = MIN( MIN(dpMatrix[i-1][j]+1, dpMatrix[i][j-1]+1) , dpMatrix[i-1][j-1] + delta ) ;
+    }
+  }
+
+}
+
+size_t
+editDistance(const std::string& s1, const std::string& s2) {
+  size_t n = s1.size();
+  size_t m = s2.size();
+  size_t** dpMatrix = new size_t*[n+1];
+  for (size_t i = 0; i < n+1; ++i) {
+    dpMatrix[i] = new size_t[m+1];
+  }
+
+  editDistanceMat(s1, s2, dpMatrix);
+ 
+  size_t dist = dpMatrix[n][m];
+  for (int i = 0; i < n+1; ++i) {
+    delete[] dpMatrix[i];   
+  }
+  delete[] dpMatrix;
+  return dist;
+}
+
 
 void
 editDistanceEstimations(size_t n_min, size_t n_max, size_t n_step, size_t k_max) {
@@ -37,4 +80,55 @@ editDistSamples(size_t n, size_t k_samples) {
   delete[] v0;
   delete[] v1;
   return v;
+}
+
+void
+editDistanceBacktrack(size_t** dpMatrix, size_t n, size_t m, EditDistanceInfo& info) {
+  info.edit_script = "";
+  size_t i = n+1;
+  size_t j = m+1;
+  while( i > 0 && j > 0) {
+    if (dpMatrix[i][j] == dpMatrix[i-1][j-1]) {
+      info.edit_script = "M" + info.edit_script;
+      continue;
+    } 
+
+    if (dpMatrix[i][j] == (1 + dpMatrix[i-1][j-1])) {
+      info.edit_script = "S" + info.edit_script;
+      continue;
+    }
+
+    if (dpMatrix[i-1][j] <= dpMatrix[i][j-1]) {
+      info.edit_script = "D" + info.edit_script;
+      continue;
+    }
+
+    info.edit_script = "I" + info.edit_script;
+  }
+
+  while (i >= 0) {
+    info.edit_script = "D" + info.edit_script;
+  }
+
+  while(j >= 0) {
+    info.edit_script = "I" + info.edit_script;
+  }
+}
+
+
+void editDistanceWithInfo(const std::string& s1, const std::string& s2, EditDistanceInfo& info) {
+  size_t n = s1.size();
+  size_t m = s2.size();
+  size_t** dpMatrix = new size_t*[n+1];
+  for (int i = 0; i < n+1; ++i) {
+    dpMatrix[i] = new size_t[m+1];
+  }
+
+  editDistanceMat(s1, s2, dpMatrix);
+  editDistanceBacktrack(dpMatrix, n, m, info);
+
+  for (int i = 0; i < n+1; ++i) {
+    delete[] dpMatrix[i];
+  }
+  delete[] dpMatrix;
 }

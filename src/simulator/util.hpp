@@ -15,7 +15,6 @@ size_t hammingDistance(const std::string& s1, const std::string& s2, size_t m);
 size_t prefixSuffixHammingDistance(const std::string& s1, const std::string& s2, size_t k);
 size_t bestHammingOverlap(const std::string& s1, const std::string& s2);
 
-size_t editDistance(const std::string& s1, const std::string& s2);
 size_t editDistanceEncoded(uint64_t s1, size_t n1, uint64_t s2, size_t n2, size_t** dpMatrix);
 size_t editDistanceLinSpace(const std::string& s1, const std::string& s2, size_t* v0, size_t* v1);
 

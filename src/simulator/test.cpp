@@ -291,8 +291,14 @@ editDistanceTests(int ops) {
     if (ed != ed_lin) {
       std::cout << s1 << '\t' << s2 << '\t' << ed << '\t' << ed_lin << '\n';
     }
-   
  }
+
+  std::cout << "* Edit script test\n\n";
+  std::string sa = "CACT";
+  std::string sb = "ACCTA";
+  EditDistanceInfo info;
+  editDistanceWithInfo(sa, sb, info);
+  std::cout << info.edit_script << '\n';
   
 }
 

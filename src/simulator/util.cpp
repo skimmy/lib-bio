@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <cstring>
 
 // some util global variables (lookup tables, constants, ...)
 double* power4_lookup = NULL; // contains 4^{-(m-s)} for s=0,...,m
@@ -166,16 +167,40 @@ editDistance(const std::string& s1, const std::string& s2) {
   return dist;
 }
 
+void printVec(size_t* v, size_t n) {
+  for (int i =0; i <n;i++){
+    std::cout << v[i] << ' ';
+  }
+  std::cout << std::endl;
+}
+
 /**
  * \brief Conputes the edit distance between strings s1 and s2 using only
- * linear space (the vecotors passed as parameters)
+ * linear space (the vecotors passed as parameters). Vectors must be at
+ * least m+1 long where m is the length of the second string s2
  */
 size_t
-editDistanceLinSpace(const std::string& s1, const std::string& s2, size_t* v1, size_t* v2) {
+editDistanceLinSpace(const std::string& s1, const std::string& s2, size_t* v0, size_t* v1) {
   size_t n1 = s1.size();
   size_t n2 = s2.size();
-  //  for (size_t 
-}
+  size_t n_max = MAX(n1, n2);
+  for (int i = 0; i < n_max+1; ++i) {
+    v0[i] = i;
+  }
+
+  for (size_t i = 1; i <= n1; ++i) {
+    v1[0] = i;
+    for (size_t j = 1; j <= n2; ++j) {
+      size_t delta = (s1[i-1] == s2[j-1]) ? 0 : 1;
+      v1[j] = MIN( MIN( v0[j] + 1, v1[j-1] + 1), v0[j-1] + delta );
+    }
+    //printVec(v0,n2); printVec(v1,n2); std::cout << "\n\n";
+    size_t * tmp = v0;
+    v0 = v1;
+    v1 = tmp;
+  }
+  return v0[n2];
+ }
 
 // returns the edit distance between strings encoded in two bits form on the 64
 // for bits input integers (strings can't be longer than 32 characters). The

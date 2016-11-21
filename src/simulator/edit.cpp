@@ -27,10 +27,14 @@ editDistSamples(size_t n, size_t k_samples) {
   std::unique_ptr<size_t[]> v(new size_t[k_samples]);
   std::string s1(n,'N');
   std::string s2(n,'N');
+  size_t* v0 = new size_t[n];
+  size_t* v1 = new size_t[n];
   for (int k = 0; k < k_samples; ++k) {
     generateIIDString(s1);
     generateIIDString(s2);
-    v[k] = editDistance(s1,s2);
+    v[k] = editDistanceLinSpace(s1,s2,v0,v1);
   }
+  delete[] v0;
+  delete[] v1;
   return v;
 }

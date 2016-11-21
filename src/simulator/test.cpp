@@ -1,6 +1,8 @@
 #include "common.hpp"
 
 #include <iostream>
+#include <algorithm>
+#include <cstring>
 #include <cmath>
 
 #define TEST_GENOME_LENGTH 65536
@@ -240,18 +242,58 @@ void testExhaustiveEditDistanceEncoded(size_t n) {
 
 void
 editDistanceTests(int ops) {
-  std::cout << "\nEDIT DISTANCE TESTS" << std::endl;
-  // Monte-Carlo estimation of the edit distance
-  if (ops & EDIT_DISTANCE_MONTE_CARLO) {
-    editDistanceEstimations(7600,10000,100,5000);
-  }
-  
-  // performes an exhaustive O(n^2 4^n) algorithm to find the average
-  // edit distance between all strings of same length given as paramater.
+  std::cout << "\nEDIT DISTANCE TESTS\n" << std::endl;
 
-  if (ops & EDIT_DISTANCE_EXHAUSTIVE_ENC) {
-    testExhaustiveEditDistanceEncoded(3);
+  std::cout << "* Reverse and symmetry strings test\n\n";
+  for (int i = 0; i < 1000; ++i) {
+    size_t n = (rand() % 150 ) + 1;
+    size_t m = (rand() % 100 ) + 1;
+    std::string s1(n,'N');
+    std::string s2(m,'N');
+    generateIIDString(s1);
+    generateIIDString(s2);
+
+    size_t ed, ed_sym, ed_rev;
+    ed = editDistance(s1,s2);
+    ed_sym = editDistance(s2,s1);
+    std::string s1r(s1.size(), 'N');
+    std::string s2r(s2.size(), 'N');
+    for (int i = s1.size() - 1, j=0; i >= 0; --i,++j) {
+      s1r[j] = s1[i];
+    }
+    
+    for (int i = s2.size() - 1, j=0; i >= 0; --i,++j) {
+      s2r[j] = s2[i];
+    }
+    ed_rev = editDistance(s1r,s2r);
+
+    if ( ed != ed_sym || ed != ed_rev) {
+      std::cout << s1 << '\t' << s2 << '\t' << ed << '\t' << ed_sym << '\t' << ed_rev << '\n';
+    }
   }
+
+  std::cout << "* Linear space test\n\n";
+
+  size_t v0[200], v1[200];
+    
+  for (int i = 0; i < 1000; ++i) {
+    memset(&v0, 0, 200*sizeof(size_t));
+    memset(&v1, 0, 200*sizeof(size_t));
+    size_t n = (rand() % 150 ) + 1;
+    size_t m = (rand() % 100 ) + 1;
+    std::string s1(n,'N');
+    std::string s2(m,'N');
+    generateIIDString(s1);
+    generateIIDString(s2);
+    size_t ed, ed_lin;
+    ed = editDistance(s1,s2);
+    ed_lin = editDistanceLinSpace(s1,s2,v0,v1);
+    if (ed != ed_lin) {
+      std::cout << s1 << '\t' << s2 << '\t' << ed << '\t' << ed_lin << '\n';
+    }
+   
+ }
+  
 }
 
 void testAll() {

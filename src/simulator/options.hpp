@@ -1,7 +1,7 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
-enum OpMode { Test, Offline, Online, Oracle, ScoreEst, AlignScore };
+enum OpMode { Test, Offline, Online, Oracle, ScoreEst, AlignScore, EditDist };
 
 // options parsing
 struct Options {
@@ -27,9 +27,11 @@ struct Options {
   bool verbose;
   bool test;
 
+  int k;
+
   static  Options opts;
 };
 
-void parseArguments(int argc, char** argv);
-
+void parseArguments(int argc, char** argv)
+;
 #endif

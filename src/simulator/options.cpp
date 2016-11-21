@@ -13,6 +13,7 @@ void printUsage() {
   std::cout << "\t-M <length>   Length of reads  [1,2,...]\n";
   std::cout << "\t-m <count>    Number of reads  [1,2,...]\n";
   std::cout << "\t-e <error>    Error probability for base call [0.0,1.0]\n";
+  std::cout << "\t-k <number>   Generic numeric parameter to be used based on task\n";
   std::cout << "\t-i <path>     Path of a fasta file for the reference\n";
   std::cout << "\t-D <path>     Path of a output file for distribution of scores\n";
   std::cout << "\t-C <path>     Path of a output file for CDF (cumulative distribution) of scores\n";
@@ -42,6 +43,7 @@ void printOperationModeDescription() {
   std::cout << "\t 3 (Oracle)      Simulation of M-1 independent pairs\n";
   std::cout << "\t 4 (ScoreEst)    Tests the approximation E[score] ~= E[num]/E[den]\n";
   std::cout << "\t 5 (AlignScore)  Given a SAM files and a reference evaluate the score\n";
+  std::cout << "\t 6 (EditDist)    Performs several experiment on the edit distance\n";
 }
 
 void parseArguments(int argc, char** argv) {
@@ -65,7 +67,7 @@ void parseArguments(int argc, char** argv) {
   Options::opts.test = false;
   
   char c;
-  while ((c = getopt(argc, argv, "N:m:M:e:i:S:D:C:A:O:ophvT")) != -1) {
+  while ((c = getopt(argc, argv, "N:m:M:e:k:i:S:D:C:A:O:ophvT")) != -1) {
     switch(c) {
     case 'N':
       Options::opts.N = atoi(optarg);
@@ -78,6 +80,9 @@ void parseArguments(int argc, char** argv) {
       break;
     case 'e':
       Options::opts.pe = atof(optarg);
+      break;
+    case 'k':
+      Options::opts.k = atoi(optarg);
       break;
     case 'i':
       Options::opts.inputReference = optarg;
@@ -106,7 +111,7 @@ void parseArguments(int argc, char** argv) {
       break;
     case 'v':
       Options::opts.verbose = true;
-      break;
+      break;     
     case 'T':
       Options::opts.test = true;
       Options::opts.mode = OpMode::Test;

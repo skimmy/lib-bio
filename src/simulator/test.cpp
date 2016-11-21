@@ -141,34 +141,6 @@ void testEditDistance() {
 }
 
 
-/**
- * Use a Monte-Carlo sampling technique to estimate the edit distance between
- * random strings of same length.
- *
- * \param n_min The minimum length to be tested
- * \param n_max The maximum lengths to be tested
- * \param n_step The incremente on length 
- * \param k_max The number of samples for each length
- * 
- */
-void
-editDistanceEstimations(size_t n_min, size_t n_max, size_t n_step, size_t k_max) {
-  std::cout << std::endl;
-  for (size_t n = n_min; n <= n_max; n += n_step) {
-    std::string s1(n,'N');
-    std::string s2(n,'N');
-    double AED = 0;
-    for (size_t k = 1; k <= k_max; ++k) {
-      generateIIDString(s1);
-      generateIIDString(s2);
-      AED += editDistance(s1,s2);
-    }
-    std::cout << n << "\t" << ( AED / k_max) << std::endl;
-  }
-  std::cout << std::endl;
-}
-
-
 // returns the average edit distance between ALL strings with length exactly n
 double
 testEditDistanceExhaustive(size_t n) {
@@ -271,7 +243,7 @@ editDistanceTests(int ops) {
   std::cout << "\nEDIT DISTANCE TESTS" << std::endl;
   // Monte-Carlo estimation of the edit distance
   if (ops & EDIT_DISTANCE_MONTE_CARLO) {
-    editDistanceEstimations(5000,7500,100,5000);
+    editDistanceEstimations(7600,10000,100,5000);
   }
   
   // performes an exhaustive O(n^2 4^n) algorithm to find the average

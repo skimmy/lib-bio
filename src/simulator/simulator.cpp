@@ -75,6 +75,9 @@ void clearSimulator() {
 }
 
 void outputResults() {
+  if (Options::opts.mode == OpMode::EditDist) {
+    return;
+  }
   if (Options::opts.pipeline) {
     if (Options::opts.mode == OpMode::Oracle) {
       double appNumDen[2];
@@ -303,6 +306,34 @@ void oracleSimulation() {
   delete[] genome;
 }
 
+#define EDIT_DISTANCE_MONTE_CARLO 1
+#define EDIT_DISTANCE_EXHAUSTIVE_ENC 2
+
+
+void
+editDistanceSimulations() {
+  size_t n = Options::opts.N;
+  size_t k = Options::opts.k;
+
+  int ops = EDIT_DISTANCE_MONTE_CARLO; // TODO: Substitute with proper flag from 'opts'
+
+  if (ops & EDIT_DISTANCE_MONTE_CARLO) {
+    std::unique_ptr<size_t[]> samples = editDistSamples(n,k);
+
+    // TODO: Move to 'output result' eventually
+    for (int i = 0; i < k; ++i) {
+      std::cout << samples[i] << std::endl;
+    }
+  }
+  
+  // performes an exhaustive O(n^2 4^n) algorithm to find the average
+  // edit distance between all strings of same length given as paramater.
+
+  if (ops & EDIT_DISTANCE_EXHAUSTIVE_ENC) {
+  
+  }
+}
+
 
 int main(int argc, char** argv) {   
   // Important NOT invert (init requires argument to be parsed)
@@ -324,6 +355,9 @@ int main(int argc, char** argv) {
     break;
   case (OpMode::AlignScore):
     evaluateAlignmentScore(Options::opts);
+    break;
+  case (OpMode::EditDist):
+    editDistanceSimulations();
     break;
   default:
     std::cout << "Unrecognized operation mode " <<

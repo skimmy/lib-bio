@@ -15,6 +15,8 @@ typedef struct
   size_t n_del;
 
   std::string edit_script = "";
+
+  size_t distance() { return n_sub + n_ins + n_del; }
   
 } EditDistanceInfo;
 
@@ -44,7 +46,7 @@ void editDistanceWithInfo(const std::string& s1, const std::string& s2, EditDist
  * 
  */
 void
-editDistanceBacktrack(size_t** dpMatrix, EditDistanceInfo& info);
+editDistanceBacktrack(size_t** dpMatrix, size_t n, size_t m, EditDistanceInfo& info);
 
 
 /**
@@ -71,5 +73,8 @@ editDistanceEstimations(size_t n_min, size_t n_max, size_t n_step, size_t k_max)
  */
 std::unique_ptr<size_t[]>
 editDistSamples(size_t n, size_t k_samples);
+
+std::unique_ptr<EditDistanceInfo[]>
+editDistSamplesInfo(size_t n, size_t k_samples);
 
 #endif

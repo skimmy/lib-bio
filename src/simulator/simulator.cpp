@@ -307,7 +307,8 @@ void oracleSimulation() {
 }
 
 #define EDIT_DISTANCE_MONTE_CARLO 1
-#define EDIT_DISTANCE_EXHAUSTIVE_ENC 2
+#define EDIT_DISTANCE_MONTE_CARLO_COMPLETE 2
+#define EDIT_DISTANCE_EXHAUSTIVE_ENC 4
 
 
 void
@@ -315,7 +316,7 @@ editDistanceSimulations() {
   size_t n = Options::opts.N;
   size_t k = Options::opts.k;
 
-  int ops = EDIT_DISTANCE_MONTE_CARLO; // TODO: Substitute with proper flag from 'opts'
+  int ops = EDIT_DISTANCE_MONTE_CARLO_COMPLETE; // TODO: Substitute with proper flag from 'opts'
 
   if (ops & EDIT_DISTANCE_MONTE_CARLO) {
     std::unique_ptr<size_t[]> samples = editDistSamples(n,k);
@@ -325,12 +326,24 @@ editDistanceSimulations() {
       std::cout << samples[i] << std::endl;
     }
   }
+
+  // performs Monte-Carlo simulation and count number of substitutitons,
+  // insertions and deletion (WARNING: this uses quadratic space algorithm).
+  if (ops & EDIT_DISTANCE_MONTE_CARLO_COMPLETE) {
+    std::unique_ptr<EditDistanceInfo[]> infos = editDistSamplesInfo(n, k);
+    std::cout << "\n\n\n";
+
+    for (int i = 0; i < k; ++i) {
+      std::cout << infos[i].n_sub << "\t" << infos[i].n_del
+		<< "\t" << infos[i].n_ins << "\t" << infos[i].edit_script << "\n";
+    }    
+  }
   
   // performes an exhaustive O(n^2 4^n) algorithm to find the average
   // edit distance between all strings of same length given as paramater.
 
   if (ops & EDIT_DISTANCE_EXHAUSTIVE_ENC) {
-  
+    
   }
 }
 

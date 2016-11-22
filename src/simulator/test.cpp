@@ -237,11 +237,9 @@ void testExhaustiveEditDistanceEncoded(size_t n) {
   delete[] dpMatrix;
 }
 
-#define EDIT_DISTANCE_MONTE_CARLO 1
-#define EDIT_DISTANCE_EXHAUSTIVE_ENC 2
 
 void
-editDistanceTests(int ops) {
+editDistanceTests() {
   std::cout << "\nEDIT DISTANCE TESTS\n" << std::endl;
 
   std::cout << "* Reverse and symmetry strings test\n\n";
@@ -294,11 +292,13 @@ editDistanceTests(int ops) {
  }
 
   std::cout << "* Edit script test\n\n";
-  std::string sa = "ACCG";
-  std::string sb = "CACCGG";
+  std::string sa = "ACCTG";
+  std::string sb = "GCTGGC";
   EditDistanceInfo info;
   editDistanceWithInfo(sa, sb, info);
-  std::cout << info.edit_script << '\n';
+  std::cout << info.edit_script << "\t" << info.n_sub << " "
+	    << info.n_ins   << " " << info.n_del << "  " 
+	    << info.distance() << '\n';
   
 }
 
@@ -311,6 +311,6 @@ void testAll() {
   //testPeq();
   //testApproximatedExpectedScore();
 
-  editDistanceTests(EDIT_DISTANCE_MONTE_CARLO);
+  editDistanceTests();
 
 }

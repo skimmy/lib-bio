@@ -4,6 +4,23 @@
 #include <memory>
 #include <cstring>
 
+size_t**
+allocDPMatrix(size_t n, size_t m) {
+  size_t** dpMatrix = new size_t*[n+1];
+  for (int i = 0; i <= n; ++i) {
+    dpMatrix[i] = new size_t[m+1];
+  }
+  return dpMatrix;
+}
+
+void
+freeDPMatrix(size_t** dpMatrix, size_t n, size_t m) {
+  for (int i = 0; i <= n; ++i) {
+    delete[] dpMatrix[i];
+  }
+  delete[] dpMatrix;
+}
+
 void
 printDPMatrix(size_t** dpMatrix, size_t n, size_t m) {
   for (size_t i = 0; i <= n; ++i) {
@@ -11,6 +28,23 @@ printDPMatrix(size_t** dpMatrix, size_t n, size_t m) {
       std::cout << dpMatrix[i][j] << '\t';
     }
     std::cout << std::endl;
+  }
+}
+
+void editInfoCompute(EditDistanceInfo& info) {
+  info.n_sub = 0;
+  info.n_ins = 0;
+  info.n_del = 0;
+  for (char c : info.edit_script) {
+    if (c == 'I') {
+      info.n_ins++;
+    }
+    if (c == 'D') {
+      info.n_del++;      
+    }
+    if (c == 'S') {
+      info.n_sub++;
+    }
   }
 }
 
@@ -92,6 +126,27 @@ editDistSamples(size_t n, size_t k_samples) {
   return v;
 }
 
+std::unique_ptr<EditDistanceInfo[]>
+editDistSamplesInfo(size_t n, size_t k_samples) {
+  std::unique_ptr<EditDistanceInfo[]> infos(new EditDistanceInfo[k_samples]);
+  std::string s1(n,'N');
+  std::string s2(n,'N');
+
+  size_t** dpMatrix = allocDPMatrix(n,n);
+
+  for (size_t k = 0; k < k_samples; ++k) {
+    generateIIDString(s1);
+    generateIIDString(s2);
+    editDistanceMat(s1, s2, dpMatrix);
+    editDistanceBacktrack(dpMatrix, n, n, infos[k]);
+    editInfoCompute(infos[k]);
+  }
+  
+  freeDPMatrix(dpMatrix, n, n);
+  
+  return infos;
+}
+
 void
 editDistanceBacktrack(size_t** dpMatrix, size_t n, size_t m, EditDistanceInfo& info) {
   info.edit_script = "";
@@ -142,6 +197,7 @@ void editDistanceWithInfo(const std::string& s1, const std::string& s2, EditDist
 
   editDistanceMat(s1, s2, dpMatrix);
   editDistanceBacktrack(dpMatrix, n, m, info);
+  editInfoCompute(info);
 
   for (int i = 0; i < n+1; ++i) {
     delete[] dpMatrix[i];

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <memory>
 #include <cstring>
+#include <cmath>
 
 size_t**
 allocDPMatrix(size_t n, size_t m) {
@@ -31,7 +32,8 @@ printDPMatrix(size_t** dpMatrix, size_t n, size_t m) {
   }
 }
 
-void editInfoCompute(EditDistanceInfo& info) {
+void
+editInfoCompute(EditDistanceInfo& info) {
   info.n_sub = 0;
   info.n_ins = 0;
   info.n_del = 0;
@@ -146,6 +148,37 @@ editDistSamplesInfo(size_t n, size_t k_samples) {
   
   return infos;
 }
+
+double
+testExhaustiveEditDistanceEncoded(size_t n) {
+  size_t** dpMatrix = new size_t*[n+1];
+  for (int i = 0; i < n+1; ++i) {
+    dpMatrix[i] = new size_t[n+1];
+  }
+
+
+  // initialization of first row and column
+  for (size_t i = 0; i < n+1; ++i) {
+    dpMatrix[i][0] = i;
+  }
+  for (size_t j = 0; j < n+1; ++j) {
+    dpMatrix[0][j] = j;
+  }
+
+  uint64_t N = pow(4,n);
+  double ed = 0;
+  for (uint64_t i = 0; i < N; ++i) {
+    for (uint64_t j = i+1; j <N; ++j) {
+      ed += 2*editDistanceEncoded(i, n, j, n, dpMatrix);      
+    }
+  }
+  for (int i = 0; i < n+1; ++i) {
+    delete[] dpMatrix[i];
+  }
+  delete[] dpMatrix;
+  return ((double)ed) / ((double) (N*N));
+}
+
 
 void
 editDistanceBacktrack(size_t** dpMatrix, size_t n, size_t m, EditDistanceInfo& info) {

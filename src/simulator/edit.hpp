@@ -3,6 +3,10 @@
 
 #include <memory>
 
+#define EDIT_DISTANCE_MONTE_CARLO 1
+#define EDIT_DISTANCE_MONTE_CARLO_COMPLETE 2
+#define EDIT_DISTANCE_EXHAUSTIVE_ENC 4
+
 
 /**
  * This is a structure to store information about how edit distance
@@ -76,5 +80,8 @@ editDistSamples(size_t n, size_t k_samples);
 
 std::unique_ptr<EditDistanceInfo[]>
 editDistSamplesInfo(size_t n, size_t k_samples);
+
+double
+testExhaustiveEditDistanceEncoded(size_t n);
 
 #endif

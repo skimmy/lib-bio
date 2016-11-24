@@ -36,6 +36,43 @@ struct ScoreSumFreq
   int sFreq;
 };
 
+class SampleEstimates
+{
+public:
+  size_t sampleSize;
+  
+  double sampleMean;
+  double sampleVariance;
+
+  SampleEstimates() : sampleSize(0), sampleMean(0), sampleVariance(0) {}
+};
+
+/**
+ * \brief Computes the estimators in the SampleEstimates class from
+ * k samples of type T for which conversion to double must be possible
+ */
+
+template<typename T>
+SampleEstimates estimatesFromSamples(T samples[], size_t k) {
+  SampleEstimates est;
+  est.sampleSize = k;
+
+  // estimates the 'sample mean'
+  for (size_t i = 0; i < est.sampleSize; ++i) {
+    est.sampleMean += (double)samples[i];    
+  }
+  est.sampleMean /= (double)est.sampleSize;
+
+  // estimates the 'sample variance'
+  double tmp = 0;
+  for (size_t i = 0; i < est.sampleSize; ++i) {
+    tmp = (samples[i] - est.sampleMean);
+    est.sampleVariance += tmp*tmp;
+  }
+  est.sampleVariance /= (double)(est.sampleSize - 1);
+  return est;
+}
+
 void initProbabilities();
 void clearProbabilities();
 double randomReadsOverlapProbNoErr(const std::string& s1, const std::string& s2, size_t s);

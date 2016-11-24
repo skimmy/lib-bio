@@ -3,6 +3,7 @@
 #include <getopt.h>
 #include <cstdlib>
 #include <iostream>
+#include <limits>
 
 void printUsage() {
   std::cout << std::endl;
@@ -19,6 +20,7 @@ void printUsage() {
   std::cout << "\t-C <path>     Path of a output file for CDF (cumulative distribution) of scores\n";
   std::cout << "\t-A <approx>   Set approximation levels (default no approx)\n";
   std::cout << "\t-O <op_mode>  Set operation mode of the simulator [0,4] (run -h for details)\n";
+  std::cout << "\t-B <sub_task> Defines the sub task for a given mode\n";
   std::cout << "\t-o            Executes online generation of reference. Deprecated use -O 2 instead\n";
   std::cout << "\t-p            Outputs on standard out for pipelining\n";
   std::cout << "\t-h            Shows extended help\n";
@@ -59,15 +61,18 @@ void parseArguments(int argc, char** argv) {
   Options::opts.outputDistribution = "";
   Options::opts.outputCDF = "";
   Options::opts.approxLevel = -1;
+  Options::opts.floatPrecision = std::numeric_limits< double >::max_digits10;
+  
 
   Options::opts.mode = OpMode::Offline;
+  Options::opts.subTask = 0;
   Options::opts.online = false;
   Options::opts.pipeline = false;
   Options::opts.verbose = false;
   Options::opts.test = false;
   
   char c;
-  while ((c = getopt(argc, argv, "N:m:M:e:k:i:S:D:C:A:O:ophvT")) != -1) {
+  while ((c = getopt(argc, argv, "N:m:M:e:k:i:S:D:C:A:O:B:oph:vT")) != -1) {
     switch(c) {
     case 'N':
       Options::opts.N = atoi(optarg);
@@ -106,6 +111,9 @@ void parseArguments(int argc, char** argv) {
     case 'O':
       Options::opts.mode = static_cast<OpMode>(atoi(optarg));
       break;
+    case 'B':
+      Options::opts.subTask = atoi(optarg);
+      break;
     case 'p':
       Options::opts.pipeline = true;
       break;
@@ -119,6 +127,7 @@ void parseArguments(int argc, char** argv) {
     case 'h':
       printUsage();
       printOperationModeDescription();
+      std::cout << "\n\n- " << optarg << " -\n\n";
       exit(0);
     default:
       printUsage();

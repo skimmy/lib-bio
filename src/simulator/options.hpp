@@ -19,7 +19,10 @@ struct Options {
 
   int approxLevel;
 
+  size_t floatPrecision;
+
   OpMode mode;
+  int subTask;
 
   bool pipeline;
   bool online;

@@ -10,6 +10,36 @@
 
 const int MC_SAMPLES = 2 << 22;
 
+void
+testSampleEstimators() {
+
+  std::cout << "\nESTIMATORS TESTS\n\n";
+
+  std::cout << "Simple test\n Samples: [1, 2, -2, 4, 2, 2]\n";
+  size_t k = 6;
+  int x[] = {1, 2, -2, 4, 2, 2};
+  SampleEstimates est = estimatesFromSamples<int>(x,k);
+  std::cout << "* Sample Mean:   " << est.sampleMean << std::endl;
+  std::cout << "* Sample Var:    " << est.sampleVariance << std::endl;
+
+  std::cout << "\nConstant test\n Samples = [0.5, 0.5, 0.5]\n";
+  double y[] = {0.5, 0.5, 0.5};
+  k = 3;
+  est = estimatesFromSamples<double>(y,k);
+  std::cout << "* Sample Mean:   " << est.sampleMean << std::endl;
+  std::cout << "* Sample Var:    " << est.sampleVariance << std::endl;
+
+  int z[128];  
+  for (int i = 0; i < 128; ++i) {
+    z[i] = (rand() % 65) - 32;
+  }
+  std::cout << "\nRandom test\n 128 samples U[-32,32]\n";
+  est = estimatesFromSamples<int>(z,128);
+  std::cout << "* Sample Mean:   " << est.sampleMean << std::endl;
+  std::cout << "* Sample Var:    " << est.sampleVariance << std::endl;
+
+}
+
 void testApproximatedExpectedScore() {
   for (int s = 0; s < Options::opts.m + 1; ++s) {
     std::cout << s << "\t" << approximatedScore(s) << "\n";
@@ -203,41 +233,6 @@ void test2bitsEncoding() {
 }
 
 
-void testExhaustiveEditDistanceEncoded(size_t n) {
-  size_t** dpMatrix = new size_t*[n+1];
-  for (int i = 0; i < n+1; ++i) {
-    dpMatrix[i] = new size_t[n+1];
-  }
-
-
-  // initialization of first row and column
-  for (size_t i = 0; i < n+1; ++i) {
-    dpMatrix[i][0] = i;
-  }
-  for (size_t j = 0; j < n+1; ++j) {
-    dpMatrix[0][j] = j;
-  }
-
-  uint64_t N = pow(4,n);
-  double ed = 0;
-  for (uint64_t i = 0; i < N; ++i) {
-    for (uint64_t j = i; j <N; ++j) {
-      if (i == j) {
-	continue;
-      }
-      ed += 2*editDistanceEncoded(i, n, j, n, dpMatrix);
-      
-    }
-  }
-  std::cout << ed / ( (double) N*N ) << '\n';
-
-  for (int i = 0; i < n+1; ++i) {
-    delete[] dpMatrix[i];
-  }
-  delete[] dpMatrix;
-}
-
-
 void
 editDistanceTests() {
   std::cout << "\nEDIT DISTANCE TESTS\n" << std::endl;
@@ -306,11 +301,11 @@ void testAll() {
   std::cout << "--------------------------------\n";
   std::cout << "          TESTING MODE          \n";
   std::cout << "--------------------------------\n";
+  testSampleEstimators();
   //  testScoreFunction();
   //  testLookupTables();
   //testPeq();
   //testApproximatedExpectedScore();
-
-  editDistanceTests();
+  //editDistanceTests();
 
 }

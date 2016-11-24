@@ -72,7 +72,7 @@ void parseArguments(int argc, char** argv) {
   Options::opts.test = false;
   
   char c;
-  while ((c = getopt(argc, argv, "N:m:M:e:k:i:S:D:C:A:O:B:oph:vT")) != -1) {
+  while ((c = getopt(argc, argv, "N:m:M:e:k:i:S:D:C:A:O:B:ophvT")) != -1) {
     switch(c) {
     case 'N':
       Options::opts.N = atoi(optarg);

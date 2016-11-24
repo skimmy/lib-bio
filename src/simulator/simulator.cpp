@@ -318,12 +318,10 @@ editDistanceSimulations() {
 
   if (ops & EDIT_DISTANCE_MONTE_CARLO) {
     std::unique_ptr<size_t[]> samples = editDistSamples(n,k);
-    
-    // TODO: Move to 'output result' eventually
-    for (int i = 0; i < k; ++i) {
-      std::cout << samples[i] << std::endl;
-      
-    }
+    SampleEstimates mcEst = estimatesFromSamples<size_t>(samples.get(),k);
+
+    std::cout << mcEst.sampleMean << std::endl;
+    std::cout << mcEst.sampleVariance << std::endl;
   }
 
   // performs Monte-Carlo simulation and count number of substitutitons,

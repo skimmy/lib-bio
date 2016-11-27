@@ -33,6 +33,23 @@ printDPMatrix(size_t** dpMatrix, size_t n, size_t m) {
 }
 
 void
+computeAverageDPMatrix(double** dpMatrix, size_t n, size_t m) {
+  for (size_t i = 0; i <= n; ++i) {
+    dpMatrix[i][0] = i;
+  }
+  for (size_t j = 0; j <= m; ++j) {
+    dpMatrix[0][j] = j;
+  }
+  for (size_t i = 1; i <= n; ++i) {
+    for (size_t j = 1; j <= m; ++j) {
+      double minMatch =    MIN( MIN ( dpMatrix[i-1][j] + 1, dpMatrix[i][j-1] + 1), dpMatrix[i-1][j-1] );
+      double minMismatch = MIN( MIN ( dpMatrix[i-1][j] + 1, dpMatrix[i][j-1] + 1), dpMatrix[i-1][j-1] + 1);
+      dpMatrix[i][j] = 0.25 * minMatch + 0.75 * minMismatch;
+    }
+  }
+}
+
+void
 editInfoCompute(EditDistanceInfo& info) {
   info.n_sub = 0;
   info.n_ins = 0;

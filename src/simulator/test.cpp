@@ -297,15 +297,41 @@ editDistanceTests() {
   
 }
 
+void
+testAverageDPMatrix(size_t n) {
+  double** dpMatrix = new double*[n+1];
+  for (int i = 0; i <= n; ++i) {
+    dpMatrix[i] = new double[n+1];
+  }
+
+  computeAverageDPMatrix(dpMatrix, n, n);
+
+  for (int i = 0; i <= n; ++i) {
+    std::cout << dpMatrix[i][i] << std::endl;
+  }
+
+  for (int i = 0; i <= n; ++i) {
+    for (int j = 0; j <=n; ++j) {
+      std::cout << dpMatrix[i][j] << "\t";
+    }
+    std::cout << "\n";
+  }
+
+  for (int i = 0; i <= n; ++i) {
+    delete[] dpMatrix[i];
+  }
+  delete[] dpMatrix;
+}
+
 void testAll() {
   std::cout << "--------------------------------\n";
   std::cout << "          TESTING MODE          \n";
   std::cout << "--------------------------------\n";
-  testSampleEstimators();
+  //  testSampleEstimators();
   //  testScoreFunction();
   //  testLookupTables();
   //testPeq();
   //testApproximatedExpectedScore();
   //editDistanceTests();
-
+  testAverageDPMatrix(Options::opts.N);
 }

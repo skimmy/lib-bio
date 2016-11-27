@@ -84,4 +84,7 @@ editDistSamplesInfo(size_t n, size_t k_samples);
 double
 testExhaustiveEditDistanceEncoded(size_t n);
 
+void
+computeAverageDPMatrix(double** dpMatrix, size_t n, size_t m);
+
 #endif

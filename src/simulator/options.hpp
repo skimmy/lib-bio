@@ -23,6 +23,7 @@ struct Options {
 
   OpMode mode;
   int subTask;
+  int optFlags;
 
   bool pipeline;
   bool online;

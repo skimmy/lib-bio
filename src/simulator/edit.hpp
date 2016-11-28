@@ -3,9 +3,16 @@
 
 #include <memory>
 
+// DEPRECATED
 #define EDIT_DISTANCE_MONTE_CARLO 1
 #define EDIT_DISTANCE_MONTE_CARLO_COMPLETE 2
 #define EDIT_DISTANCE_EXHAUSTIVE_ENC 4
+
+#define EDIT_DISTANCE_ESTIMATE_EXHAUSTIVE 0x1
+#define EDIT_DISTANCE_ALGORITHM_QUADRATIC 0x2
+#define EDIT_DISTANCE_INFO_PARTIAL        0x4
+#define EDIT_DISTANCE_INFO_SCRIPT         0x8
+#define EDIT_DISTANCE_SAMPLE_MATRIX       0xF
 
 
 /**
@@ -29,6 +36,11 @@ typedef struct
  */
 size_t editDistance(const std::string& s1, const std::string& s2);
 
+size_t editDistanceEncoded(uint64_t s1, size_t n1, uint64_t s2, size_t n2, size_t** dpMatrix);
+
+size_t editDistanceLinSpace(const std::string& s1, const std::string& s2, size_t* v0, size_t* v1);
+
+EditDistanceInfo editDistanceLinSpaceInfo(const std::string& s1, const std::string& s2, EditDistanceInfo* v0, EditDistanceInfo* v1);
 
 /**
  * \brief Computes the dynamic programming matrix dpMatrix for edit distance
@@ -80,6 +92,11 @@ editDistSamples(size_t n, size_t k_samples);
 
 std::unique_ptr<EditDistanceInfo[]>
 editDistSamplesInfo(size_t n, size_t k_samples);
+
+
+std::unique_ptr<EditDistanceInfo[]>
+editDistSamplesInfoLinSpace(size_t n, size_t k_samples, double** avgMatrix = NULL);
+
 
 double
 testExhaustiveEditDistanceEncoded(size_t n);

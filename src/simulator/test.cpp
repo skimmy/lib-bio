@@ -294,7 +294,14 @@ editDistanceTests() {
   std::cout << info.edit_script << "\t" << info.n_sub << " "
 	    << info.n_ins   << " " << info.n_del << "  " 
 	    << info.distance() << '\n';
-  
+
+  std::cout << "\n* Linear info test\n\n";
+  EditDistanceInfo v00[16];
+  EditDistanceInfo v11[16];
+  std::string st1 =  "AGTACCG";
+  std::string st2 = "TAGTTCC";
+  EditDistanceInfo i = editDistanceLinSpaceInfo(st1, st2, v00, v11);
+  std::cout << i.n_sub << "\t" << i.n_del << "\t" << i.n_ins << "\n";
 }
 
 void
@@ -332,6 +339,6 @@ void testAll() {
   //  testLookupTables();
   //testPeq();
   //testApproximatedExpectedScore();
-  //editDistanceTests();
-  testAverageDPMatrix(Options::opts.N);
+  editDistanceTests();
+  //  testAverageDPMatrix(Options::opts.N);
 }

@@ -310,7 +310,66 @@ void oracleSimulation() {
 }
 
 void
-editDistanceSimulations() {
+editDistanceOpMode() {
+  // The default edit distance mode is
+  // Sample
+  // Linear Alg
+  // mean and variance output
+  // no script
+  // no sample matrix
+  int flags = Options::opts.optFlags;
+
+  size_t n = Options::opts.N;
+  
+  if (flags & EDIT_DISTANCE_ESTIMATE_EXHAUSTIVE) {
+    // Exhasutve (only quadratic)
+    print_warning("only \033[1;37mqudratic algorithm\033[0m available with exhaustive option");
+    double avgDist = testExhaustiveEditDistanceEncoded(n);
+    std::cout << avgDist << std::endl;    
+  }
+  
+  else {
+    // SAMPLE
+    size_t k = Options::opts.k;
+
+    if (flags & EDIT_DISTANCE_ALGORITHM_QUADRATIC) {
+      // QUADRATIC + Sample
+      if (flags & EDIT_DISTANCE_INFO_PARTIAL) {
+	// Sample + Quadratic + Partial Info
+	if (flags & EDIT_DISTANCE_INFO_SCRIPT) {
+	  std::unique_ptr<EditDistanceInfo[]> infos =
+	    editDistSamplesInfo(n,k);	  
+	}
+	else {
+	  print_warning("Quadratic info without script not yet implemented");
+	}
+      }
+    }
+
+    
+    else {
+      // LINEAR + Sample
+      if (flags & EDIT_DISTANCE_INFO_PARTIAL) {
+	// PARTIAL INFO + Sample + Linear
+	print_warning("Partial info for linear under developement");
+	std::unique_ptr<EditDistanceInfo[]> samples =
+	  editDistSamplesInfoLinSpace(n,k);
+      }
+      else {
+	// MINIMAL INFO (mean + var) + Sample + Linear
+	std::unique_ptr<size_t[]> samples =
+	  editDistSamples(n,k);
+	SampleEstimates estimators = estimatesFromSamples<size_t>(samples.get(), k);
+	std::cout << estimators.sampleMean << std::endl;
+	std::cout << estimators.sampleVariance << std::endl;
+      }
+    }
+  }
+}
+
+// DEPRECATED: Remove when editDistanceOpMode() is completed
+void
+editDistanceSimulations() {  
   size_t n = Options::opts.N;
   size_t k = Options::opts.k;
 
@@ -369,7 +428,8 @@ int main(int argc, char** argv) {
     evaluateAlignmentScore(Options::opts);
     break;
   case (OpMode::EditDist):
-    editDistanceSimulations();
+    //    editDistanceSimulations();
+    editDistanceOpMode();
     break;
   default:
     std::cout << "Unrecognized operation mode " <<

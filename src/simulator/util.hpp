@@ -15,9 +15,6 @@ size_t hammingDistance(const std::string& s1, const std::string& s2, size_t m);
 size_t prefixSuffixHammingDistance(const std::string& s1, const std::string& s2, size_t k);
 size_t bestHammingOverlap(const std::string& s1, const std::string& s2);
 
-size_t editDistanceEncoded(uint64_t s1, size_t n1, uint64_t s2, size_t n2, size_t** dpMatrix);
-size_t editDistanceLinSpace(const std::string& s1, const std::string& s2, size_t* v0, size_t* v1);
-
 void printString(char* s, size_t n);
 void printDoubleMatrix(double** M, size_t n, size_t m);
 double** initDoubleMatrix(size_t n, size_t m);
@@ -25,5 +22,8 @@ void clearDoubleMatrix(double** matrix, size_t n, size_t m);
 double elementsSumDoubleMatrix(double** matrix, size_t n, size_t m);
 
 Read randomRead(size_t m);
+
+void print_warning(const std::string &msg);
+void fatal_error(const std::string &msg, int exit_code);
 
 #endif

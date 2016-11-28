@@ -28,6 +28,7 @@ typedef struct
   std::string edit_script = "";
 
   size_t distance() { return n_sub + n_ins + n_del; }
+  void reset() { n_sub = 0; n_del = 0; n_ins = 0; }
   
 } EditDistanceInfo;
 

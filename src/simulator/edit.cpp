@@ -74,8 +74,8 @@ EditDistanceInfo editDistanceLinSpaceInfo(const std::string& s1, const std::stri
   }
 
   for (size_t i = 1; i <= n1; ++i) {
-    v1[0].n_ins = i;
-    v1[0].n_del = 0;
+    v1[0].n_ins = 0;
+    v1[0].n_del = i;
     v1[0].n_sub = 0;
     for (size_t j = 1; j <= n2; ++j) {
       size_t delta = (s1[i-1] == s2[j-1]) ? 0 : 1;
@@ -107,6 +107,7 @@ EditDistanceInfo editDistanceLinSpaceInfo(const std::string& s1, const std::stri
 	}
       }
     }
+    
     tmp = v0;
     v0 = v1;
     v1 = tmp;

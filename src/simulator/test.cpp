@@ -296,12 +296,22 @@ editDistanceTests() {
 	    << info.distance() << '\n';
 
   std::cout << "\n* Linear info test\n\n";
-  EditDistanceInfo v00[16];
-  EditDistanceInfo v11[16];
-  std::string st1 =  "AGTACCG";
-  std::string st2 = "TAGTTCC";
-  EditDistanceInfo i = editDistanceLinSpaceInfo(st1, st2, v00, v11);
-  std::cout << i.n_sub << "\t" << i.n_del << "\t" << i.n_ins << "\n";
+  EditDistanceInfo v00[100];
+  EditDistanceInfo v11[100];
+  std::string st1(8,'N');
+  std::string st2(8,'N');
+  for (int i = 0; i < 300; ++i) {
+    generateIIDString(st1);
+    generateIIDString(st2);
+    EditDistanceInfo in = editDistanceLinSpaceInfo(st1, st2, v00, v11);
+    if (in.n_del != in.n_ins) {
+      std::cout << in.n_sub << "\t" << in.n_del << "\t" << in.n_ins
+		<< "\t" << st1 << "\t" << st2 << "\n";
+      EditDistanceInfo infoCorrect;
+      editDistanceWithInfo(st1,st2, infoCorrect);
+      std::cout << infoCorrect.n_sub << "\t" << infoCorrect.n_del << "\t" << infoCorrect.n_ins << "\n\n";
+    }
+  }
 }
 
 void

@@ -338,7 +338,10 @@ editDistanceOpMode() {
 	// Sample + Quadratic + Partial Info
 	if (flags & EDIT_DISTANCE_INFO_SCRIPT) {
 	  std::unique_ptr<EditDistanceInfo[]> infos =
-	    editDistSamplesInfo(n,k);	  
+	    editDistSamplesInfo(n,k);
+	  for (size_t i = 0; i < k; ++i) {
+	    std::cout << infos[i].n_sub << "\t" << infos[i].n_ins << "\t" << infos[i].n_del << "\n";
+	  }
 	}
 	else {
 	  print_warning("Quadratic info without script not yet implemented");

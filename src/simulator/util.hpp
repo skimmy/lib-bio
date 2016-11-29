@@ -1,6 +1,8 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <iostream>
+
 #define MAX(X,Y) ( (X) > (Y)  ? (X) : (Y) )
 #define MIN(X,Y) ( (X) < (Y)  ? (X) : (Y) )
 
@@ -22,6 +24,14 @@ void clearDoubleMatrix(double** matrix, size_t n, size_t m);
 double elementsSumDoubleMatrix(double** matrix, size_t n, size_t m);
 
 Read randomRead(size_t m);
+
+template<typename T>
+void printVector(T* v, size_t n, char* delim = " ") {
+  for (int i =0; i <n;i++){
+    std::cout << v[i] << delim;
+  }
+  std::cout << std::endl;
+}
 
 void print_warning(const std::string &msg);
 void fatal_error(const std::string &msg, int exit_code);

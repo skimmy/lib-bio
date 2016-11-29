@@ -284,8 +284,8 @@ editDistanceTests() {
     if (ed != ed_lin) {
       std::cout << s1 << '\t' << s2 << '\t' << ed << '\t' << ed_lin << '\n';
     }
- }
-
+  }
+    
   std::cout << "* Edit script test\n\n";
   std::string sa = "ACCTG";
   std::string sb = "GCTGGC";
@@ -294,25 +294,29 @@ editDistanceTests() {
   std::cout << info.edit_script << "\t" << info.n_sub << " "
 	    << info.n_ins   << " " << info.n_del << "  " 
 	    << info.distance() << '\n';
-
+  
   std::cout << "\n* Linear info test\n\n";
   EditDistanceInfo v00[100];
   EditDistanceInfo v11[100];
+  editDistanceLinSpaceInfo(std::string("GTCAATGG"), std::string("CCGTTATA"), v00, v11);
+  //editDistanceLinSpaceInfo(std::string("GTGTACGG"), std::string("TGATCTAG"), v00, v11);
+
   std::string st1(8,'N');
   std::string st2(8,'N');
-  for (int i = 0; i < 300; ++i) {
+  for (int i = 0; i < 0; ++i) {
     generateIIDString(st1);
     generateIIDString(st2);
     EditDistanceInfo in = editDistanceLinSpaceInfo(st1, st2, v00, v11);
-    if (in.n_del != in.n_ins) {
-      std::cout << in.n_sub << "\t" << in.n_del << "\t" << in.n_ins
-		<< "\t" << st1 << "\t" << st2 << "\n";
-      EditDistanceInfo infoCorrect;
-      editDistanceWithInfo(st1,st2, infoCorrect);
-      std::cout << infoCorrect.n_sub << "\t" << infoCorrect.n_del << "\t" << infoCorrect.n_ins << "\n\n";
+    EditDistanceInfo infoCorrect;
+    editDistanceWithInfo(st1,st2, infoCorrect);
+    if (in != infoCorrect) {
+      std::cout << st1 << "\t" << st2 << "\n";
+      std::cout << in << std::endl << infoCorrect << "\n\n";
     }
   }
 }
+
+
 
 void
 testAverageDPMatrix(size_t n) {

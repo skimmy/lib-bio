@@ -82,38 +82,34 @@ EditDistanceInfo editDistanceLinSpaceInfo(const std::string& s1, const std::stri
       size_t a = v0[j-1].distance() + delta; // a = M[i-1][j-1] + delta
       size_t b = v0[j].distance() + 1;       // b = M[i-1][j]   + 1     
       size_t c = v1[j-1].distance() + 1;     // c = M[i][j-1]   + 1
-      if (a <= b) {
-	// Match or Sub
-	if (a <= c) {
-	  v1[j] = v0[j-1];
-	  v1[j].n_sub += delta;
-	}
-	// Ins
-	else {
-	  v1[j] = v1[j-1];
-	  v1[j].n_ins++;
-	}
-      }      
-      else {
-	if (b < c) {
-	  // Del
-	  v1[j] = v0[j];
-	  v1[j].n_del++;
-	}
-	else {
-	  // Ins
-	  v1[j] = v1[j-1];
-	  v1[j].n_del++;
-	}
+
+      // Case of match
+      if (s1[i-1] == s2[j-1]) {
+	v1[j] = v0[j-1];
+	continue;
       }
+      // Case of substitution NOT WORSE than others
+      if ( (a <= b) && (a <= c)) {
+	v1[j] = v0[j-1];
+	v1[j].n_sub++;
+	continue;
+      }
+      // In case of tie (equality) always select a deletion
+      if ( b <= c ) {
+	v1[j] = v0[j];
+	v1[j].n_del++;
+      } else {
+	v1[j] = v1[j-1];
+	v1[j].n_ins++;
+      }
+      
     }
-    
     tmp = v0;
     v0 = v1;
     v1 = tmp;
+    printVector<EditDistanceInfo>(v0,n2+1,"\t"); std::cout << std::endl;
   }
-  
-  
+  printVector<EditDistanceInfo>(v0,n2+1,"\t"); std::cout << std::endl;
   return v0[n2];
 }
 

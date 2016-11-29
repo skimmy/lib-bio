@@ -2,6 +2,7 @@
 #define SIM_EDIT_H
 
 #include <memory>
+#include <iostream>
 
 // DEPRECATED
 #define EDIT_DISTANCE_MONTE_CARLO 1
@@ -19,8 +20,9 @@
  * This is a structure to store information about how edit distance
  * is divided into substitution, 
  */
-typedef struct
+class EditDistanceInfo
 {
+public:
   size_t n_sub;
   size_t n_ins;
   size_t n_del;
@@ -29,8 +31,19 @@ typedef struct
 
   size_t distance() { return n_sub + n_ins + n_del; }
   void reset() { n_sub = 0; n_del = 0; n_ins = 0; }
+  bool operator==(const EditDistanceInfo& i) {
+    return (n_sub == i.n_sub && n_del == i.n_del && n_ins == i.n_ins);
+  }
+  bool operator!=(const EditDistanceInfo& i) {
+    return !(*this == i);
+  }
   
-} EditDistanceInfo;
+  friend std::ostream& operator<<(std::ostream& out, EditDistanceInfo& info) {
+    out << info.n_sub << " " << info.n_del << " " << info.n_ins;
+    return out;
+  }
+  
+};
 
 /**
  * \brief computes the edit distance between strings s1 and s2

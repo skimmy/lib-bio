@@ -52,7 +52,6 @@ editDistanceLinSpace(const std::string& s1, const std::string& s2, size_t* v0, s
       size_t delta = (s1[i-1] == s2[j-1]) ? 0 : 1;
       v1[j] = MIN( MIN( v0[j] + 1, v1[j-1] + 1), v0[j-1] + delta );
     }
-    //printVec(v0,n2); printVec(v1,n2); std::cout << "\n\n";
     size_t * tmp = v0;
     v0 = v1;
     v1 = tmp;
@@ -104,12 +103,13 @@ EditDistanceInfo editDistanceLinSpaceInfo(const std::string& s1, const std::stri
       }
       
     }
+    //    printVector<EditDistanceInfo>(v0,n2+1,"\t"); std::cout << std::endl;
     tmp = v0;
     v0 = v1;
     v1 = tmp;
-    printVector<EditDistanceInfo>(v0,n2+1,"\t"); std::cout << std::endl;
+
   }
-  printVector<EditDistanceInfo>(v0,n2+1,"\t"); std::cout << std::endl;
+  //  printVector<EditDistanceInfo>(v0,n2+1,"\t"); std::cout << std::endl;
   return v0[n2];
 }
 
@@ -257,7 +257,7 @@ editDistSamplesInfo(size_t n, size_t k_samples) {
     generateIIDString(s1);
     generateIIDString(s2);
     editDistanceMat(s1, s2, dpMatrix);
-    editDistanceBacktrack(dpMatrix, n, n, infos[k]);
+    editDistanceBacktrack(dpMatrix, s1, s2, infos[k]);
     editInfoCompute(infos[k]);
   }
   
@@ -326,31 +326,36 @@ testExhaustiveEditDistanceEncoded(size_t n) {
 
 
 void
-editDistanceBacktrack(size_t** dpMatrix, size_t n, size_t m, EditDistanceInfo& info) {
+editDistanceBacktrack(size_t** dpMatrix,const std::string& s1, const std::string& s2, EditDistanceInfo& info) {
   info.edit_script = "";
-  size_t i = n;
-  size_t j = m;  
+  size_t i = s1.size();
+  size_t j = s2.size();  
   while( i > 0 && j > 0) {
-    if (dpMatrix[i-1][j-1] <= dpMatrix[i-1][j]) {
-      
-      if(dpMatrix[i-1][j-1] <= dpMatrix[i][j-1]) {
-
-	if (dpMatrix[i-1][j-1] == dpMatrix[i][j]) { 
-	  info.edit_script = "M" + info.edit_script;
-	} else {
-	  info.edit_script = "S" + info.edit_script;
-	}	
-	i--; j--;
-	continue;
-	
-      } else {
-	info.edit_script = "I" + info.edit_script;
-	j--;
-	continue;
-      }
+    size_t a = dpMatrix[i-1][j-1];
+    size_t b = dpMatrix[i-1][j];
+    size_t c = dpMatrix[i][j-1];
+    size_t x = dpMatrix[i][j];
+    // Match case
+    if (s1[i-1] == s2[j-1]) {
+      info.edit_script = "M" + info.edit_script;
+      i--; j--;
+      continue;
     }
-    info.edit_script = "D" + info.edit_script;
-    i--;
+    // Substitution case
+    if (a <= b && a <=c) {
+      info.edit_script = "S" + info.edit_script;
+      i--; j--;
+      continue;
+    }
+    // In case of a tie prefer deletion
+    if (b <= c) {
+      info.edit_script = "D" + info.edit_script;
+      i--;
+    } else {
+      info.edit_script = "I" + info.edit_script;
+      j--;
+    }      
+    
   }
 
   while (i > 0) {
@@ -374,8 +379,10 @@ void editDistanceWithInfo(const std::string& s1, const std::string& s2, EditDist
   }
 
   editDistanceMat(s1, s2, dpMatrix);
-  editDistanceBacktrack(dpMatrix, n, m, info);
+  editDistanceBacktrack(dpMatrix, s1, s2, info);
   editInfoCompute(info);
+
+  //  printMatrix<size_t>(dpMatrix, n+1, m+1, "\t");
 
   for (int i = 0; i < n+1; ++i) {
     delete[] dpMatrix[i];

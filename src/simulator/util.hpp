@@ -33,6 +33,16 @@ void printVector(T* v, size_t n, char* delim = " ") {
   std::cout << std::endl;
 }
 
+template<typename T>
+void printMatrix(T** mat, size_t n, size_t m, char* delim = " ") {
+  for (size_t i = 0; i < n; ++i) {
+    for (size_t j = 0; j < m; ++j) {
+      std::cout << mat[i][j] << delim;
+    }
+    std::cout << "\n";
+  }
+}
+
 void print_warning(const std::string &msg);
 void fatal_error(const std::string &msg, int exit_code);
 

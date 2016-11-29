@@ -76,7 +76,7 @@ void editDistanceWithInfo(const std::string& s1, const std::string& s2, EditDist
  * 
  */
 void
-editDistanceBacktrack(size_t** dpMatrix, size_t n, size_t m, EditDistanceInfo& info);
+editDistanceBacktrack(size_t** dpMatrix,const std::string& s1, const std::string& s2, EditDistanceInfo& info);
 
 
 /**

@@ -389,3 +389,55 @@ void editDistanceWithInfo(const std::string& s1, const std::string& s2, EditDist
   }
   delete[] dpMatrix;
 }
+
+size_t
+sampleEditDistanceDistribution(size_t n, size_t* v0, size_t* v1) {
+  std::string s1(n, 'N'); 
+  std::string s2(n, 'N');
+  generateIIDString(s1);
+  generateIIDString(s2);
+  size_t d = editDistanceLinSpace(s1, s2, v0, v1);
+  return d;
+}
+
+
+SampleEstimates
+editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta, double delta_var) {
+
+  size_t* v0 = new size_t[n+1];
+  size_t* v1 = new size_t[n+1];
+  
+  size_t k = 1;
+  size_t k_max = Options::opts.k;
+  size_t sample = sampleEditDistanceDistribution(n, v0, v1);
+  double mean_k = sample;
+  double var_k = 0, var_k_1 = 0;
+
+  double cumulative_sum = sample;
+  double cumulative_quad_sum = sample * sample;
+  
+  while(k < k_max) {
+    k++;
+    sample = sampleEditDistanceDistribution(n, v0, v1);
+    cumulative_sum += sample;
+    cumulative_quad_sum += (sample * sample);
+    mean_k = cumulative_sum / ((double)k);
+    var_k_1 = var_k;
+    var_k = ( cumulative_quad_sum - k*(mean_k*mean_k)  ) / ((double)(k-1));
+    if ( ( abs(var_k - var_k_1) / var_k ) < delta_var) {
+      if (var_k * ( z_delta*z_delta ) < ((double)k) * ( precision * precision )) {
+	break;
+      }
+    }
+  }
+
+  delete[] v0;
+  delete[] v1;
+
+  SampleEstimates est;
+  est.sampleSize = k;
+  est.sampleMean = mean_k;
+  est.sampleVariance = var_k;
+
+  return est;
+}

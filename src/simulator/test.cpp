@@ -321,6 +321,18 @@ editDistanceTests() {
       std::cout << in << std::endl << infoCorrect << "\n\n";
     }
   }
+
+  std::cout << "* Bounded Estimate Test" << "\n\n";
+  size_t old_opt_k = Options::opts.k;
+  Options::opts.k = 500000;
+  size_t n = 9;
+  double prec = 0.005;
+  double z = 2;
+  double d_var = 0.1;
+  SampleEstimates estimates = editDistanceErrorBoundedEstimates(n, prec, z, d_var);
+  std::cout << estimates.sampleSize << "\t" << estimates.sampleMean << "\t"
+	    << estimates.sampleVariance << std::endl;
+  Options::opts.k = old_opt_k;
 }
 
 

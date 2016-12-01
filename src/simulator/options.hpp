@@ -5,37 +5,39 @@ enum OpMode { Test, Offline, Online, Oracle, ScoreEst, AlignScore, EditDist };
 
 // options parsing
 struct Options {
-  size_t N;
-  size_t m;
-  size_t M;
-  double pe;
+  size_t N; // -M
+  size_t m; // -m
+  size_t M; // -M
+  double pe; // -e
 
   size_t empiricalDistributionStep;
+  double precision;   // -P
+  double confidence;  // -c
+  double oscillation; // -d
 
-  std::string inputReference;
-  std::string inputSAM;
-  std::string outputDistribution;
-  std::string outputCDF;
+  std::string inputReference; // -i
+  std::string inputSAM; // -S
+  std::string outputDistribution; // -D
+  std::string outputCDF; //-C
 
-  int approxLevel;
+  int approxLevel; // -A
 
-  size_t floatPrecision;
+  size_t floatPrecision; // TODO
 
-  OpMode mode;
-  int subTask;
-  int optFlags;
+  OpMode mode;  // -O
+  int subTask;  // -B
+  int optFlags; // -f
 
   bool pipeline;
-  bool online;
+  bool online; // -v 
 
-  bool verbose;
-  bool test;
+  bool verbose; // -v
 
-  int k;
+  int k; // -k
 
   static  Options opts;
 };
 
-void parseArguments(int argc, char** argv)
-;
+void parseArguments(int argc, char** argv);
+
 #endif

@@ -14,7 +14,10 @@ void printUsage() {
   std::cout << "\t-M <length>   Length of reads  [1,2,...]\n";
   std::cout << "\t-m <count>    Number of reads  [1,2,...]\n";
   std::cout << "\t-e <error>    Error probability for base call [0.0,1.0]\n";
-  std::cout << "\t-k <number>   Generic numeric parameter to be used based on task\n";
+  std::cout << "\t-P <prec>     The precision required for task based quantity [0.0, 1.0]\n";
+  std::cout << "\t-c <conf>     The confidence (or z_confidence) required (task based)\n";
+  std::cout << "\t-d <oscill>   Oscillation tolerated (task based) \n";
+  std::cout << "\t-k <number>   Generic numeric parameter to be used based on task\n";  
   std::cout << "\t-i <path>     Path of a fasta file for the reference\n";
   std::cout << "\t-D <path>     Path of a output file for distribution of scores\n";
   std::cout << "\t-C <path>     Path of a output file for CDF (cumulative distribution) of scores\n";
@@ -22,11 +25,9 @@ void printUsage() {
   std::cout << "\t-O <op_mode>  Set operation mode of the simulator [0,4] (run -h for details)\n";
   std::cout << "\t-B <sub_task> Defines the sub task for a given mode\n";
   std::cout << "\t-f <flags>    Flags code to be activated (operation mode and subtask dependent\n";
-  std::cout << "\t-o            Executes online generation of reference. Deprecated use -O 2 instead\n";
   std::cout << "\t-p            Outputs on standard out for pipelining\n";
   std::cout << "\t-h            Shows extended help\n";
   std::cout << "\t-v            Activate verbose mode\n";
-  std::cout << "\t-T            perform test (every other option is ignored). Deprecated use -O 0 instead\n";
   std::cout << std::endl;
 }
 
@@ -56,12 +57,18 @@ void parseArguments(int argc, char** argv) {
   Options::opts.m = 50;
   Options::opts.M = 10;
   Options::opts.pe = 0.01;
+  Options::opts.precision = 0.01;
+  Options::opts.confidence = 0.95;
+  Options::opts.oscillation = 0.5;
+  
   Options::opts.empiricalDistributionStep = 100;
+
   Options::opts.inputReference = "";
   Options::opts.inputSAM = "";
   Options::opts.outputDistribution = "";
   Options::opts.outputCDF = "";
   Options::opts.approxLevel = -1;
+
   Options::opts.floatPrecision = std::numeric_limits< double >::max_digits10;
   
 
@@ -71,10 +78,9 @@ void parseArguments(int argc, char** argv) {
   Options::opts.online = false;
   Options::opts.pipeline = false;
   Options::opts.verbose = false;
-  Options::opts.test = false;
   
   char c;
-  while ((c = getopt(argc, argv, "N:m:M:e:k:i:S:D:C:A:O:B:f:ophvT")) != -1) {
+  while ((c = getopt(argc, argv, "N:m:M:e:P:c:d:k:i:S:D:C:A:O:B:f:phv")) != -1) {
     switch(c) {
     case 'N':
       Options::opts.N = atoi(optarg);
@@ -87,6 +93,15 @@ void parseArguments(int argc, char** argv) {
       break;
     case 'e':
       Options::opts.pe = atof(optarg);
+      break;
+    case 'P':
+      Options::opts.precision = atof(optarg);
+      break;
+    case 'c':
+      Options::opts.confidence = atof(optarg);
+      break;
+    case 'd':
+      Options::opts.oscillation = atof(optarg);
       break;
     case 'k':
       Options::opts.k = atoi(optarg);
@@ -106,10 +121,6 @@ void parseArguments(int argc, char** argv) {
     case 'A':
       Options::opts.approxLevel = atoi(optarg);
       break;
-    case 'o':
-      Options::opts.online = true;
-      Options::opts.mode = OpMode::Online;
-      break;
     case 'O':
       Options::opts.mode = static_cast<OpMode>(atoi(optarg));
       break;
@@ -125,10 +136,6 @@ void parseArguments(int argc, char** argv) {
     case 'v':
       Options::opts.verbose = true;
       break;     
-    case 'T':
-      Options::opts.test = true;
-      Options::opts.mode = OpMode::Test;
-      break;
     case 'h':
       printUsage();
       printOperationModeDescription();

@@ -318,8 +318,17 @@ editDistanceOpMode() {
   // no script
   // no sample matrix
   int flags = Options::opts.optFlags;
-
   size_t n = Options::opts.N;
+
+  if (flags & EDIT_DISTANCE_BOUNDED_ERROR) {
+    size_t k_max = Options::opts.k;
+    double precision = Options::opts.precision;
+    double z_confidence = Options::opts.confidence;
+    double delta = Options::opts.oscillation;
+    SampleEstimates est = editDistanceErrorBoundedEstimates(n, precision, z_confidence, delta);
+    std::cout << est.sampleSize << "\t" << est.sampleMean  << "\t" << est.sampleVariance << "\n";
+    return;
+  }
   
   if (flags & EDIT_DISTANCE_ESTIMATE_EXHAUSTIVE) {
     // Exhasutve (only quadratic)

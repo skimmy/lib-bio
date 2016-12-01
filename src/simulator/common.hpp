@@ -17,6 +17,7 @@
 #include "align.hpp"
 #include "io.hpp"
 #include "edit.hpp"
+#include "log.hpp"
 
 // testing functions
 void testAll();

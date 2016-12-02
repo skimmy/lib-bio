@@ -333,6 +333,21 @@ editDistanceTests() {
   std::cout << estimates.sampleSize << "\t" << estimates.sampleMean << "\t"
 	    << estimates.sampleVariance << std::endl;
   Options::opts.k = old_opt_k;
+
+  std::cout << "\n* Relative Error Estimate Test" << "\n\n";
+  old_opt_k = Options::opts.k;
+  Options::opts.k = 3000;
+  n = 10;
+  double e_model = 6.569;
+
+  // n = 35000;
+  // double e_model = 18070;
+  prec = 0.01;
+  z = 3;
+  estimates = editDistanceRelativeErrorEstimates(n, e_model, prec, z);
+  std::cout << estimates.sampleSize << "\t" << estimates.sampleMean << "\t"
+	    << estimates.sampleVariance << "\t" << std::abs(estimates.sampleMean - e_model) << "\n";
+  Options::opts.k = old_opt_k;
 }
 
 

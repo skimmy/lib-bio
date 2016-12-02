@@ -123,4 +123,7 @@ computeAverageDPMatrix(double** dpMatrix, size_t n, size_t m);
 SampleEstimates
 editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta, double delta_var);
 
+SampleEstimates
+editDistanceRelativeErrorEstimates(size_t n, double e_model, double precision, double z_delta);
+
 #endif

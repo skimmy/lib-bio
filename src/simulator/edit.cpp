@@ -441,3 +441,44 @@ editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta, do
 
   return est;
 }
+
+SampleEstimates
+editDistanceRelativeErrorEstimates(size_t n, double e_model, double precision, double z_delta) {
+
+  size_t* v0 = new size_t[n+1];
+  size_t* v1 = new size_t[n+1];
+  
+  size_t k = 1;
+  size_t k_max = Options::opts.k;
+  size_t sample = sampleEditDistanceDistribution(n, v0, v1);
+  double mean_k = sample;
+  double var_k = 0;
+
+  double cumulative_sum = sample;
+  double cumulative_quad_sum = sample * sample;
+
+  double discrepancy = std::abs(mean_k - e_model);
+
+  while(k < k_max &&
+	( std::abs(mean_k - e_model) > ( (sqrt(var_k / (double)k)) * z_delta * precision ) ) ) {
+    discrepancy = std::abs(mean_k - e_model);
+    //  std::cout << "(" << k << ") " << discrepancy << "\n";
+    k++;
+    sample = sampleEditDistanceDistribution(n, v0, v1);
+    cumulative_sum += sample;
+    cumulative_quad_sum += (sample * sample);
+    mean_k = cumulative_sum / ((double)k);
+    var_k = ( cumulative_quad_sum - k*(mean_k*mean_k)  ) / ((double)(k-1));
+    //    std::cout << "\t" << mean_k << " " << var_k  << " " << k << "\n";
+  }
+  //  std::cout << "(" << k << ") " << discrepancy << "\n\n\n";
+  delete[] v0;
+  delete[] v1;
+
+  SampleEstimates est;
+  est.sampleSize = k;
+  est.sampleMean = mean_k;
+  est.sampleVariance = var_k;
+
+  return est;
+}

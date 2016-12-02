@@ -450,6 +450,7 @@ editDistanceRelativeErrorEstimates(size_t n, double e_model, double precision, d
   
   size_t k = 1;
   size_t k_max = Options::opts.k;
+  size_t k_min = 16;
   size_t sample = sampleEditDistanceDistribution(n, v0, v1);
   double mean_k = sample;
   double var_k = 0;
@@ -457,21 +458,19 @@ editDistanceRelativeErrorEstimates(size_t n, double e_model, double precision, d
   double cumulative_sum = sample;
   double cumulative_quad_sum = sample * sample;
 
-  double discrepancy = std::abs(mean_k - e_model);
+  double rho_k = 0;
 
-  while(k < k_max &&
-	( std::abs(mean_k - e_model) > ( (sqrt(var_k / (double)k)) * z_delta * precision ) ) ) {
-    discrepancy = std::abs(mean_k - e_model);
-    //  std::cout << "(" << k << ") " << discrepancy << "\n";
+  do {
     k++;
     sample = sampleEditDistanceDistribution(n, v0, v1);
     cumulative_sum += sample;
     cumulative_quad_sum += (sample * sample);
     mean_k = cumulative_sum / ((double)k);
     var_k = ( cumulative_quad_sum - k*(mean_k*mean_k)  ) / ((double)(k-1));
-    //    std::cout << "\t" << mean_k << " " << var_k  << " " << k << "\n";
-  }
-  //  std::cout << "(" << k << ") " << discrepancy << "\n\n\n";
+    rho_k = std::sqrt( var_k / ((double)k));
+  } while( k < k_min || (k < k_max &&
+			 ( std::abs(mean_k - e_model) < ( rho_k * z_delta / precision ) ) ) );
+   
   delete[] v0;
   delete[] v1;
 

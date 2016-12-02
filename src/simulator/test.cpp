@@ -336,14 +336,14 @@ editDistanceTests() {
 
   std::cout << "\n* Relative Error Estimate Test" << "\n\n";
   old_opt_k = Options::opts.k;
-  Options::opts.k = 3000;
-  n = 10;
-  double e_model = 6.569;
+  Options::opts.k = 30000;
+  n = 1000;
+  double e_model = 0;
 
   // n = 35000;
   // double e_model = 18070;
-  prec = 0.01;
-  z = 3;
+  prec = 0.001;
+  z = 2;
   estimates = editDistanceRelativeErrorEstimates(n, e_model, prec, z);
   std::cout << estimates.sampleSize << "\t" << estimates.sampleMean << "\t"
 	    << estimates.sampleVariance << "\t" << std::abs(estimates.sampleMean - e_model) << "\n";
@@ -351,6 +351,38 @@ editDistanceTests() {
 }
 
 
+class InverseSquareRootFunction
+{
+private:
+  double gamma, beta;
+public:
+  InverseSquareRootFunction(double gam, double bet) {
+    gamma = gam;
+    beta = bet;
+  }
+  double operator() (double x) { return ( gamma / std::pow(x, beta) ); }
+};
+
+// TODO Move to edit.hpp as soon as good
+// This will eventally become the code to verify the model
+// E[ed(X,Y)] = \xi n + \gam n^{1-\bet}
+void
+editDistanceVerifySecondOrderFunction() {
+  size_t n_max = std::pow(2,14);
+  size_t n = std::pow(2,0);
+  InverseSquareRootFunction g(1.0, 2.0);
+  double prec = 0.001; //Options::opts.precision;
+  double z = 2; //Options::opts.confidence;
+  Options::opts.k = 50000;
+  while (n <= n_max) {
+    SampleEstimates est =
+      editDistanceRelativeErrorEstimates(n, 0, prec, z);
+    std::cout << n << "\t" << est.sampleMean << "\t" << est.sampleVariance << "\t" << est.sampleSize << std::endl;
+    n *= 2;
+    
+  }
+  std::cout << std::endl;
+}
 
 void
 testAverageDPMatrix(size_t n) {
@@ -387,6 +419,7 @@ void testAll() {
   //  testLookupTables();
   //testPeq();
   //testApproximatedExpectedScore();
-  editDistanceTests();
+  //editDistanceTests();
+  editDistanceVerifySecondOrderFunction();
   //  testAverageDPMatrix(Options::opts.N);
 }

@@ -366,6 +366,25 @@ editDistanceOpMode() {
 	print_warning("Partial info for linear under developement");
 	std::unique_ptr<EditDistanceInfo[]> samples =
 	  editDistSamplesInfoLinSpace(n,k);
+	
+	std::unique_ptr<double[]> subSamples = extractSubstitutionArray(samples.get(), k);
+	std::unique_ptr<double[]> delSamples = extractDeletionArray(samples.get(), k);
+	std::unique_ptr<double[]> insSamples = extractInsertionArray(samples.get(), k);
+	SampleEstimates subEst = estimatesFromSamples<double>(subSamples.get(), k);
+	SampleEstimates delEst = estimatesFromSamples<double>(delSamples.get(), k);
+	SampleEstimates insEst = estimatesFromSamples<double>(insSamples.get(), k);
+
+	// If 'verbose' is set  all samples are printed
+	if (Options::opts.verbose) {
+	  for (size_t i = 0; i < k; ++i) {
+	    std::cout << samples[i] << std::endl;
+	  }
+	}
+
+	std::cout << subEst.sampleMean << "\t" << subEst.sampleVariance << "\n";
+	std::cout << delEst.sampleMean << "\t" << delEst.sampleVariance << "\n";
+	std::cout << insEst.sampleMean << "\t" << insEst.sampleVariance << "\n";
+	
       }
       else {
 	// MINIMAL INFO (mean + var) + Sample + Linear

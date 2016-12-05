@@ -38,13 +38,29 @@ public:
   bool operator!=(const EditDistanceInfo& i) {
     return !(*this == i);
   }
-  
+
+ 
   friend std::ostream& operator<<(std::ostream& out, EditDistanceInfo& info) {
     out << info.n_sub << " " << info.n_del << " " << info.n_ins;
     return out;
-  }
-  
+  }  
 };
+
+/**
+ * \brief Extracts the substitutions array from an array of EditDistanceInfo
+ */
+std::unique_ptr<double[]> extractSubstitutionArray(const EditDistanceInfo* v, size_t k);
+
+/**
+ * \brief Extracts the deletions array from an array of EditDistanceInfo
+ */
+std::unique_ptr<double[]> extractDeletionArray(const EditDistanceInfo* v, size_t k);
+
+/**
+ * \brief Extracts the insertions array from an array of EditDistanceInfo
+ */
+std::unique_ptr<double[]> extractInsertionArray(const EditDistanceInfo* v, size_t k);
+
 
 /**
  * \brief computes the edit distance between strings s1 and s2

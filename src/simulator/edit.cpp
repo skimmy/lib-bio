@@ -279,7 +279,6 @@ editDistSamplesInfoLinSpace(size_t n, size_t k_samples, double** avgMatrix) {
     generateIIDString(s1);
     generateIIDString(s2);
     samples[k] = editDistanceLinSpaceInfo(s1,s2, v0, v1);
-    std::cout << samples[k].n_sub << " " << samples[k].n_ins << " " << samples[k].n_del << "\n";
   }
 
   delete[] v1;
@@ -481,3 +480,31 @@ editDistanceRelativeErrorEstimates(size_t n, double e_model, double precision, d
 
   return est;
 }
+
+std::unique_ptr<double[]> extractSubstitutionArray(const EditDistanceInfo* v, size_t k) {
+  std::unique_ptr<double[]> o(new double[k]);
+  for (size_t i = 0; i < k; ++i) {
+    o[i] = v[i].n_sub;
+  }
+  return o;
+}
+
+
+std::unique_ptr<double[]> extractDeletionArray(const EditDistanceInfo* v, size_t k) {
+  std::unique_ptr<double[]> o(new double[k]);
+  
+  for (size_t i = 0; i < k; ++i) {
+    o[i] = v[i].n_del;
+  }
+  return o;
+}
+
+
+std::unique_ptr<double[]> extractInsertionArray(const EditDistanceInfo* v, size_t k)  {
+  std::unique_ptr<double[]> o(new double[k]);
+  for (size_t i = 0; i < k; ++i) {
+    o[i] = v[i].n_ins;
+  }
+  return o;
+}
+

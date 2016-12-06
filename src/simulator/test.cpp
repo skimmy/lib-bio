@@ -348,6 +348,19 @@ editDistanceTests() {
   std::cout << estimates.sampleSize << "\t" << estimates.sampleMean << "\t"
 	    << estimates.sampleVariance << "\t" << std::abs(estimates.sampleMean - e_model) << "\n";
   Options::opts.k = old_opt_k;
+
+  std::cout << "\n* Sample Matrix Test\n\n";
+  n = 8;
+  EditDistanceInfo** sMat = new EditDistanceInfo*[n];
+  for (size_t i = 0; i < n; ++i) {
+    sMat[i] = new EditDistanceInfo[n];
+  }
+  editDistSamplesInfoLinSpace(n,100, sMat);
+  printMatrix<EditDistanceInfo>(sMat,n,n, "\t");
+  for (size_t i = 0; i < n; ++i) {
+    delete[] sMat[i];
+  }
+  delete[] sMat;
 }
 
 
@@ -419,7 +432,7 @@ void testAll() {
   //  testLookupTables();
   //testPeq();
   //testApproximatedExpectedScore();
-  //editDistanceTests();
-  editDistanceVerifySecondOrderFunction();
+  editDistanceTests();
+  //editDistanceVerifySecondOrderFunction();
   //  testAverageDPMatrix(Options::opts.N);
 }

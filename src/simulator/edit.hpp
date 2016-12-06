@@ -25,8 +25,10 @@ class EditDistanceInfo
 {
 public:
   size_t n_sub;
-  size_t n_ins;
   size_t n_del;
+  size_t n_ins;  
+
+  EditDistanceInfo() : n_sub(0), n_del(0), n_ins(0) {}
 
   std::string edit_script = "";
 
@@ -37,6 +39,17 @@ public:
   }
   bool operator!=(const EditDistanceInfo& i) {
     return !(*this == i);
+  }
+  EditDistanceInfo& operator+=(const EditDistanceInfo& rhs) {
+    n_sub += rhs.n_sub;
+    n_del += rhs.n_del;
+    n_ins += rhs.n_ins;
+    return *this;
+  }
+
+  friend EditDistanceInfo operator+(EditDistanceInfo lhs, const EditDistanceInfo& rhs) {
+    lhs += rhs;
+    return lhs;
   }
 
  
@@ -71,7 +84,7 @@ size_t editDistanceEncoded(uint64_t s1, size_t n1, uint64_t s2, size_t n2, size_
 
 size_t editDistanceLinSpace(const std::string& s1, const std::string& s2, size_t* v0, size_t* v1);
 
-EditDistanceInfo editDistanceLinSpaceInfo(const std::string& s1, const std::string& s2, EditDistanceInfo* v0, EditDistanceInfo* v1);
+EditDistanceInfo editDistanceLinSpaceInfo(const std::string& s1, const std::string& s2, EditDistanceInfo* v0, EditDistanceInfo* v1, EditDistanceInfo** sampleMat = NULL);
 
 /**
  * \brief Computes the dynamic programming matrix dpMatrix for edit distance
@@ -125,9 +138,8 @@ editDistSamples(size_t n, size_t k_samples);
 std::unique_ptr<EditDistanceInfo[]>
 editDistSamplesInfo(size_t n, size_t k_samples);
 
-
 std::unique_ptr<EditDistanceInfo[]>
-editDistSamplesInfoLinSpace(size_t n, size_t k_samples, double** avgMatrix = NULL);
+editDistSamplesInfoLinSpace(size_t n, size_t k_samples, EditDistanceInfo** sampleMat = NULL);
 
 
 double

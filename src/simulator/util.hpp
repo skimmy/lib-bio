@@ -34,7 +34,7 @@ void printVector(T* v, size_t n, char* delim = " ") {
 }
 
 template<typename T>
-void printMatrix(T** mat, size_t n, size_t m, char* delim = " ") {
+void printMatrix(T** mat, size_t n, size_t m, std::string delim = " ") {
   for (size_t i = 0; i < n; ++i) {
     for (size_t j = 0; j < m; ++j) {
       std::cout << mat[i][j] << delim;

@@ -59,7 +59,7 @@ editDistanceLinSpace(const std::string& s1, const std::string& s2, size_t* v0, s
   return v0[n2];
 }
 
-EditDistanceInfo editDistanceLinSpaceInfo(const std::string& s1, const std::string& s2, EditDistanceInfo* v0, EditDistanceInfo* v1) {
+EditDistanceInfo editDistanceLinSpaceInfo(const std::string& s1, const std::string& s2, EditDistanceInfo* v0, EditDistanceInfo* v1, EditDistanceInfo** sampleMat) {
   size_t n1 = s1.size();
   size_t n2 = s2.size();
   size_t n_max = MAX(n1, n2);
@@ -85,25 +85,28 @@ EditDistanceInfo editDistanceLinSpaceInfo(const std::string& s1, const std::stri
       // Case of match
       if (s1[i-1] == s2[j-1]) {
 	v1[j] = v0[j-1];
-	continue;
-      }
-      // Case of substitution NOT WORSE than others
-      if ( (a <= b) && (a <= c)) {
-	v1[j] = v0[j-1];
-	v1[j].n_sub++;
-	continue;
-      }
-      // In case of tie (equality) always select a deletion
-      if ( b <= c ) {
-	v1[j] = v0[j];
-	v1[j].n_del++;
+	//	continue;
       } else {
-	v1[j] = v1[j-1];
-	v1[j].n_ins++;
+	// Case of substitution NOT WORSE than others
+	if ( (a <= b) && (a <= c)) {
+	  v1[j] = v0[j-1];
+	  v1[j].n_sub++;	
+	} else {
+	  // In case of tie (equality) always select a deletion
+	  if ( b <= c ) {
+	    v1[j] = v0[j];
+	    v1[j].n_del++;
+	  } else {
+	    v1[j] = v1[j-1];
+	    v1[j].n_ins++;
+	  }
+	}
       }
-      
+      if (sampleMat != NULL) {
+	sampleMat[i-1][j-1] += v1[j];
+      }
     }
-    //    printVector<EditDistanceInfo>(v0,n2+1,"\t"); std::cout << std::endl;
+    
     tmp = v0;
     v0 = v1;
     v1 = tmp;
@@ -267,7 +270,7 @@ editDistSamplesInfo(size_t n, size_t k_samples) {
 }
 
 std::unique_ptr<EditDistanceInfo[]>
-editDistSamplesInfoLinSpace(size_t n, size_t k_samples, double** avgMatrix) {
+editDistSamplesInfoLinSpace(size_t n, size_t k_samples,  EditDistanceInfo** sampleMat) {
   std::unique_ptr<EditDistanceInfo[]> samples(new EditDistanceInfo[k_samples]);
   std::string s1(n, 'N');
   std::string s2(n, 'N');
@@ -278,7 +281,7 @@ editDistSamplesInfoLinSpace(size_t n, size_t k_samples, double** avgMatrix) {
   for (size_t k = 0; k < k_samples; ++k) {
     generateIIDString(s1);
     generateIIDString(s2);
-    samples[k] = editDistanceLinSpaceInfo(s1,s2, v0, v1);
+    samples[k] = editDistanceLinSpaceInfo(s1,s2, v0, v1, sampleMat);
   }
 
   delete[] v1;
@@ -380,8 +383,6 @@ void editDistanceWithInfo(const std::string& s1, const std::string& s2, EditDist
   editDistanceMat(s1, s2, dpMatrix);
   editDistanceBacktrack(dpMatrix, s1, s2, info);
   editInfoCompute(info);
-
-  //  printMatrix<size_t>(dpMatrix, n+1, m+1, "\t");
 
   for (int i = 0; i < n+1; ++i) {
     delete[] dpMatrix[i];

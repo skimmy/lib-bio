@@ -5,6 +5,42 @@
 #include <cstring>
 #include <cmath>
 
+// ----------------------------------------------------------------------
+//                               INFO CONVERSION
+// ----------------------------------------------------------------------
+
+std::unique_ptr<double[]> extractSubstitutionArray(const EditDistanceInfo* v, size_t k) {
+  std::unique_ptr<double[]> o(new double[k]);
+  for (size_t i = 0; i < k; ++i) {
+    o[i] = v[i].n_sub;
+  }
+  return o;
+}
+
+
+std::unique_ptr<double[]> extractDeletionArray(const EditDistanceInfo* v, size_t k) {
+  std::unique_ptr<double[]> o(new double[k]);
+  
+  for (size_t i = 0; i < k; ++i) {
+    o[i] = v[i].n_del;
+  }
+  return o;
+}
+
+
+std::unique_ptr<double[]> extractInsertionArray(const EditDistanceInfo* v, size_t k)  {
+  std::unique_ptr<double[]> o(new double[k]);
+  for (size_t i = 0; i < k; ++i) {
+    o[i] = v[i].n_ins;
+  }
+  return o;
+}
+
+// ----------------------------------------------------------------------
+//                             DP MATRIX UTILS
+// ----------------------------------------------------------------------
+
+
 size_t**
 allocDPMatrix(size_t n, size_t m) {
   size_t** dpMatrix = new size_t*[n+1];
@@ -31,6 +67,10 @@ printDPMatrix(size_t** dpMatrix, size_t n, size_t m) {
     std::cout << std::endl;
   }
 }
+
+// ----------------------------------------------------------------------
+//                        EDIT DISTANCE COMPUTATION
+// ----------------------------------------------------------------------
 
 /**
  * \brief Conputes the edit distance between strings s1 and s2 using only
@@ -210,6 +250,10 @@ editDistance(const std::string& s1, const std::string& s2) {
   delete[] dpMatrix;
   return dist;
 }
+
+// ----------------------------------------------------------------------
+//                        EDIT DISTANCE SAMPLING
+// ----------------------------------------------------------------------
 
 
 void
@@ -400,9 +444,14 @@ sampleEditDistanceDistribution(size_t n, size_t* v0, size_t* v1) {
   return d;
 }
 
+// ----------------------------------------------------------------------
+//                          ESTIMATION PROCEDURE
+// ----------------------------------------------------------------------
+
+
 
 SampleEstimates
-editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta, double delta_var) {
+editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta) {
 
   size_t* v0 = new size_t[n+1];
   size_t* v1 = new size_t[n+1];
@@ -424,10 +473,8 @@ editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta, do
     mean_k = cumulative_sum / ((double)k);
     var_k_1 = var_k;
     var_k = ( cumulative_quad_sum - k*(mean_k*mean_k)  ) / ((double)(k-1));
-    if ( ( abs(var_k - var_k_1) / var_k ) < delta_var) {
-      if (var_k * ( z_delta*z_delta ) < ((double)k) * ( precision * precision )) {
-	break;
-      }
+    if (var_k * ( z_delta*z_delta ) < ((double)k) * ( precision * precision )) {
+      break;
     }
   }
 
@@ -481,31 +528,3 @@ editDistanceRelativeErrorEstimates(size_t n, double e_model, double precision, d
 
   return est;
 }
-
-std::unique_ptr<double[]> extractSubstitutionArray(const EditDistanceInfo* v, size_t k) {
-  std::unique_ptr<double[]> o(new double[k]);
-  for (size_t i = 0; i < k; ++i) {
-    o[i] = v[i].n_sub;
-  }
-  return o;
-}
-
-
-std::unique_ptr<double[]> extractDeletionArray(const EditDistanceInfo* v, size_t k) {
-  std::unique_ptr<double[]> o(new double[k]);
-  
-  for (size_t i = 0; i < k; ++i) {
-    o[i] = v[i].n_del;
-  }
-  return o;
-}
-
-
-std::unique_ptr<double[]> extractInsertionArray(const EditDistanceInfo* v, size_t k)  {
-  std::unique_ptr<double[]> o(new double[k]);
-  for (size_t i = 0; i < k; ++i) {
-    o[i] = v[i].n_ins;
-  }
-  return o;
-}
-

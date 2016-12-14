@@ -528,3 +528,66 @@ editDistanceRelativeErrorEstimates(size_t n, double e_model, double precision, d
 
   return est;
 }
+
+// Computes 2 e(n/2) - e(n) with error < (precison) * (value)
+SampleEstimates
+differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delta, size_t k_max) {
+
+  size_t* v0 = new size_t[n+1];
+  size_t* v1 = new size_t[n+1];
+
+  size_t k = 1;
+
+  size_t sample_n = sampleEditDistanceDistribution(n, v0, v1);
+  size_t sample_n_2 = sampleEditDistanceDistribution(n >> 1, v0, v1);
+
+  double cumul_sum_n = sample_n;
+  double cumul_sum_n_2 = sample_n_2;
+
+  double cumul_sum_square_n = sample_n * sample_n;
+  double cumul_sum_square_n_2 = sample_n_2 * sample_n_2;
+
+  double mean_n = cumul_sum_n / ((double) k);
+  double mean_n_2 = cumul_sum_n_2 / ( (double) k);
+
+  double diff_n = 2 * mean_n_2 - mean_n;
+
+  double var_n = ( cumul_sum_square_n - k * mean_n * mean_n ) / ( (double) k-1);
+  double var_n_2 = ( cumul_sum_square_n_2 - k * mean_n_2 * mean_n_2) / ( (double)k-1 );
+
+  double rho = 0;
+
+  do {
+    k++;
+
+    sample_n = sampleEditDistanceDistribution(n, v0, v1);
+    sample_n_2 = sampleEditDistanceDistribution(n >> 1, v0, v1);
+
+    cumul_sum_n += sample_n;
+    cumul_sum_n_2 += sample_n_2;
+
+    cumul_sum_square_n += sample_n * sample_n;
+    cumul_sum_square_n_2 += sample_n_2 * sample_n_2;
+
+    mean_n = cumul_sum_n / ((double) k);
+    mean_n_2 = cumul_sum_n_2 / ( (double) k);
+
+    diff_n = 2 * mean_n_2 - mean_n;
+
+    var_n = ( cumul_sum_square_n - k * mean_n * mean_n ) / ( (double) k-1);
+    var_n_2 = ( cumul_sum_square_n_2 - k * mean_n_2 * mean_n_2) / ( (double)k-1 );
+
+    rho = std::sqrt( (4*var_n_2 + var_n) / ((double)k) );
+
+    
+  } while(k < k_max && ( rho > precision * diff_n / z_delta ));
+    
+  delete[] v1;
+  delete[] v0;
+    
+  SampleEstimates est;
+  est.sampleMean = diff_n;
+  est.sampleVariance = rho;
+  est.sampleSize = k;
+  return est;
+}

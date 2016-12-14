@@ -154,4 +154,7 @@ editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta);
 SampleEstimates
 editDistanceRelativeErrorEstimates(size_t n, double e_model, double precision, double z_delta);
 
+SampleEstimates
+differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delta, size_t k_max);
+
 #endif

@@ -328,13 +328,12 @@ editDistanceTests() {
   size_t n = 200;
   double prec = 0.1;
   double z = 2;
-  double d_var = 0.1;
-  SampleEstimates estimates = editDistanceErrorBoundedEstimates(n, prec, z, d_var);
+  SampleEstimates estimates = editDistanceErrorBoundedEstimates(n, prec, z);
   std::cout << estimates.sampleSize << "\t" << estimates.sampleMean << "\t"
 	    << estimates.sampleVariance << std::endl;
   Options::opts.k = old_opt_k;
 
-  std::cout << "\n* Relative Error Estimate Test" << "\n\n";
+  std::cout << "\n* Relative Error Estimate Test\n\n";
   old_opt_k = Options::opts.k;
   Options::opts.k = 30000;
   n = 1000;
@@ -347,16 +346,29 @@ editDistanceTests() {
   estimates = editDistanceRelativeErrorEstimates(n, e_model, prec, z);
   std::cout << estimates.sampleSize << "\t" << estimates.sampleMean << "\t"
 	    << estimates.sampleVariance << "\t" << std::abs(estimates.sampleMean - e_model) << "\n";
+
+  std::cout << "\n* Relative Error Difference Test\n\n";
+
+  prec = 0.1;
+  z=1;
+  n = Options::opts.N;
+  estimates = differenceBoundedRelativeErrorEstimate(n, prec, z, Options::opts.k);
+
+  std::cout << estimates.sampleSize << "\t" << estimates.sampleMean << "\t"
+	    << estimates.sampleVariance << "\n";
+
   Options::opts.k = old_opt_k;
 
+
   std::cout << "\n* Sample Matrix Test\n\n";
+  
   n = 8;
   EditDistanceInfo** sMat = new EditDistanceInfo*[n];
   for (size_t i = 0; i < n; ++i) {
     sMat[i] = new EditDistanceInfo[n];
   }
   editDistSamplesInfoLinSpace(n,100, sMat);
-  printMatrix<EditDistanceInfo>(sMat,n,n, "\t");
+  //  printMatrix<EditDistanceInfo>(sMat,n,n, "\t");
   for (size_t i = 0; i < n; ++i) {
     delete[] sMat[i];
   }

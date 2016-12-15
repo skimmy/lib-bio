@@ -351,7 +351,7 @@ editDistanceTests() {
 
   prec = 0.1;
   z=1;
-  n = Options::opts.N;
+  n = 32;
   estimates = differenceBoundedRelativeErrorEstimate(n, prec, z, Options::opts.k);
 
   std::cout << estimates.sampleSize << "\t" << estimates.sampleMean << "\t"

@@ -296,7 +296,6 @@ void oracleSimulation() {
     } else {
       Read r2 = generateOnlineRead(genome, d);
       size_t s = m - d;
-      //      std::cout << s << '\t' << r1.r << ' ' << r2.r<<'\t' << prefixSuffixHammingDistance(r1.r, r2.r, s) << "\n";
       oraclePoints[s].hammDist += prefixSuffixHammingDistance(r1.r, r2.r, s);
       double sc = scoreExt(r1.r, r2.r, s,numDen);
       oraclePoints[s].sumNum = numDen[1];
@@ -324,7 +323,8 @@ editDistanceOpMode() {
     size_t k_max = Options::opts.k;
     double precision = Options::opts.precision;
     double z_confidence = Options::opts.confidence;
-    SampleEstimates est = editDistanceErrorBoundedEstimates(n, precision, z_confidence);
+    //    SampleEstimates est = editDistanceErrorBoundedEstimates(n, precision, z_confidence);
+    SampleEstimates est = differenceBoundedRelativeErrorEstimate(n, precision, z_confidence, k_max);
     std::cout << est.sampleSize << "\t" << est.sampleMean  << "\t" << est.sampleVariance << "\n";
     return;
   }

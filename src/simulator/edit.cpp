@@ -587,7 +587,7 @@ differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delt
     
   SampleEstimates est;
   est.sampleMean = diff_n;
-  est.sampleVariance = rho;
+  est.sampleVariance = z_delta *rho;
   est.sampleSize = k;
   return est;
 }

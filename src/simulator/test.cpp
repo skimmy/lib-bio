@@ -11,6 +11,28 @@
 const int MC_SAMPLES = 2 << 22;
 
 void
+testProbFunctions() {
+  std::cout << "\nPROBABILITY FUNCTIONS TESTS\n\n";
+
+  std::cout << "* Median tests\n";
+  int f_sym [5] = {1, 3, 4, 3, 1};
+  size_t median_idx = medianFromFrequency<int>(f_sym,5);
+  std::cout << "  Median for {1, 3, 4, 3, 1}\t\t"
+	    << f_sym[median_idx] << " i: " << median_idx << "\n";
+
+  double f_skew [7] = {0.5, 0.5, 0.5, 1, 1, 2, 0.5};
+  median_idx = medianFromFrequency<double>(f_skew, 7);
+  std::cout << "  Median for {0.5, 0.5, 0.5, 1, 1, 2, 0.5}\t\t"
+	    <<  f_skew[median_idx]  << " i: " << median_idx << "\n";
+
+  double f_0 [3] = {0.5, 0.25, 0.25};
+  median_idx = medianFromFrequency<double>(f_0, 3);
+  std::cout << "  Median for {0.5, 0.25, 0.25}\t\t"
+	    <<  f_0[median_idx]  << " i: " << median_idx << "\n";
+
+}
+
+void
 testSampleEstimators() {
 
   std::cout << "\nESTIMATORS TESTS\n\n";
@@ -335,7 +357,7 @@ editDistanceTests() {
 
   std::cout << "\n* Relative Error Estimate Test\n\n";
   old_opt_k = Options::opts.k;
-  Options::opts.k = 30000;
+  Options::opts.k = 300000000;
   n = 1000;
   double e_model = 0;
 
@@ -349,9 +371,9 @@ editDistanceTests() {
 
   std::cout << "\n* Relative Error Difference Test\n\n";
 
-  prec = 0.1;
-  z=1;
-  n = 32;
+  prec = 0;
+  z=2;
+  n = 128;
   estimates = differenceBoundedRelativeErrorEstimate(n, prec, z, Options::opts.k);
 
   std::cout << estimates.sampleSize << "\t" << estimates.sampleMean << "\t"
@@ -444,6 +466,7 @@ void testAll() {
   //  testLookupTables();
   //testPeq();
   //testApproximatedExpectedScore();
+  //testProbFunctions();
   editDistanceTests();
   //editDistanceVerifySecondOrderFunction();
   //  testAverageDPMatrix(Options::opts.N);

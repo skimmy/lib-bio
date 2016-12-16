@@ -5,6 +5,8 @@
 #include <cstring>
 #include <cmath>
 
+
+
 // ----------------------------------------------------------------------
 //                               INFO CONVERSION
 // ----------------------------------------------------------------------
@@ -534,6 +536,58 @@ editDistanceRelativeErrorEstimates(size_t n, double e_model, double precision, d
   return est;
 }
 
+class SamplingEstimationProcess {
+public:
+  SamplingEstimationProcess(size_t n)
+    : cumulativeSum(0), cumulativeSumSquare(0), k(0)
+  {
+    this->n = n;
+    this->frequency = new size_t[n+1];
+    std::fill_n(this->frequency, n+1, 0);
+  }
+  ~SamplingEstimationProcess() {
+    delete[] frequency;
+  }
+
+  void newSample(size_t sample) {
+    this->frequency[sample]++;
+    this->cumulativeSum += sample;
+    this->cumulativeSumSquare += (sample * sample);
+    this->k++;
+  }
+
+  double sampleMean() const {
+    return ( (double)cumulativeSum ) / ( (double)k);
+  }
+
+  double sampleVariance() const {
+    double sMean = sampleMean();
+    double meanTerm = ((double)k) * sMean * sMean;
+    return ( ( this->cumulativeSumSquare - meanTerm ) / ((double)k-1));
+  }
+
+  size_t medianForSampleDistribution() const {
+    return medianFromFrequency<size_t>(frequency, n+1);
+  }
+
+  size_t sampleSize() const {
+    return k;
+  }
+
+  void writeFrequencyOnFile(const std::string& path) {
+    std::ofstream os(path, std::ofstream::out);
+    writeVectorOnStream<size_t>(frequency, n+1, os);
+    os.close();
+  }
+
+private:
+  size_t k;
+  size_t n;
+  double cumulativeSum;
+  double cumulativeSumSquare;
+  size_t* frequency;
+};
+
 // Computes 2 e(n/2) - e(n) with error < (precison) * (value)
 SampleEstimates
 differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delta, size_t k_max) {
@@ -542,49 +596,59 @@ differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delt
   size_t* v1 = new size_t[n+1];
 
   size_t k = 1;
+  // create sampling process structures (one for 'n' and one for 'n/2' )
+  SamplingEstimationProcess est_n(n);
+  SamplingEstimationProcess est_n_2(n >> 1);
 
+  // generate new sample
   size_t sample_n = sampleEditDistanceDistribution(n, v0, v1);
   size_t sample_n_2 = sampleEditDistanceDistribution(n >> 1, v0, v1);
 
-  double cumul_sum_n = sample_n;
-  double cumul_sum_n_2 = sample_n_2;
-
-  double cumul_sum_square_n = sample_n * sample_n;
-  double cumul_sum_square_n_2 = sample_n_2 * sample_n_2;
-
-  double mean_n = cumul_sum_n / ((double) k);
-  double mean_n_2 = cumul_sum_n_2 / ( (double) k);
-
+  // refresh process and variables
+  est_n.newSample(sample_n);
+  est_n_2.newSample(sample_n_2);  
+  // sample means, variances (0 with 1 sample) and diff 2e(n/2) - e(n)
+  double mean_n = est_n.sampleMean();
+  double mean_n_2 = est_n_2.sampleMean();
   double diff_n = 2 * mean_n_2 - mean_n;
-
-  double var_n = ( cumul_sum_square_n - k * mean_n * mean_n ) / ( (double) k-1);
-  double var_n_2 = ( cumul_sum_square_n_2 - k * mean_n_2 * mean_n_2) / ( (double)k-1 );
-
+  double var_n = 0;
+  double var_n_2 = 0;
+  // error term
   double rho = 0;
 
   do {
     k++;
-
+    // generate new sample
     sample_n = sampleEditDistanceDistribution(n, v0, v1);
     sample_n_2 = sampleEditDistanceDistribution(n >> 1, v0, v1);
-
-    cumul_sum_n += sample_n;
-    cumul_sum_n_2 += sample_n_2;
-
-    cumul_sum_square_n += sample_n * sample_n;
-    cumul_sum_square_n_2 += sample_n_2 * sample_n_2;
-
-    mean_n = cumul_sum_n / ((double) k);
-    mean_n_2 = cumul_sum_n_2 / ( (double) k);
-
+    // refresh sample processes
+    est_n.newSample(sample_n);
+    est_n_2.newSample(sample_n_2);
+    // get recomputed params...
+    mean_n = est_n.sampleMean();
+    mean_n_2 = est_n_2.sampleMean();    
     diff_n = 2 * mean_n_2 - mean_n;
-
-    var_n = ( cumul_sum_square_n - k * mean_n * mean_n ) / ( (double) k-1);
-    var_n_2 = ( cumul_sum_square_n_2 - k * mean_n_2 * mean_n_2) / ( (double)k-1 );
-
+    var_n = est_n.sampleVariance();
+    var_n_2 = est_n_2.sampleVariance();
+    // ...and error terms
     rho = std::sqrt( (4*var_n_2 + var_n) / ((double)k) );
 
-    
+    // middle checkpoint
+    if (k % 50000 == 0) {
+      std::cout << est_n.sampleSize()
+		<< "\t" << mean_n << "\t" << var_n << "\t" << est_n.medianForSampleDistribution()
+		<< "\t" << mean_n_2 << "\t" << var_n_2 << "\t" << est_n_2.medianForSampleDistribution()
+		<< std::endl;
+	//		<< "\t" << diff_n << "\t" << rho << std::endl;
+      if (k % 500000 == 0) {
+	// print density to file
+	est_n.writeFrequencyOnFile("/tmp/density2_" + std::to_string(k) + ".txt");
+      }
+    }
+
+    // continue looping as long as
+    //      rho > threshold
+    // and maximum iterations threshold is not reached
   } while(k < k_max && ( rho > precision * diff_n / z_delta ));
     
   delete[] v1;

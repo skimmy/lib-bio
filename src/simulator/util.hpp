@@ -43,6 +43,16 @@ void printMatrix(T** mat, size_t n, size_t m, std::string delim = " ") {
   }
 }
 
+
+template<typename T>
+void writeVectorOnStream(T v[], size_t n, std::ostream& os, std::string delim = "\n") {
+  for (size_t i = 0; i < n; ++i) {
+    os << v[i] << delim;
+  }
+  os.flush();
+}
+
+
 void print_warning(const std::string &msg);
 void fatal_error(const std::string &msg, int exit_code);
 

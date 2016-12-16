@@ -87,3 +87,27 @@ double approximatedScore(size_t s);
 
 double score(const std::string& r1, const std::string& r2, size_t s);
 double scoreExt(const std::string& r1, const std::string& r2, size_t s, double* num_den);
+
+/*
+ * Returns the index of the FIRST elements x such that 
+ *     P[X < x] >= 0.5
+ */
+template<typename T>
+size_t medianFromFrequency(T f[], size_t n) {
+  // first compute the sum...
+  T sum = 0;
+  for (size_t i = 0; i < n; ++i) {
+    sum += f[i];
+  }
+  
+  // ...then find when 50% of the mass is covered
+  T pSum = 0;
+  for (size_t i = 0; i < n; ++i) {
+    pSum += f[i];
+    if ( ((double)pSum) / ( (double)sum) >= 0.5) {
+      return i;
+    }    
+  }
+  return n-1;
+}
+

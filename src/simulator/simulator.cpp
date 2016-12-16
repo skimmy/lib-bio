@@ -10,6 +10,7 @@
 #include <ctime>
 
 #include <iostream>
+#include <algorithm>
 
 
 char bases[] = {'A', 'C', 'G', 'T'};
@@ -45,6 +46,8 @@ struct EstimationPoint
 };
 EstimationPoint * oraclePoints;
 
+EditDistanceSimOutput* edOut;
+
 void initSimulator() {
   revBases['A'] = revBases['a'] = 0;
   revBases['C'] = revBases['c'] = 1;
@@ -68,17 +71,32 @@ void initSimulator() {
 
   // set the precision from options
   std::cout.precision(Options::opts.floatPrecision);
+
+  edOut = new EditDistanceSimOutput();
 }
 
 void clearSimulator() {
+  delete edOut;
   delete[] oraclePoints;
   clearChainMatrix();
   clearProbabilities();
-  clearUtil();  
+  clearUtil();
 }
 
 void outputResults() {
   if (Options::opts.mode == OpMode::EditDist) {
+    // CDF ouput requested (-D <distfile> option)
+    if (!Options::opts.outputDistribution.empty()) {
+      if (edOut->distPDF) {
+	size_t n = Options::opts.N;	
+	std::ofstream ofs(Options::opts.outputDistribution, std::ofstream::out);      
+	logInfo("Writing Edit Distance distribution on " + Options::opts.outputDistribution);
+	for (size_t i = 0; i <= n; ++i) {
+	  ofs << edOut->distPDF[i] << std::endl;
+	}
+	ofs.close();
+      }
+    }
     return;
   }
   if (Options::opts.pipeline) {
@@ -318,6 +336,8 @@ editDistanceOpMode() {
   // no sample matrix
   int flags = Options::opts.optFlags;
   size_t n = Options::opts.N;
+  edOut->distPDF = new double[n+1];
+  std::fill_n(edOut->distPDF, n+1, 0);
 
   if (flags & EDIT_DISTANCE_BOUNDED_ERROR) {
     size_t k_max = Options::opts.k;
@@ -332,7 +352,7 @@ editDistanceOpMode() {
   if (flags & EDIT_DISTANCE_ESTIMATE_EXHAUSTIVE) {
     // Exhasutve (only quadratic)
     print_warning("only \033[1;37mqudratic algorithm\033[0m available with exhaustive option");
-    double avgDist = testExhaustiveEditDistanceEncoded(n);
+    double avgDist = testExhaustiveEditDistanceEncoded(n, edOut->distPDF);
     std::cout << avgDist << std::endl;    
   }
   

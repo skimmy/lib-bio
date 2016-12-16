@@ -335,13 +335,24 @@ editDistSamplesInfoLinSpace(size_t n, size_t k_samples,  EditDistanceInfo** samp
 }
 
 
+size_t
+sampleEditDistanceDistribution(size_t n, size_t* v0, size_t* v1) {
+  std::string s1(n, 'N'); 
+  std::string s2(n, 'N');
+  generateIIDString(s1);
+  generateIIDString(s2);
+  size_t d = editDistanceLinSpace(s1, s2, v0, v1);
+  return d;
+}
+
+
 // -----------------------------------------------------------------------------
 //                            EXHASUTIVE AND BACKTRACK
 // -----------------------------------------------------------------------------
 
 
 double
-testExhaustiveEditDistanceEncoded(size_t n) {
+testExhaustiveEditDistanceEncoded(size_t n, double* freq) {
   size_t** dpMatrix = new size_t*[n+1];
   for (int i = 0; i < n+1; ++i) {
     dpMatrix[i] = new size_t[n+1];
@@ -358,9 +369,13 @@ testExhaustiveEditDistanceEncoded(size_t n) {
 
   uint64_t N = pow(4,n);
   double ed = 0;
+  size_t dist = 0;
   for (uint64_t i = 0; i < N; ++i) {
+    freq[0]++;
     for (uint64_t j = i+1; j <N; ++j) {
-      ed += 2*editDistanceEncoded(i, n, j, n, dpMatrix);      
+      dist = editDistanceEncoded(i, n, j, n, dpMatrix);
+      freq[dist] += 2.0;
+      ed += 2*dist;
     }
   }
   for (int i = 0; i < n+1; ++i) {
@@ -432,16 +447,6 @@ void editDistanceWithInfo(const std::string& s1, const std::string& s2, EditDist
     delete[] dpMatrix[i];
   }
   delete[] dpMatrix;
-}
-
-size_t
-sampleEditDistanceDistribution(size_t n, size_t* v0, size_t* v1) {
-  std::string s1(n, 'N'); 
-  std::string s2(n, 'N');
-  generateIIDString(s1);
-  generateIIDString(s2);
-  size_t d = editDistanceLinSpace(s1, s2, v0, v1);
-  return d;
 }
 
 // ----------------------------------------------------------------------
@@ -590,4 +595,16 @@ differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delt
   est.sampleVariance = z_delta *rho;
   est.sampleSize = k;
   return est;
+}
+
+// ----------------------------------------------------------------------
+//                        OUTPUT RESULT CLASS
+// ----------------------------------------------------------------------
+
+
+EditDistanceSimOutput::~EditDistanceSimOutput() {
+  if (this->distPDF) {
+    delete[] this->distPDF;
+    this->distPDF = NULL;
+  }
 }

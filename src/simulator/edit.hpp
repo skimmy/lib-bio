@@ -16,10 +16,18 @@
 #define EDIT_DISTANCE_SAMPLE_MATRIX       0x10
 #define EDIT_DISTANCE_BOUNDED_ERROR       0x20
 
+class EditDistanceSimOutput {
+  // This class is more a 'struct' like object that exposes most of
+  // its attributes (which are indeed filled during simulations).  
+public:
+  double* distPDF = NULL;
+  ~EditDistanceSimOutput();
+};
+
 
 /**
- * This is a structure to store information about how edit distance
- * is divided into substitution, 
+ * This is a structure to store information about how edit distance is
+ * divided into substitution,
  */
 class EditDistanceInfo
 {
@@ -143,7 +151,7 @@ editDistSamplesInfoLinSpace(size_t n, size_t k_samples, EditDistanceInfo** sampl
 
 
 double
-testExhaustiveEditDistanceEncoded(size_t n);
+testExhaustiveEditDistanceEncoded(size_t n, double* freq);
 
 void
 computeAverageDPMatrix(double** dpMatrix, size_t n, size_t m);

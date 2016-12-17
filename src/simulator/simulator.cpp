@@ -419,7 +419,9 @@ editDistanceOpMode() {
 
 int main(int argc, char** argv) {   
   // Important NOT invert (init requires argument to be parsed)
-  parseArguments(argc,argv);
+  //  parseArguments(argc,argv);
+  parseArgumentsBoost(argc,argv);
+  //  return -1;
   initSimulator();
 
   switch (Options::opts.mode) {

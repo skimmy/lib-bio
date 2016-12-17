@@ -1,6 +1,9 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
+#define HAVE_BOOST
+
+
 enum OpMode { Test, Offline, Online, Oracle, ScoreEst, AlignScore, EditDist };
 
 // options parsing
@@ -40,6 +43,11 @@ struct Options {
 
 void parseArguments(int argc, char** argv);
 
+
+#ifdef HAVE_BOOST
+
 void parseArgumentsBoost(int argc, char** argv);
+
+#endif
 
 #endif

@@ -5,6 +5,18 @@
 #include <iostream>
 #include <limits>
 
+// remove when substituted with the automake corresponding flag
+#define HAVE_BOOST
+
+
+#ifdef HAVE_BOOST
+
+#include <boost/program_options.hpp>
+namespace po = boost::program_options;
+
+#endif
+
+
 void printUsage() {
   std::cout << std::endl;
   std::cout << "USAGE\n";
@@ -37,6 +49,7 @@ void printArguments() {
   std::cout << "Reads length (m)             " << Options::opts.m << std::endl;
   std::cout << "Reads count (M)              " << Options::opts.M << std::endl;
   std::cout << "Base error probability (pe)  " << Options::opts.pe << std::endl;
+  std::cout << "Operation mode (O)           " << Options::opts.mode << std::endl;
 }
 
 void printOperationModeDescription() {
@@ -50,9 +63,9 @@ void printOperationModeDescription() {
   std::cout << "\t 6 (EditDist)    Performs several experiment on the edit distance\n";
 }
 
-void parseArguments(int argc, char** argv) {
-
-  // default options
+void
+setDefualtParams() {
+   // default options
   Options::opts.N = 1000000; // size of the reference;
   Options::opts.m = 50;
   Options::opts.M = 10;
@@ -78,6 +91,12 @@ void parseArguments(int argc, char** argv) {
   Options::opts.online = false;
   Options::opts.pipeline = false;
   Options::opts.verbose = false;
+
+}
+
+void parseArguments(int argc, char** argv) {
+
+  setDefualtParams();
   
   char c;
   while ((c = getopt(argc, argv, "N:m:M:e:P:c:d:k:i:S:D:C:A:O:B:f:phv")) != -1) {
@@ -152,6 +171,93 @@ void parseArguments(int argc, char** argv) {
   }
 }
 
+
+#ifdef HAVE_BOOST
+
 void
-parseArgumentBoost(int argc, char** argv) {
+parseArgumentsBoost(int argc, char** argv) {
+  logWarning("Boost program_options test in progress");
+
+  setDefualtParams();
+  po::options_description opts_desc("All options");
+  // set options
+  opts_desc.add_options()
+    ("help,h","Show help message")
+
+    ("length,N", po::value<size_t>(&Options::opts.N),
+     "Size of the genome or strings in general")
+
+    ("read-length,m", po::value<size_t>(&Options::opts.m),
+     "Length of the read")
+
+    ("read-count,M", po::value<size_t>(&Options::opts.M),
+     "Number of reads")
+    
+    ("error-prob,e", po::value<double>(&Options::opts.pe),
+     "Error probability")
+
+    ("max-error,P", po::value<double>(&Options::opts.precision),
+     "The maximum error tollerated for estimation (epsilon)")
+
+    ("confidence,c", po::value<double>(&Options::opts.confidence),
+     "Confidence interval as a multiple of sigmas of a normal distribution (delta)")
+
+    ("iterations,k", po::value<int>(&Options::opts.k),
+     "Number of iterations or samples")
+
+    ("input-reference,i",po::value<std::string>(&Options::opts.inputReference),
+     "Reference DNA/RNA input file (fasta format)")
+
+    ("input-sam,S", po::value<std::string>(&Options::opts.inputSAM),
+     "Sam alignment input file")
+
+    ("output-density,D", po::value<std::string>(&Options::opts.outputDistribution),
+     "File were density will be written. If left unspecified, no output will be produced")
+
+    ("output-distribution,C", po::value<std::string>(&Options::opts.outputCDF),
+     "File were distribution will be written. If left unspecified, no output will be produced")
+
+    ("approx-level,A", po::value<int>(&Options::opts.approxLevel),
+     "Set the approximation level")
+
+    ("operation-mode,O", po::value<int>(), "Sets the operation mode")
+
+    ("sub-task,B", po::value<int>(&Options::opts.subTask),
+     "Defines the subtask for the operation mode selected")
+
+    ("flags,f", po::value<int>(&Options::opts.optFlags),
+     "Sets flags to define behavior of mode / subtask")
+
+    ("pipeline,p", "If set will run in pipeline")
+
+    ("verbose,v", "If set will run in verbose output")
+    
+    ; 
+  
+  // invoke boost command line parser
+  po::variables_map vm;
+  po::store(po::parse_command_line(argc, argv, opts_desc), vm);
+  po::notify(vm);
+
+  // set parameters based on passed arguments
+  if (vm.count("help")) {
+    std::cout << opts_desc << std::endl;
+    printOperationModeDescription();
+    std::cout << std::endl;
+    exit(0);
+  }
+  if (vm.count("operation-mode")) {
+    Options::opts.mode = static_cast<OpMode>(vm["operation-mode"].as<int>());
+  }
+
+  if (vm.count("pipeline")) {
+    Options::opts.pipeline = true;
+  }
+
+  if (vm.count("verbose")) {
+    Options::opts.verbose = true;
+  }
+
 }
+
+#endif

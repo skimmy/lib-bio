@@ -151,3 +151,7 @@ void parseArguments(int argc, char** argv) {
     printArguments();
   }
 }
+
+void
+parseArgumentBoost(int argc, char** argv) {
+}

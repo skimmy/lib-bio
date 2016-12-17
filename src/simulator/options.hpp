@@ -40,4 +40,6 @@ struct Options {
 
 void parseArguments(int argc, char** argv);
 
+void parseArgumentsBoost(int argc, char** argv);
+
 #endif

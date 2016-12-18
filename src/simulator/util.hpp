@@ -65,6 +65,10 @@ public:
     return tmp; 
   }
 
+  T getCurrent() {
+    return next;
+  }
+
   void rewind() {
     next = start;
   }
@@ -84,6 +88,10 @@ public:
     T tmp = next;
     next += step;
     return tmp;
+  }
+
+  T getCurrent() {
+    return next;
   }
 
   void rewind() {

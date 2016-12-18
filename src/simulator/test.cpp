@@ -478,15 +478,17 @@ void testAll() {
   std::cout << "--------------------------------\n";
   std::cout << "          TESTING MODE          \n";
   std::cout << "--------------------------------\n";
-  testUtils();
+  //testUtils();
+  //testProbFunctions();
+  
   //  testSampleEstimators();
   //  testScoreFunction();
   //  testLookupTables();
   //testPeq();
   //testApproximatedExpectedScore();
-
-  //testProbFunctions();
-  //editDistanceTests();
+  
+  
+  editDistanceTests();
 
   //editDistanceVerifySecondOrderFunction();
   //  testAverageDPMatrix(Options::opts.N);

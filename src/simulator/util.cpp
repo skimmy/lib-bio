@@ -9,7 +9,6 @@
 double* power4_lookup = NULL; // contains 4^{-(m-s)} for s=0,...,m
 
 void initUtil() {
-
   int m = Options::opts.m;
   power4_lookup = new double[m+1];
   for (int s = 0; s <= m; ++s) {

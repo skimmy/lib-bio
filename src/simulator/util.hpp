@@ -52,6 +52,50 @@ void writeVectorOnStream(T v[], size_t n, std::ostream& os, std::string delim = 
   os.flush();
 }
 
+template<typename T>
+class GeometricProgression {
+public:
+  GeometricProgression(double r, T s)
+    : ratio(r), start(s), next(s)
+  {  }
+  
+  T getNext() {
+    T tmp =next;
+    next *= ratio;
+    return tmp; 
+  }
+
+  void rewind() {
+    next = start;
+  }
+private:
+  const double ratio;
+  const T start;
+  T next;
+};
+
+template<typename T>
+class LinearProgression {
+public:
+  LinearProgression(T s, T b)
+    : step(s), start(b), next(b) {}
+  
+  T getNext() {
+    T tmp = next;
+    next += step;
+    return tmp;
+  }
+
+  void rewind() {
+    next = start;
+  }
+  
+private:
+  T next;
+  const T step;
+  const T start;
+};
+
 
 void print_warning(const std::string &msg);
 void fatal_error(const std::string &msg, int exit_code);

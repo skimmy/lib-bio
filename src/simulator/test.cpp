@@ -11,6 +11,23 @@
 const int MC_SAMPLES = 2 << 22;
 
 void
+testUtils() {
+  std::cout << "\nUTILITY FUNCTIONS/CLASSES TESTS" << std::endl;
+
+  std::cout << "* Geometric progression\n";
+  GeometricProgression<int> geom(2,1);
+  for (size_t i = 0; i < 10; ++i) {
+    std::cout << geom.getNext() << std::endl;
+  }
+
+  std::cout << "* Linear Progression\n";
+  LinearProgression<double> lin(0.5,0);
+  for (size_t i = 0; i < 10; ++i) {
+    std::cout << lin.getNext() << std::endl;
+  }
+}
+
+void
 testProbFunctions() {
   std::cout << "\nPROBABILITY FUNCTIONS TESTS\n\n";
 
@@ -28,7 +45,7 @@ testProbFunctions() {
   double f_0 [3] = {0.5, 0.25, 0.25};
   median_idx = medianFromFrequency<double>(f_0, 3);
   std::cout << "  Median for {0.5, 0.25, 0.25}\t\t"
-	    <<  f_0[median_idx]  << " i: " << median_idx << "\n";
+	    <<  f_0[median_idx]  << " i: " << median_idx << "\n";  
 
 }
 
@@ -461,13 +478,18 @@ void testAll() {
   std::cout << "--------------------------------\n";
   std::cout << "          TESTING MODE          \n";
   std::cout << "--------------------------------\n";
+  //testUtils();
+  //testProbFunctions();
+  
   //  testSampleEstimators();
   //  testScoreFunction();
   //  testLookupTables();
   //testPeq();
   //testApproximatedExpectedScore();
-  //testProbFunctions();
+  
+  
   editDistanceTests();
+
   //editDistanceVerifySecondOrderFunction();
   //  testAverageDPMatrix(Options::opts.N);
 }

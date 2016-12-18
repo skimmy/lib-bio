@@ -592,6 +592,10 @@ private:
 SampleEstimates
 differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delta, size_t k_max) {
 
+  // TODO Need a way to parametrize the output checkpoints
+  GeometricProgression<size_t> power_2(2,8);
+  LinearProgression<size_t> step_10((2 << 16),(2<<16));
+
   size_t* v0 = new size_t[n+1];
   size_t* v1 = new size_t[n+1];
 
@@ -634,18 +638,23 @@ differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delt
     rho = std::sqrt( (4*var_n_2 + var_n) / ((double)k) );
 
     // middle checkpoint
-    if (k % 50000 == 0) {
+    if (k == step_10.getCurrent()) {
+
       std::cout << est_n.sampleSize()
 		<< "\t" << mean_n << "\t" << var_n << "\t" << est_n.medianForSampleDistribution()
 		<< "\t" << mean_n_2 << "\t" << var_n_2 << "\t" << est_n_2.medianForSampleDistribution()
 		<< std::endl;
-	//		<< "\t" << diff_n << "\t" << rho << std::endl;
-      if (k % 500000 == 0) {
-	// print density to file
-	est_n.writeFrequencyOnFile("/tmp/density2_" + std::to_string(k) + ".txt");
-      }
+      step_10.getNext();
     }
-
+    
+    if (k == power_2.getCurrent()) {
+      
+      // print density to file
+      est_n.writeFrequencyOnFile("/tmp/density2_" + std::to_string(k) + ".txt");
+      power_2.getNext();
+    }
+    
+    
     // continue looping as long as
     //      rho > threshold
     // and maximum iterations threshold is not reached

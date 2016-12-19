@@ -99,9 +99,10 @@ public:
   }
   
 private:
-  T next;
   const T step;
   const T start;
+  T next;
+
 };
 
 

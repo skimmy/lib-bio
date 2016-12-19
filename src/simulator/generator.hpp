@@ -2,8 +2,8 @@
 #define GENERATOR_H
 
 struct Read {
+  size_t j;  
   std::string r;
-  size_t j;
   Read(const std::string& s, size_t p) : j(p), r(s) {}
   // !!! WARNING '>' is used to make the priority queue work in ascending order
   bool operator < (const Read& other) const { return this->j > other.j; }

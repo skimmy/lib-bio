@@ -103,7 +103,7 @@ void outputResults() {
     if (Options::opts.mode == OpMode::Oracle) {
       double appNumDen[2];
       for (size_t i = 0; i < Options::opts.m+1; ++i) {
-	double appE = approximatedScore(i, appNumDen);
+	approximatedScore(i, appNumDen);
 	std::cout << i << "\t" <<
 	  oraclePoints[i].sumScore << "\t" << oraclePoints[i].count << "\t" <<
 	  oraclePoints[i].sumNum << "\t" << oraclePoints[i].sumDen << "\t" <<
@@ -153,9 +153,6 @@ void offlineSimulation() {
   
   size_t N = Options::opts.N;
   size_t m = Options::opts.m;
-  size_t M = Options::opts.M;
-  size_t Nbar = N - m + 1;
-  double pe = Options::opts.pe; 
   
   ref = new char[N];
   generateIIDGenome(N,ref);
@@ -178,7 +175,6 @@ void offlineSimulation() {
     reads.pop();
     size_t s = m - (r2.j - r1.j);
     evaluateChainRelation(r1, r2, s);
-    int dh = -1;
 
     if (s <= m) {
       onHole = false;
@@ -207,7 +203,6 @@ void onlineSimulation() {
 
   size_t N = Options::opts.N;
   size_t m = Options::opts.m;
-  size_t M = Options::opts.M;  
   
   GenomeSegment g(N, m, MAX_GENOME_SEGMENT_LENGTH);
   generateFirstGenomeSegment(g);

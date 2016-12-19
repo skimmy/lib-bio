@@ -80,7 +80,7 @@ testSampleEstimators() {
 }
 
 void testApproximatedExpectedScore() {
-  for (int s = 0; s < Options::opts.m + 1; ++s) {
+  for (int s = 0; s < (int)Options::opts.m + 1; ++s) {
     std::cout << s << "\t" << approximatedScore(s) << "\n";
   }
 }
@@ -97,7 +97,6 @@ void testPeq() {
   }
   // joint probability distribution (R1 = x, R2 = y | R0 = tBase)
   double x = 0;
-  size_t i,j;
   char R1,R2;
   for (int i = 0; i < MC_SAMPLES; ++i) {
     char tBase = bases[rand() & 0x03];
@@ -110,7 +109,7 @@ void testPeq() {
     if (x < pe) {
       R2 = randomMutation(tBase);
     }
-    jointProb[revBases[R1]][revBases[R2]]++;
+    jointProb[(int)revBases[(int)R1]][(int)revBases[(int)R2]]++;
   }
   std::cout << "\n";
   for (int i = 0; i < 4; i++) {
@@ -220,8 +219,8 @@ testEditDistanceExhaustive(size_t n) {
   std::string s1(n,'A');
   std::string s2(n,'A');
   s1[1] = 'T';
-  for (int i = 0; i < n; ++i) {
-    for (int bi = 0; bi < 4; ++bi) {
+  for (size_t i = 0; i < n; ++i) {
+    for (size_t bi = 0; bi < 4; ++bi) {
       s2[i] = bases[bi];
       size_t d = editDistance(s1,s2);
       dist += d;
@@ -452,24 +451,24 @@ editDistanceVerifySecondOrderFunction() {
 void
 testAverageDPMatrix(size_t n) {
   double** dpMatrix = new double*[n+1];
-  for (int i = 0; i <= n; ++i) {
+  for (size_t i = 0; i <= n; ++i) {
     dpMatrix[i] = new double[n+1];
   }
 
   computeAverageDPMatrix(dpMatrix, n, n);
 
-  for (int i = 0; i <= n; ++i) {
+  for (size_t i = 0; i <= n; ++i) {
     std::cout << dpMatrix[i][i] << std::endl;
   }
 
-  for (int i = 0; i <= n; ++i) {
-    for (int j = 0; j <=n; ++j) {
+  for (size_t i = 0; i <= n; ++i) {
+    for (size_t j = 0; j <=n; ++j) {
       std::cout << dpMatrix[i][j] << "\t";
     }
     std::cout << "\n";
   }
 
-  for (int i = 0; i <= n; ++i) {
+  for (size_t i = 0; i <= n; ++i) {
     delete[] dpMatrix[i];
   }
   delete[] dpMatrix;

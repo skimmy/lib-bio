@@ -580,6 +580,14 @@ public:
     os.close();
   }
 
+  SampleEstimates toSampleEstimates() const {
+    SampleEstimates est;
+    est.sampleSize = k;
+    est.sampleMean = sampleMean();
+    est.sampleVariance = sampleVariance();
+    return est;
+  }
+
 private:
   size_t k;
   size_t n;
@@ -589,7 +597,7 @@ private:
 };
 
 // Computes 2 e(n/2) - e(n) with error < (precison) * (value)
-SampleEstimates
+std::vector<SampleEstimates>
 differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delta, size_t k_max) {
 
   // TODO Need a way to parametrize the output checkpoints
@@ -638,20 +646,24 @@ differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delt
     rho = std::sqrt( (4*var_n_2 + var_n) / ((double)k) );
 
     // middle checkpoint
-    if (k == step_10.getCurrent()) {
+    /* if (k == step_10.getCurrent()) {
 
       std::cout << est_n.sampleSize()
 		<< "\t" << mean_n << "\t" << var_n << "\t" << est_n.medianForSampleDistribution()
 		<< "\t" << mean_n_2 << "\t" << var_n_2 << "\t" << est_n_2.medianForSampleDistribution()
 		<< std::endl;
       step_10.getNext();
-    }
+      }*/
     
     if (k == power_2.getCurrent()) {
       
       // print density to file
       est_n.writeFrequencyOnFile("/tmp/density2_" + std::to_string(k) + ".txt");
       power_2.getNext();
+      std::cout << est_n.sampleSize()
+		<< "\t" << mean_n << "\t" << var_n << "\t" << est_n.medianForSampleDistribution()
+		<< "\t" << mean_n_2 << "\t" << var_n_2 << "\t" << est_n_2.medianForSampleDistribution()
+		<< std::endl;
     }
     
     
@@ -662,12 +674,11 @@ differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delt
     
   delete[] v1;
   delete[] v0;
-    
-  SampleEstimates est;
-  est.sampleMean = diff_n;
-  est.sampleVariance = z_delta *rho;
-  est.sampleSize = k;
-  return est;
+  std::vector<SampleEstimates> estimates(2);
+  estimates[0] = est_n_2.toSampleEstimates();
+  estimates[1] = est_n.toSampleEstimates();
+
+  return estimates;
 }
 
 // ----------------------------------------------------------------------

@@ -54,7 +54,7 @@ void initSimulator() {
   revBases['G'] = revBases['g'] = 2;
   revBases['T'] = revBases['t'] = 3;
   scoreDist = EmpiricalDistribution(0,1,Options::opts.empiricalDistributionStep);
-  srand(time(NULL));
+  initRandomGenerator();
   initUtil();
   initProbabilities();
   initChainMatrix();

@@ -1,6 +1,36 @@
 #include "common.hpp"
 
 #include <iostream>
+#include <random>
+
+struct RandGen
+{
+  std::mt19937 gen;
+  RandGen(std::mt19937 g) {
+    gen = g;
+    basesIdx = new std::uniform_int_distribution<>(0,3);
+  }
+  
+  std::uniform_int_distribution<>* basesIdx;
+
+  int nextBaseIdx() { return (*basesIdx)(gen); }
+  
+};
+
+RandGen* randGen;
+
+void
+initRandomGenerator() {
+  srand(time(NULL));
+  std::random_device rd;
+  std::mt19937 gen(rd());  
+  randGen = new RandGen(gen);
+}
+
+int randomBaseIndex() {
+  //  return (rand() & 0x3);
+  return randGen->nextBaseIdx();
+}
 
 char baseComplement(char b) {
   switch(b) {
@@ -38,13 +68,13 @@ void simpleIIDErrors(std::string& s, double pe) {
 
 void generateIIDGenome(size_t N, char* S) {		
   for (size_t i = 0; i < N; ++i) {		
-    S[i] = bases[rand() & 0x3];		
+    S[i] = bases[randomBaseIndex()];		
   }		
 }
 
 void generateIIDString(std::string& s) {
   for (size_t i = 0; i < s.size(); ++i) {
-    s[i] = bases[rand() & 0x03];
+    s[i] = bases[randomBaseIndex()];
   }
 }
 

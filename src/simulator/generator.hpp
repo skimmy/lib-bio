@@ -9,6 +9,9 @@ struct Read {
   bool operator < (const Read& other) const { return this->j > other.j; }
 };
 
+void
+initRandomGenerator();
+
 void simpleIIDErrors(std::string& s, double pe);
 
 void generateIIDGenome(size_t N, char* S);

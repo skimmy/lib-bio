@@ -339,7 +339,11 @@ editDistanceOpMode() {
     double precision = Options::opts.precision;
     double z_confidence = Options::opts.confidence;
     std::vector<SampleEstimates> est = differenceBoundedRelativeErrorEstimate(n, precision, z_confidence, k_max);
-    std::cout << est[1].sampleSize << "\t" << est[1].sampleMean  << "\t" << est[1].sampleVariance << "\n";
+    std::cout << std::endl;
+    std::cout << (n>>1) << "\t" << est[0].sampleSize << "\t"
+	      << est[0].sampleMean  << "\t" << est[0].sampleVariance << "\n";    
+    std::cout << n << "\t" << est[1].sampleSize
+	      << "\t" << est[1].sampleMean  << "\t" << est[1].sampleVariance << "\n";
     return;
   }
   

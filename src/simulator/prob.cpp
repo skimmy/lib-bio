@@ -58,13 +58,9 @@ void initProbabilities() {
   power_qeq_lookup = new double[m+1];
   approxExpScoreNum = new double[m+1];
   approxExpScoreDen = new double[m+1];
-  for (size_t s = 0; s <= m; ++s) {
+  for (int s = 0; s <= m; ++s) {
     power_peq_lookup[s] = pow(p_equal_calls, s);
     power_qeq_lookup[s] = pow(q_equal_calls, s);
-
-    //    double tildeI = pow(p_equal_calls, s * p_equal_calls) *
-    //      pow( q_equal_calls, s * ( 1 - p_equal_calls ));
-
     double tmp = p_equal_calls * p_equal_calls + q_equal_calls* ( 1 - p_equal_calls );
     double tildeI = pow(tmp, s );
     approxExpScoreNum[s] = pow(4,s) * tildeI;
@@ -134,8 +130,6 @@ double overlappingStringsSum(const std::string& s1, const std::string& s2) {
 double overlappingStringsSumWithErr(const std::string& s1, const std::string& s2) {
   double sum = 0.0;
   size_t m = Options::opts.m;
-  double peq = p_equal_calls;
-  double qeq = 1.0 - p_equal_calls;
   for (size_t s = 1; s <= m-1; ++s) {
     // WARNING: If needed here we can use lookup tables to make things faster
     double tab = indicatorErr(s1, s2, s);

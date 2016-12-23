@@ -4,11 +4,6 @@
 #include <memory>
 #include <iostream>
 
-// DEPRECATED
-#define EDIT_DISTANCE_MONTE_CARLO 1
-#define EDIT_DISTANCE_MONTE_CARLO_COMPLETE 2
-#define EDIT_DISTANCE_EXHAUSTIVE_ENC 4
-
 #define EDIT_DISTANCE_ESTIMATE_EXHAUSTIVE 0x1
 #define EDIT_DISTANCE_ALGORITHM_QUADRATIC 0x2
 #define EDIT_DISTANCE_INFO_PARTIAL        0x4
@@ -162,7 +157,7 @@ editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta);
 SampleEstimates
 editDistanceRelativeErrorEstimates(size_t n, double e_model, double precision, double z_delta);
 
-SampleEstimates
+std::vector<SampleEstimates>
 differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delta, size_t k_max);
 
 #endif

@@ -50,7 +50,7 @@ double elementsSumDoubleMatrix(double** matrix, size_t n, size_t m) {
 }
 
 void printString(char* s, size_t n) {
-  for (int i = 0; i < n; ++i) {
+  for (size_t i = 0; i < n; ++i) {
     std::cout << s[i];
   }
 }
@@ -69,18 +69,17 @@ uint64_t string2Encode(const std::string&s) {
   size_t n = MAX(32, s.size());
   uint64_t mask = 0;
   uint64_t enc = 0;
-  for (int i = 0; i < n; ++i) {
-    uint64_t b = revBases[s[i]];
+  for (size_t i = 0; i < n; ++i) {
+    uint64_t b = revBases[(size_t)s[i]];
     enc = enc | ( (b & 0x3) << 2*i );
     mask = mask | (0x3 << 2*i);
   }
-  //  std::cout << "\n++ " << enc << '\t' << mask << '\t' << (enc & mask) << '\n';
-  return (enc & mask);// ( ((uint64_t)-1) >> (64 - 2*n));
+  return (enc & mask);
 }
 
 std::string encoding2String(uint64_t e, size_t n) {
   std::string s;
-  for (int i = 0; i < n; ++i) {
+  for (size_t i = 0; i < n; ++i) {
     s += bases[e & 0x03];
     e = e >> 2;
   }
@@ -89,7 +88,7 @@ std::string encoding2String(uint64_t e, size_t n) {
 
 size_t hammingDistance(const char* s1, const char* s2, size_t m) {
   size_t d = 0;
-  for (int i = 0; i < m; ++i) {
+  for (size_t i = 0; i < m; ++i) {
     if (s1[i] != s2[i]) {
       ++d;
     }
@@ -105,7 +104,7 @@ size_t hammingDistance(const std::string& s1, const std::string& s2, size_t m) {
 size_t prefixSuffixHammingDistance(const std::string& s1, const std::string& s2, size_t k) {
   size_t d = 0;
   size_t md = s2.length() - k;
-  for (int i = 0; i < k; ++i, ++md) {
+  for (size_t i = 0; i < k; ++i, ++md) {
     if (s2[i] != s1[md]) {
       d++;
     }
@@ -126,7 +125,7 @@ size_t bestHammingOverlap(const std::string& s1, const std::string& s2) {
 
 
 void printVec(size_t* v, size_t n) {
-  for (int i =0; i <n;i++){
+  for (size_t i =0; i <n;i++){
     std::cout << v[i] << ' ';
   }
   std::cout << std::endl;
@@ -140,6 +139,7 @@ Read randomRead(size_t m) {
   generateIIDGenome(m,tmp);
   Read r(std::string(tmp), 0);
   delete[] tmp;
+  return r;
 }
 
 // Error and warnings

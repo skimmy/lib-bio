@@ -54,7 +54,7 @@ void initSimulator() {
   revBases['G'] = revBases['g'] = 2;
   revBases['T'] = revBases['t'] = 3;
   scoreDist = EmpiricalDistribution(0,1,Options::opts.empiricalDistributionStep);
-  srand(time(NULL));
+  initRandomGenerator();
   initUtil();
   initProbabilities();
   initChainMatrix();
@@ -103,7 +103,7 @@ void outputResults() {
     if (Options::opts.mode == OpMode::Oracle) {
       double appNumDen[2];
       for (size_t i = 0; i < Options::opts.m+1; ++i) {
-	double appE = approximatedScore(i, appNumDen);
+	approximatedScore(i, appNumDen);
 	std::cout << i << "\t" <<
 	  oraclePoints[i].sumScore << "\t" << oraclePoints[i].count << "\t" <<
 	  oraclePoints[i].sumNum << "\t" << oraclePoints[i].sumDen << "\t" <<
@@ -153,9 +153,6 @@ void offlineSimulation() {
   
   size_t N = Options::opts.N;
   size_t m = Options::opts.m;
-  size_t M = Options::opts.M;
-  size_t Nbar = N - m + 1;
-  double pe = Options::opts.pe; 
   
   ref = new char[N];
   generateIIDGenome(N,ref);
@@ -178,7 +175,6 @@ void offlineSimulation() {
     reads.pop();
     size_t s = m - (r2.j - r1.j);
     evaluateChainRelation(r1, r2, s);
-    int dh = -1;
 
     if (s <= m) {
       onHole = false;
@@ -207,7 +203,6 @@ void onlineSimulation() {
 
   size_t N = Options::opts.N;
   size_t m = Options::opts.m;
-  size_t M = Options::opts.M;  
   
   GenomeSegment g(N, m, MAX_GENOME_SEGMENT_LENGTH);
   generateFirstGenomeSegment(g);
@@ -343,9 +338,12 @@ editDistanceOpMode() {
     size_t k_max = Options::opts.k;
     double precision = Options::opts.precision;
     double z_confidence = Options::opts.confidence;
-    //    SampleEstimates est = editDistanceErrorBoundedEstimates(n, precision, z_confidence);
-    SampleEstimates est = differenceBoundedRelativeErrorEstimate(n, precision, z_confidence, k_max);
-    std::cout << est.sampleSize << "\t" << est.sampleMean  << "\t" << est.sampleVariance << "\n";
+    std::vector<SampleEstimates> est = differenceBoundedRelativeErrorEstimate(n, precision, z_confidence, k_max);
+    std::cout << std::endl;
+    std::cout << (n>>1) << "\t" << est[0].sampleSize << "\t"
+	      << est[0].sampleMean  << "\t" << est[0].sampleVariance << "\n";    
+    std::cout << n << "\t" << est[1].sampleSize
+	      << "\t" << est[1].sampleMean  << "\t" << est[1].sampleVariance << "\n";
     return;
   }
   

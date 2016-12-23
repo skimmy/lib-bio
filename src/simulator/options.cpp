@@ -165,10 +165,6 @@ void parseArguments(int argc, char** argv) {
       exit(1);
     }
   }
-
-  if (Options::opts.verbose) {
-    printArguments();
-  }
 }
 
 

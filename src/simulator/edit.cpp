@@ -46,7 +46,7 @@ std::unique_ptr<double[]> extractInsertionArray(const EditDistanceInfo* v, size_
 size_t**
 allocDPMatrix(size_t n, size_t m) {
   size_t** dpMatrix = new size_t*[n+1];
-  for (int i = 0; i <= n; ++i) {
+  for (size_t i = 0; i <= n; ++i) {
     dpMatrix[i] = new size_t[m+1];
   }
   return dpMatrix;
@@ -54,7 +54,7 @@ allocDPMatrix(size_t n, size_t m) {
 
 void
 freeDPMatrix(size_t** dpMatrix, size_t n, size_t m) {
-  for (int i = 0; i <= n; ++i) {
+  for (size_t i = 0; i <= n; ++i) {
     delete[] dpMatrix[i];
   }
   delete[] dpMatrix;
@@ -84,7 +84,7 @@ editDistanceLinSpace(const std::string& s1, const std::string& s2, size_t* v0, s
   size_t n1 = s1.size();
   size_t n2 = s2.size();
   size_t n_max = MAX(n1, n2);
-  for (int i = 0; i < n_max+1; ++i) {
+  for (size_t i = 0; i < n_max+1; ++i) {
     v0[i] = i;
   }
 
@@ -164,8 +164,8 @@ EditDistanceInfo editDistanceLinSpaceInfo(const std::string& s1, const std::stri
 size_t
 editDistanceEncoded(uint64_t s1, size_t n1, uint64_t s2, size_t n2, size_t** dpMatrix) {
 
-  for (int i = 1; i < n1+1; ++i) {
-    for(int j = 1; j < n2+1; ++j) {
+  for (size_t i = 1; i < n1+1; ++i) {
+    for(size_t j = 1; j < n2+1; ++j) {
       uint64_t x = ( s1 >> 2*(i-1) ) & 0x3; // pre compute matrix {A,C,G,T} x [1...n]
       uint64_t y = ( s2 >> 2*(j-1) ) & 0x3;
       size_t delta = (x == y) ? 0 : 1; // try to find an alternative not involving if
@@ -225,8 +225,8 @@ editDistanceMat(const std::string& s1, const std::string& s2, size_t** dpMatrix)
     dpMatrix[0][j] = j;
   }
   
-  for (int i = 1; i < n+1; ++i) {
-    for(int j = 1; j < m+1; ++j) {
+  for (size_t i = 1; i < n+1; ++i) {
+    for(size_t j = 1; j < m+1; ++j) {
       size_t delta = (s1[i-1] == s2[j-1]) ? 0 : 1;
       dpMatrix[i][j] = MIN( MIN(dpMatrix[i-1][j]+1, dpMatrix[i][j-1]+1) , dpMatrix[i-1][j-1] + delta ) ;
     }
@@ -246,7 +246,7 @@ editDistance(const std::string& s1, const std::string& s2) {
   editDistanceMat(s1, s2, dpMatrix);
  
   size_t dist = dpMatrix[n][m];
-  for (int i = 0; i < n+1; ++i) {
+  for (size_t i = 0; i < n+1; ++i) {
     delete[] dpMatrix[i];   
   }
   delete[] dpMatrix;
@@ -284,7 +284,7 @@ editDistSamples(size_t n, size_t k_samples) {
   std::string s2(n,'N');
   size_t* v0 = new size_t[n];
   size_t* v1 = new size_t[n];
-  for (int k = 0; k < k_samples; ++k) {
+  for (size_t k = 0; k < k_samples; ++k) {
     generateIIDString(s1);
     generateIIDString(s2);
     v[k] = editDistanceLinSpace(s1,s2,v0,v1);
@@ -356,7 +356,7 @@ sampleEditDistanceDistribution(size_t n, size_t* v0, size_t* v1) {
 double
 testExhaustiveEditDistanceEncoded(size_t n, double* freq) {
   size_t** dpMatrix = new size_t*[n+1];
-  for (int i = 0; i < n+1; ++i) {
+  for (size_t i = 0; i < n+1; ++i) {
     dpMatrix[i] = new size_t[n+1];
   }
 
@@ -380,7 +380,7 @@ testExhaustiveEditDistanceEncoded(size_t n, double* freq) {
       ed += 2*dist;
     }
   }
-  for (int i = 0; i < n+1; ++i) {
+  for (size_t i = 0; i < n+1; ++i) {
     delete[] dpMatrix[i];
   }
   delete[] dpMatrix;
@@ -397,7 +397,6 @@ editDistanceBacktrack(size_t** dpMatrix,const std::string& s1, const std::string
     size_t a = dpMatrix[i-1][j-1];
     size_t b = dpMatrix[i-1][j];
     size_t c = dpMatrix[i][j-1];
-    size_t x = dpMatrix[i][j];
     // Match case
     if (s1[i-1] == s2[j-1]) {
       info.edit_script = "M" + info.edit_script;
@@ -437,7 +436,7 @@ void editDistanceWithInfo(const std::string& s1, const std::string& s2, EditDist
   size_t n = s1.size();
   size_t m = s2.size();
   size_t** dpMatrix = new size_t*[n+1];
-  for (int i = 0; i < n+1; ++i) {
+  for (size_t i = 0; i < n+1; ++i) {
     dpMatrix[i] = new size_t[m+1];
   }
 
@@ -445,7 +444,7 @@ void editDistanceWithInfo(const std::string& s1, const std::string& s2, EditDist
   editDistanceBacktrack(dpMatrix, s1, s2, info);
   editInfoCompute(info);
 
-  for (int i = 0; i < n+1; ++i) {
+  for (size_t i = 0; i < n+1; ++i) {
     delete[] dpMatrix[i];
   }
   delete[] dpMatrix;
@@ -467,7 +466,7 @@ editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta) {
   size_t k_max = Options::opts.k;
   size_t sample = sampleEditDistanceDistribution(n, v0, v1);
   double mean_k = sample;
-  double var_k = 0, var_k_1 = 0;
+  double var_k = 0;
 
   double cumulative_sum = sample;
   double cumulative_quad_sum = sample * sample;
@@ -478,7 +477,6 @@ editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta) {
     cumulative_sum += sample;
     cumulative_quad_sum += (sample * sample);
     mean_k = cumulative_sum / ((double)k);
-    var_k_1 = var_k;
     var_k = ( cumulative_quad_sum - k*(mean_k*mean_k)  ) / ((double)(k-1));
     if (var_k * ( z_delta*z_delta ) < ((double)k) * ( precision * precision )) {
       break;
@@ -580,21 +578,30 @@ public:
     os.close();
   }
 
+  SampleEstimates toSampleEstimates() const {
+    SampleEstimates est;
+    est.sampleSize = k;
+    est.sampleMean = sampleMean();
+    est.sampleVariance = sampleVariance();
+    return est;
+  }
+
 private:
-  size_t k;
   size_t n;
   double cumulativeSum;
   double cumulativeSumSquare;
+  size_t k;
+
   size_t* frequency;
 };
 
 // Computes 2 e(n/2) - e(n) with error < (precison) * (value)
-SampleEstimates
+std::vector<SampleEstimates>
 differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delta, size_t k_max) {
 
   // TODO Need a way to parametrize the output checkpoints
   GeometricProgression<size_t> power_2(2,8);
-  LinearProgression<size_t> step_10((2 << 16),(2<<16));
+  LinearProgression<size_t> step_10(8,16);
 
   size_t* v0 = new size_t[n+1];
   size_t* v1 = new size_t[n+1];
@@ -638,7 +645,7 @@ differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delt
     rho = std::sqrt( (4*var_n_2 + var_n) / ((double)k) );
 
     // middle checkpoint
-    if (k == step_10.getCurrent()) {
+    if (k == step_10.getCurrent() && Options::opts.verbose) {
 
       std::cout << est_n.sampleSize()
 		<< "\t" << mean_n << "\t" << var_n << "\t" << est_n.medianForSampleDistribution()
@@ -652,6 +659,10 @@ differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delt
       // print density to file
       est_n.writeFrequencyOnFile("/tmp/density2_" + std::to_string(k) + ".txt");
       power_2.getNext();
+      // std::cout << est_n.sampleSize()
+      // 		<< "\t" << mean_n << "\t" << var_n << "\t" << est_n.medianForSampleDistribution()
+      // 		<< "\t" << mean_n_2 << "\t" << var_n_2 << "\t" << est_n_2.medianForSampleDistribution()
+      // 		<< std::endl;
     }
     
     
@@ -662,12 +673,11 @@ differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delt
     
   delete[] v1;
   delete[] v0;
-    
-  SampleEstimates est;
-  est.sampleMean = diff_n;
-  est.sampleVariance = z_delta *rho;
-  est.sampleSize = k;
-  return est;
+  std::vector<SampleEstimates> estimates(2);
+  estimates[0] = est_n_2.toSampleEstimates();
+  estimates[1] = est_n.toSampleEstimates();
+
+  return estimates;
 }
 
 // ----------------------------------------------------------------------

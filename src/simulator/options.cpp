@@ -178,55 +178,55 @@ parseArgumentsBoost(int argc, char** argv) {
   po::options_description opts_desc("All options");
   // set options
   opts_desc.add_options()
-    ("help,h","Show help message")
+    ("help,h","Show help message") // -h, --help
 
-    ("length,N", po::value<size_t>(&Options::opts.N),
+    ("length,N", po::value<size_t>(&Options::opts.N), // -N, --length
      "Size of the genome or strings in general")
 
-    ("read-length,m", po::value<size_t>(&Options::opts.m),
+    ("read-length,m", po::value<size_t>(&Options::opts.m), // -m ,--read-length
      "Length of the read")
 
-    ("read-count,M", po::value<size_t>(&Options::opts.M),
+    ("read-count,M", po::value<size_t>(&Options::opts.M), // -M, --read-count
      "Number of reads")
     
-    ("error-prob,e", po::value<double>(&Options::opts.pe),
+    ("error-prob,e", po::value<double>(&Options::opts.pe), // -e, --error-prob
      "Error probability")
 
-    ("max-error,P", po::value<double>(&Options::opts.precision),
+    ("max-error,P", po::value<double>(&Options::opts.precision), // -P, --max-error
      "The maximum error tollerated for estimation (epsilon)")
 
-    ("confidence,c", po::value<double>(&Options::opts.confidence),
+    ("confidence,c", po::value<double>(&Options::opts.confidence), // - , --confidence
      "Confidence interval as a multiple of sigmas of a normal distribution (delta)")
 
-    ("iterations,k", po::value<int>(&Options::opts.k),
+    ("iterations,k", po::value<int>(&Options::opts.k), // -k, --iterations
      "Number of iterations or samples")
 
-    ("input-reference,i",po::value<std::string>(&Options::opts.inputReference),
+    ("input-reference,i",po::value<std::string>(&Options::opts.inputReference), // -i, --input-reference
      "Reference DNA/RNA input file (fasta format)")
 
-    ("input-sam,S", po::value<std::string>(&Options::opts.inputSAM),
+    ("input-sam,S", po::value<std::string>(&Options::opts.inputSAM), // -S, --input-sam
      "Sam alignment input file")
 
-    ("output-density,D", po::value<std::string>(&Options::opts.outputDistribution),
+    ("output-density,D", po::value<std::string>(&Options::opts.outputDistribution), // -D, --output-density
      "File were density will be written. If left unspecified, no output will be produced")
 
-    ("output-distribution,C", po::value<std::string>(&Options::opts.outputCDF),
+    ("output-distribution,C", po::value<std::string>(&Options::opts.outputCDF), // -C, --output-distribution
      "File were distribution will be written. If left unspecified, no output will be produced")
 
-    ("approx-level,A", po::value<int>(&Options::opts.approxLevel),
+    ("approx-level,A", po::value<int>(&Options::opts.approxLevel), // -A, --approx-level
      "Set the approximation level")
 
-    ("operation-mode,O", po::value<int>(), "Sets the operation mode")
+    ("operation-mode,O", po::value<int>(), "Sets the operation mode") // -O, --operation-mode
 
-    ("sub-task,B", po::value<int>(&Options::opts.subTask),
-     "Defines the subtask for the operation mode selected")
+    ("sub-task,B", po::value<int>(&Options::opts.subTask), // -B, --sub-tast
+     "Defines the subtask for the operation mode selected") 
 
-    ("flags,f", po::value<int>(&Options::opts.optFlags),
+    ("flags,f", po::value<int>(&Options::opts.optFlags), // -f, --flads
      "Sets flags to define behavior of mode / subtask")
 
-    ("pipeline,p", "If set will run in pipeline")
+    ("pipeline,p", "If set will run in pipeline") // -p, --pipeline
 
-    ("verbose,v", "If set will run in verbose output")
+    ("verbose,v", "If set will run in verbose output") // -v, --verbose
     
     ; 
   

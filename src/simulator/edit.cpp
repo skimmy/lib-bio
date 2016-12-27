@@ -431,6 +431,135 @@ editDistanceBacktrack(size_t** dpMatrix,const std::string& s1, const std::string
   }
 }
 
+void
+closestToDiagonalBacktrack(size_t n, size_t m, size_t** dpMatrix, EditDistanceInfo& info) {
+  info.n_sub = 0;
+  info.n_del = 0;
+  info.n_ins = 0;
+  info.edit_script = "";
+
+  size_t i = n;
+  size_t j = m;
+  size_t a = 0, b = 0, c = 0, d = 0;
+  // backtrack until one edge is reached
+  while(i > 0 && j > 0) {
+    a = dpMatrix[i-1][j-1];
+    b = dpMatrix[i-1][j];
+    c = dpMatrix[i][j-1];
+    d = dpMatrix[i][j];
+    //    std::cout << info.edit_script << "\n";
+    //    std::cout << "(" << i << ", " << j <<") ";
+    
+    // Match
+    if ( (a == d) && ( a <= b) && (a <= c)) {
+      info.edit_script = "M" + info.edit_script;
+      i--; j--;
+      continue;
+    }
+    
+    // Substitution
+    if ( (a < b) && (a < c) ) {
+      info.n_sub++;
+      info.edit_script = "S" + info.edit_script;
+      i--; j--;
+      continue;
+    }
+    // Deletion
+    if ( (b < a) && (b < c) ) {
+      info.n_del++;
+      info.edit_script = "D" + info.edit_script;
+      i--;
+      continue;
+    }
+    // Insertion
+    if ( (c < a) && (c < b) ) {
+      info.n_ins++;
+      info.edit_script = "I" + info.edit_script;
+      j--;
+      continue;
+    }
+    // Tie between all operations
+    if ( (a == b) && (b == c) ) {
+      if (i < j) {
+	info.n_ins++;
+	info.edit_script = "I" + info.edit_script;
+	j--;
+	continue;
+      }
+      if (i == j) {
+	info.n_sub++;
+	info.edit_script = "S" + info.edit_script;
+	i--; j--;
+	continue;
+      }
+      if (i > j) {
+	info.n_del++;
+	info.edit_script = "D" + info.edit_script;
+	i--;
+	continue;
+      }
+    }
+
+    // Tie between sub and del
+    if (a == b) {
+      if (i > j) {
+	info.n_del++;
+	info.edit_script = "D" + info.edit_script;
+	i--;
+      } else {
+	info.n_sub++;
+	info.edit_script = "S" + info.edit_script;
+	i--; j--;
+      }
+      continue;	
+    }
+    // Tie between sub and ins
+    if (a == c) {
+      if (i < j) {
+	info.n_ins++;
+	info.edit_script = "I" + info.edit_script;
+	j--;
+      } else {
+	info.n_sub++;
+	info.edit_script = "S" + info.edit_script;
+	i--; j--;
+      }
+      continue;
+    }
+
+    // Tie between del and ins
+    if (b == c) {
+      if (j <= i) {
+	info.n_del++;
+	info.edit_script = "D" + info.edit_script;
+	i--;
+      } else {
+	info.n_ins++;
+	info.edit_script = "I" + info.edit_script;	
+	j--;
+      }
+      continue;
+
+    }
+  }
+
+  // backtrack the left edge (if needed)
+  while(i > 0) {
+    info.n_del++;
+    info.edit_script = "D" + info.edit_script;
+    i--;
+  }
+
+  // bacltrack the top edge (if needed)
+  while(j > 0) {
+    info.n_ins++;
+    info.edit_script  = "I" + info.edit_script;
+    j--;
+  }
+  
+
+}
+
 
 void editDistanceWithInfo(const std::string& s1, const std::string& s2, EditDistanceInfo& info) {
   size_t n = s1.size();
@@ -678,6 +807,61 @@ differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delt
   estimates[1] = est_n.toSampleEstimates();
 
   return estimates;
+}
+
+// ----------------------------------------------------------------------
+//                      SCRIPT DISTRIBUTION FUNCTIONS
+// ----------------------------------------------------------------------
+
+void
+scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix) {
+  size_t ** dpMatrix = allocMatrix<size_t>(n+1,m+1);
+  for (size_t i = 0; i <= n; ++i) {
+    for (size_t j = 0; j <= m; ++j) {
+      distMatrix[i][j] = 0;
+    }
+  }
+
+  std::string s1(n,'N');
+  std::string s2(n,'N');
+  EditDistanceInfo info;
+
+  for (size_t l = 0; l < k; ++l) {
+    generateIIDString(s1);
+    generateIIDString(s2);
+    editDistanceMat(s1, s2, dpMatrix);
+    closestToDiagonalBacktrack(n, m, dpMatrix, info);
+    // refresh the distribution matrix
+    size_t i = 0, j = 0;
+    distMatrix[i][j]++;
+    //    for (char c : info.edit_script) {
+    for (size_t t = 0; t < info.edit_script.size(); ++t) {
+      char c = info.edit_script[t];
+      switch(c) {
+      case 'M':
+	i++; j++;
+	break;
+      case 'S':
+	i++; j++;
+	break;
+      case 'I':
+	j++;
+	break;
+      case 'D':
+	i++;
+	break;
+      }
+      distMatrix[i][j]++;
+    }
+    
+    // DEBUG
+    //    std::cout << info;
+    //    std::cout << "\t" << info.edit_script << "\t" << s1 << " " << s2;
+    //    std::cout << std::endl;
+    //printMatrix<size_t>(dpMatrix,n+1,n+1);    
+  }
+  printMatrix<size_t>(distMatrix,n+1,m+1);
+  freeMatrix<size_t>(n+1, m+1, dpMatrix);
 }
 
 // ----------------------------------------------------------------------

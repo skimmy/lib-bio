@@ -331,8 +331,16 @@ editDistanceOpMode() {
   // no sample matrix
   int flags = Options::opts.optFlags;
   size_t n = Options::opts.N;
+  int task = Options::opts.subTask;
   edOut->distPDF = new double[n+1];
   std::fill_n(edOut->distPDF, n+1, 0);
+
+  if (task == EDIT_DISTANCE_SUBTASK_SCRIPT_DIST) {
+    size_t** freqMat = allocMatrix<size_t>(n+1, n+1);
+    scriptDistributionMatrix(n, n, Options::opts.k, freqMat);
+    freeMatrix<size_t>(n+1, n+1, freqMat);
+    return;
+  }
 
   if (flags & EDIT_DISTANCE_BOUNDED_ERROR) {
     size_t k_max = Options::opts.k;

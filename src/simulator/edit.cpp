@@ -814,7 +814,7 @@ differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delt
 // ----------------------------------------------------------------------
 
 void
-scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix) {
+scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix, std::vector<std::string>* scripts) {
   size_t ** dpMatrix = allocMatrix<size_t>(n+1,m+1);
   for (size_t i = 0; i <= n; ++i) {
     for (size_t j = 0; j <= m; ++j) {
@@ -852,6 +852,10 @@ scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix) {
 	break;
       }
       distMatrix[i][j]++;
+    }
+
+    if (scripts != nullptr) {
+      scripts->push_back(info.edit_script);
     }
     
     // DEBUG

@@ -86,7 +86,8 @@ void clearSimulator() {
 void outputResults() {
   if (Options::opts.mode == OpMode::EditDist) {
     // CDF ouput requested (-D <distfile> option)
-    if (!Options::opts.outputDistribution.empty()) {
+    if (!Options::opts.outputDistribution.empty() &&
+	Options::opts.subTask != EDIT_DISTANCE_SUBTASK_SCRIPT_DIST) {
       if (edOut->distPDF) {
 	size_t n = Options::opts.N;	
 	std::ofstream ofs(Options::opts.outputDistribution, std::ofstream::out);      
@@ -337,8 +338,21 @@ editDistanceOpMode() {
 
   if (task == EDIT_DISTANCE_SUBTASK_SCRIPT_DIST) {
     size_t** freqMat = allocMatrix<size_t>(n+1, n+1);
-    scriptDistributionMatrix(n, n, Options::opts.k, freqMat);
+    std::vector<std::string>* allScripts = nullptr;
+    if (!Options::opts.outputDistribution.empty()) {
+      allScripts = new std::vector<std::string>();
+    }
+    scriptDistributionMatrix(n, n, Options::opts.k, freqMat, allScripts);
     freeMatrix<size_t>(n+1, n+1, freqMat);
+    if (allScripts != nullptr) {
+      std::ofstream ofs(Options::opts.outputDistribution, std::ofstream::out);
+      for (std::string script : *allScripts) {
+	ofs << script << "\n";
+      }
+      ofs.close();
+      delete allScripts;
+      allScripts = nullptr;
+    }
     return;
   }
 

@@ -177,8 +177,11 @@ differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delt
  * @param m number of columns of the matrix
  * @param k number of samples to be used
  * @param distMatrix pointer to a matrix that will contain the frequencies (i.e., output)
+ * @param scripts a pointer to a standard vector that will contain the scripts. 
+ *  If set to <code>nullptr</code> no script will be stored
  */
 void
-scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix);
+scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix,
+			 std::vector<std::string>* scripts = nullptr);
 
 #endif

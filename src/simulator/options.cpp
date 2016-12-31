@@ -174,11 +174,16 @@ void
 parseArgumentsBoost(int argc, char** argv) {
   logWarning("Boost program_options test in progress");
 
+  std::string infoArg = "";
+
   setDefualtParams();
   po::options_description opts_desc("All options");
   // set options
   opts_desc.add_options()
-    ("help,h","Show help message") // -h, --help
+
+    ("info", po::value<std::string>(&infoArg), "Gives information")
+    
+    ("help,h", "Show help message") // -h, --help
 
     ("length,N", po::value<size_t>(&Options::opts.N), // -N, --length
      "Size of the genome or strings in general")
@@ -234,6 +239,12 @@ parseArgumentsBoost(int argc, char** argv) {
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, opts_desc), vm);
   po::notify(vm);
+
+  // When info is requested every other option is ignored
+  if (vm.count("info")) {
+    std::cout << "Information on " << vm["info"].as<std::string>() << std::endl;
+    exit(0);
+  }
 
   // set parameters based on passed arguments
   if (vm.count("help")) {

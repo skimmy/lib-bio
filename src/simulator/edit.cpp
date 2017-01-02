@@ -4,6 +4,7 @@
 #include <memory>
 #include <cstring>
 #include <cmath>
+#include <limits>
 
 
 
@@ -252,6 +253,56 @@ editDistance(const std::string& s1, const std::string& s2) {
   delete[] dpMatrix;
   return dist;
 }
+
+// ----------------------------------------------------------------------
+//                    EDIT DISTANCE APPROXIMATIONS
+// ----------------------------------------------------------------------
+
+void
+editDistanceBandwiseApproxMat(const std::string& s1, const std::string& s2, size_t T, size_t** dpMatrix) {
+  size_t n = s1.size();
+  size_t m = s2.size();
+  size_t INF = std::numeric_limits<std::size_t>::max();
+  // init matrix assuming T < min{n,m} (the strictness is crucial to
+  // initialize the 'border' diagonals
+  for (size_t i = 0; i <= T; ++i) {
+    dpMatrix[i][0] = i;
+  }
+  for (size_t j = 0; j <= T; ++j) {
+    dpMatrix[0][j] = j;
+  }
+  for (size_t t = T+1; t <= m; ++t) {
+    dpMatrix[t - (T+1)][t] = INF;
+  }
+  for (size_t t = T+1; t <= n; ++t) {
+    dpMatrix[t][t-(T+1)] = INF;
+  }
+  for (size_t i = 1; i <= n; ++i) {
+    for (size_t j = MAX(0,i-T); j <= MIN(m,i+T); ++j) {
+      size_t delta = (s1[i-1] == s2[j-1]) ? 0 : 1;
+      dpMatrix[i][j] = MIN( dpMatrix[i-1][j-1] + delta,
+			    MIN(dpMatrix[i-1][j] + 1, dpMatrix[i][j-1] + 1));
+    }
+  }
+}
+
+size_t
+editDistanceBandwiseApprox(const std::string& s1, const std::string& s2, size_t T) {
+  size_t n = s1.size();
+  size_t m = s2.size();
+  size_t** dpMatrix = allocMatrix<size_t>(n+1, m+1);
+
+  editDistanceBandwiseApproxMat(s1, s2, T, dpMatrix);
+  
+  size_t dist = dpMatrix[n][m];
+
+  // DEBUG
+  printMatrix<size_t>(dpMatrix,n+1,m+1);
+  
+  freeMatrix<size_t>(n+1, m+1, dpMatrix);
+  return dist;
+}
+
 
 // ----------------------------------------------------------------------
 //                        EDIT DISTANCE SAMPLING

@@ -373,13 +373,13 @@ editDistanceTests() {
 
   std::cout << "\n* Relative Error Estimate Test\n\n";
   old_opt_k = Options::opts.k;
-  Options::opts.k = 300000000;
-  n = 1000;
+  Options::opts.k = 3000;
+  n = 100;
   double e_model = 0;
 
   // n = 35000;
   // double e_model = 18070;
-  prec = 0.001;
+  prec = 0.1;
   z = 2;
   estimates = editDistanceRelativeErrorEstimates(n, e_model, prec, z);
   std::cout << estimates.sampleSize << "\t" << estimates.sampleMean << "\t"
@@ -412,6 +412,11 @@ editDistanceTests() {
     delete[] sMat[i];
   }
   delete[] sMat;
+
+  std::cout << "\n* Bandwise Approximation Test\n\n";
+  std::string s1 = "ACGTACGT";
+  std::string s2 = "ACGTACGT";
+  editDistanceBandwiseApprox(s1 ,s2, 4);
 }
 
 

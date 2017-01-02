@@ -121,6 +121,9 @@ editDistanceBacktrack(size_t** dpMatrix, const std::string& s1, const std::strin
 void
 closestToDiagonalBacktrack(size_t n, size_t m, size_t** dpMatrix, EditDistanceInfo& info);
 
+size_t
+editDistanceBandwiseApprox(const std::string& s1, const std::string& s2, size_t T);
+
 
 /**
  * Use a Monte-Carlo sampling technique to estimate the edit distance between

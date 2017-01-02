@@ -10,6 +10,8 @@ def parseArguments():
     parser.add_argument("--matrix-file", dest="matFile", help="Name of file where matrix will be saved", default="matrix.txt")
     parser.add_argument("--max-file", dest="maxFile", help="Name of the file where maximum oscillation vectore will be saved",
                         default="max.txt")
+    parser.add_argument("--dist-file", dest="distFile", help="Name od file where distributions of operations will be saved",
+                        default="dist.txt")
     # parser.add_argument("opt", help="Required option")
     # parser.add_argument("-o", "--optional", dest='o', help="Optional flag", action='store_true')
     # parser.add_argument("-d", "--default", help="SWith default", default="Hello")
@@ -40,6 +42,22 @@ def printScripts(scripts):
 def printFrequencyMatrix(freqMat):
     for row in freqMat:
         print('\t'.join([str(x) for x in row]))
+
+def operationsDistribution(n, scripts):
+    subDist = np.zeros(n)
+    insDist = np.zeros(n)
+    delDist = np.zeros(n)
+    matchDist = np.zeros(n)
+    for script in scripts:
+        nSub = script.count('S')
+        nIns = script.count('I')
+        nDel = script.count('D')
+        nMatch = len(script) - (nSub + nIns + nDel)
+        subDist[nSub] += 1
+        insDist[nIns] += 1
+        delDist[nDel] += 1
+        matchDist[nMatch] += 1
+    return (matchDist, subDist, delDist, insDist)
 
 def calculateScriptsStats(n, scripts):
     mat = np.zeros((n,n))
@@ -74,10 +92,13 @@ if __name__ == "__main__":
     fh.close()
     # n+1 because the DP goes from (0,0) to (n,n) included
     freqMat, maxDistr = calculateScriptsStats(n+1, allScripts)
-#    printScripts(allScripts)
-#    printFrequencyMatrix(freqMat)
+    #    printScripts(allScripts)
+    #    printFrequencyMatrix(freqMat)
+    mDist, sDist, dDist, iDist = operationsDistribution(n+1, allScripts)
+    np.savetxt(args.distFile ,zip(np.arange(n+1), mDist, sDist, dDist, iDist), delimiter="\t")
     np.savetxt(args.matFile, freqMat, delimiter="\n")
     np.savetxt(args.maxFile, maxDistr, delimiter="\n")
+    
     
     
     

@@ -13,8 +13,9 @@
 #define EDIT_DISTANCE_BOUNDED_ERROR       0x20
 
 // edit distance subtasks
-#define EDIT_DISTANCE_SUBTASK_DEFUALT     0
-#define EDIT_DISTANCE_SUBTASK_SCRIPT_DIST 8
+#define EDIT_DISTANCE_SUBTASK_DEFUALT       0
+#define EDIT_DISTANCE_SUBTASK_SCRIPT_DIST   8
+#define EDIT_DISTANCE_SUBTASK_COMPARE_ALGS  32
 
 
 class EditDistanceSimOutput {
@@ -186,5 +187,9 @@ differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delt
 void
 scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix,
 			 std::vector<std::string>* scripts = nullptr);
+
+
+void
+compareEditDistanceAlgorithms(size_t n, size_t m, size_t k);
 
 #endif

@@ -4,7 +4,6 @@
 #include <memory>
 #include <cstring>
 #include <cmath>
-#include <limits>
 
 
 
@@ -262,7 +261,7 @@ void
 editDistanceBandwiseApproxMat(const std::string& s1, const std::string& s2, size_t T, size_t** dpMatrix) {
   size_t n = s1.size();
   size_t m = s2.size();
-  size_t INF = std::numeric_limits<std::size_t>::max();
+  size_t INF = n+m+1;
   // init matrix assuming T < min{n,m} (the strictness is crucial to
   // initialize the 'border' diagonals
   for (size_t i = 0; i <= T; ++i) {
@@ -498,8 +497,10 @@ closestToDiagonalBacktrack(size_t n, size_t m, size_t** dpMatrix, EditDistanceIn
     b = dpMatrix[i-1][j];
     c = dpMatrix[i][j-1];
     d = dpMatrix[i][j];
-    //    std::cout << info.edit_script << "\n";
-    //    std::cout << "(" << i << ", " << j <<") ";
+    // DEBUG
+    // std::cout << "(" << i <<", " << j << ")" << "\n";
+    // std::cout << a << "\t" << b << "\n";
+    // std::cout << c << "\t" << d << "\n";
     
     // Match
     if ( (a == d) && ( a <= b) && (a <= c)) {
@@ -553,6 +554,7 @@ closestToDiagonalBacktrack(size_t n, size_t m, size_t** dpMatrix, EditDistanceIn
 
     // Tie between sub and del
     if (a == b) {
+
       if (i > j) {
 	info.n_del++;
 	info.edit_script = "D" + info.edit_script;
@@ -908,14 +910,72 @@ scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix, std:
     if (scripts != nullptr) {
       scripts->push_back(info.edit_script);
     }
-    
-    // DEBUG
-    //    std::cout << info;
-    //    std::cout << "\t" << info.edit_script << "\t" << s1 << " " << s2;
-    //    std::cout << std::endl;
-    //printMatrix<size_t>(dpMatrix,n+1,n+1);    
+
   }
   printMatrix<size_t>(distMatrix,n+1,m+1);
+  freeMatrix<size_t>(n+1, m+1, dpMatrix);
+}
+
+// ----------------------------------------------------------------------
+//                        ALGORITHMS COMPARISON
+// ----------------------------------------------------------------------
+
+class AlgorithmComparisonResult {
+public:
+  EditDistanceInfo exactAlg;
+  EditDistanceInfo bandApproxAlg;
+};
+
+void
+compareEditDistanceAlgorithms(size_t n, size_t m, size_t k) {
+  size_t T = 2 * std::sqrt(n);
+  
+  size_t** dpMatrix = allocMatrix<size_t>(n+1, m+1);
+  std::vector<AlgorithmComparisonResult> results;
+  std::string s1(n, 'N');
+  std::string s2(m, 'N');
+  for (size_t l = 0; l < k; ++l) {
+    AlgorithmComparisonResult res;
+    generateIIDString(s1);
+    generateIIDString(s2);
+    //    s1 = "CGACGGAT";
+    //    s2 = "TCGACGGG";
+    editDistanceMat(s1, s2, dpMatrix);
+    closestToDiagonalBacktrack(s1.size(), s2.size(), dpMatrix, res.exactAlg);
+
+    //editDistanceBacktrack(dpMatrix, s1, s2, res.exactAlg);
+    //editInfoCompute(res.exactAlg);
+    
+    //    printMatrix<size_t>(dpMatrix,s1.size()+1,s2.size()+1);
+    //std::cout << res.exactAlg.edit_script << "\n";
+
+    //    T = s1.size() /2;
+    editDistanceBandwiseApproxMat(s1, s2, T, dpMatrix);
+    closestToDiagonalBacktrack(s1.size(), s2.size(), dpMatrix, res.bandApproxAlg);
+
+    //editDistanceBacktrack(dpMatrix, s1, s2, res.bandApproxAlg);
+    //editInfoCompute(res.bandApproxAlg);
+    //    printMatrix<size_t>(dpMatrix,s1.size()+1,s2.size()+1);
+    //    std::cout << res.bandApproxAlg.edit_script << "\n";
+    results.push_back(res);
+  }
+  // DEBUG
+  std::cout << "\nTASK: Compare algorithms\n";
+  size_t errors = 0;
+  double avg_err = 0;
+  for (AlgorithmComparisonResult res : results) {
+    if (res.exactAlg.distance() != res.bandApproxAlg.distance()) {
+      avg_err += res.bandApproxAlg.distance() - res.exactAlg.distance();
+      errors++;
+      std::cout << res.exactAlg << "  (" << res.exactAlg.distance() << ")\t\t"
+		<< res.bandApproxAlg << "  (" << res.bandApproxAlg.distance() << ")\t\t"
+		<< res.bandApproxAlg.distance() - res.exactAlg.distance() << "\n";
+      
+    }
+  }
+  avg_err /= (double)errors;
+  std::cout << "Errors:  " << errors << "\n";
+  std::cout << "Avg err: " << avg_err << "\n";
   freeMatrix<size_t>(n+1, m+1, dpMatrix);
 }
 

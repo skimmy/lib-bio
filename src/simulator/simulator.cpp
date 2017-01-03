@@ -336,6 +336,7 @@ editDistanceOpMode() {
   edOut->distPDF = new double[n+1];
   std::fill_n(edOut->distPDF, n+1, 0);
 
+  // TASK - Scripts Generation (8)
   if (task == EDIT_DISTANCE_SUBTASK_SCRIPT_DIST) {
     size_t** freqMat = allocMatrix<size_t>(n+1, n+1);
     std::vector<std::string>* allScripts = nullptr;
@@ -356,6 +357,13 @@ editDistanceOpMode() {
     return;
   }
 
+  // TASK - Algorithms comparison (32)
+  if (task == EDIT_DISTANCE_SUBTASK_COMPARE_ALGS) {
+    compareEditDistanceAlgorithms(n, n, Options::opts.k);
+    return;
+  }
+
+  // Task - Default (0)
   if (flags & EDIT_DISTANCE_BOUNDED_ERROR) {
     size_t k_max = Options::opts.k;
     double precision = Options::opts.precision;

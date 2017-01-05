@@ -4,6 +4,7 @@
 #include <memory>
 #include <cstring>
 #include <cmath>
+#include <map>
 
 
 
@@ -290,14 +291,8 @@ editDistanceBandwiseApprox(const std::string& s1, const std::string& s2, size_t 
   size_t n = s1.size();
   size_t m = s2.size();
   size_t** dpMatrix = allocMatrix<size_t>(n+1, m+1);
-
-  editDistanceBandwiseApproxMat(s1, s2, T, dpMatrix);
-  
-  size_t dist = dpMatrix[n][m];
-
-  // DEBUG
-  printMatrix<size_t>(dpMatrix,n+1,m+1);
-  
+  editDistanceBandwiseApproxMat(s1, s2, T, dpMatrix);  
+  size_t dist = dpMatrix[n][m];  
   freeMatrix<size_t>(n+1, m+1, dpMatrix);
   return dist;
 }
@@ -922,60 +917,104 @@ scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix, std:
 
 class AlgorithmComparisonResult {
 public:
-  EditDistanceInfo exactAlg;
-  EditDistanceInfo bandApproxAlg;
+  
+  ~AlgorithmComparisonResult() {
+    if (exactAlg) {
+      delete exactAlg;
+    }    
+    if (s1) {
+      delete s1;      
+    }
+    if (s2) {
+      delete s2;
+    }
+  }
+
+  void addExact(const EditDistanceInfo& info) {
+    if (this->exactAlg) {
+      delete this->exactAlg;
+    }
+    this->exactAlg = new EditDistanceInfo(info);
+  }
+
+  void addBandApprox(const EditDistanceInfo& info, size_t T) {
+    this->bandApproxAlg[T] = info;
+  }
+
+  bool hasExact() {
+    return (this->exactAlg != nullptr);
+  }
+
+  bool hasBandApproxWithT(size_t T) {
+    return (this->bandApproxAlg.count(T));
+  }
+
+  EditDistanceInfo getExact() {
+    return *(this->exactAlg);
+  }
+
+  EditDistanceInfo getBandApproxWithT(size_t T) {
+    return this->bandApproxAlg[T];
+  }
+
+private:
+  EditDistanceInfo* exactAlg = nullptr;
+  std::map<size_t, EditDistanceInfo> bandApproxAlg;
+
+  // if needed we may want to return also the string used to calculate
+  // to compute the edit distances. Pointersa re used to minimize the
+  // required memory (destructor will take care of freeing memory).
+  std::string* s1 = nullptr;
+  std::string* s2 = nullptr;
+
 };
 
 void
-compareEditDistanceAlgorithms(size_t n, size_t m, size_t k) {
-  size_t T = 2 * std::sqrt(n);
+compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
+  size_t T_max = n / 2;
+  size_t T_min = 2;
+  GeometricProgression<size_t> geom(2, T_min);
+  std::vector<size_t> Ts = geom.valuesLeq(T_max);
+  
   
   size_t** dpMatrix = allocMatrix<size_t>(n+1, m+1);
-  std::vector<AlgorithmComparisonResult> results;
+  std::vector< std::shared_ptr<AlgorithmComparisonResult> > results;
   std::string s1(n, 'N');
   std::string s2(m, 'N');
   for (size_t l = 0; l < k; ++l) {
-    AlgorithmComparisonResult res;
+    std::shared_ptr<AlgorithmComparisonResult> res =
+      std::make_shared<AlgorithmComparisonResult>();
     generateIIDString(s1);
     generateIIDString(s2);
-    //    s1 = "CGACGGAT";
-    //    s2 = "TCGACGGG";
+
+    // Exact algorithms
+    EditDistanceInfo tmp;
     editDistanceMat(s1, s2, dpMatrix);
-    closestToDiagonalBacktrack(s1.size(), s2.size(), dpMatrix, res.exactAlg);
+    closestToDiagonalBacktrack(s1.size(), s2.size(), dpMatrix, tmp);
+    res->addExact(tmp);
 
-    //editDistanceBacktrack(dpMatrix, s1, s2, res.exactAlg);
-    //editInfoCompute(res.exactAlg);
-    
-    //    printMatrix<size_t>(dpMatrix,s1.size()+1,s2.size()+1);
-    //std::cout << res.exactAlg.edit_script << "\n";
+    // Approximation for all values of T
+    for (size_t T : Ts) {  
+      editDistanceBandwiseApproxMat(s1, s2, T, dpMatrix);
+      closestToDiagonalBacktrack(s1.size(), s2.size(), dpMatrix, tmp);
+      res->addBandApprox(tmp, T);
+    }
 
-    //    T = s1.size() /2;
-    editDistanceBandwiseApproxMat(s1, s2, T, dpMatrix);
-    closestToDiagonalBacktrack(s1.size(), s2.size(), dpMatrix, res.bandApproxAlg);
-
-    //editDistanceBacktrack(dpMatrix, s1, s2, res.bandApproxAlg);
-    //editInfoCompute(res.bandApproxAlg);
-    //    printMatrix<size_t>(dpMatrix,s1.size()+1,s2.size()+1);
-    //    std::cout << res.bandApproxAlg.edit_script << "\n";
     results.push_back(res);
   }
-  // DEBUG
-  std::cout << "\nTASK: Compare algorithms\n";
-  size_t errors = 0;
-  double avg_err = 0;
-  for (AlgorithmComparisonResult res : results) {
-    if (res.exactAlg.distance() != res.bandApproxAlg.distance()) {
-      avg_err += res.bandApproxAlg.distance() - res.exactAlg.distance();
-      errors++;
-      std::cout << res.exactAlg << "  (" << res.exactAlg.distance() << ")\t\t"
-		<< res.bandApproxAlg << "  (" << res.bandApproxAlg.distance() << ")\t\t"
-		<< res.bandApproxAlg.distance() - res.exactAlg.distance() << "\n";
-      
-    }
+
+  os << "0" << "\t";
+  for (size_t T : Ts) {
+    os << T << "\t";
   }
-  avg_err /= (double)errors;
-  std::cout << "Errors:  " << errors << "\n";
-  std::cout << "Avg err: " << avg_err << "\n";
+  os << std::endl;
+  for (auto pRes : results) {
+    os << pRes->getExact() << "\t";
+    for (size_t T : Ts) {
+      os << pRes->getBandApproxWithT(T) << "\t";
+    }
+    os << std::endl;
+  }
   freeMatrix<size_t>(n+1, m+1, dpMatrix);
 }
 

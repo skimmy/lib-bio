@@ -39,6 +39,8 @@ public:
   size_t n_ins;  
 
   EditDistanceInfo() : n_sub(0), n_del(0), n_ins(0) {}
+  EditDistanceInfo(const EditDistanceInfo& i) :
+    n_sub(i.n_sub), n_del(i.n_del), n_ins(i.n_ins) {}
 
   std::string edit_script = "";
 
@@ -63,7 +65,7 @@ public:
   }
 
  
-  friend std::ostream& operator<<(std::ostream& out, EditDistanceInfo& info) {
+  friend std::ostream& operator<<(std::ostream& out, const EditDistanceInfo& info) {
     out << info.n_sub << " " << info.n_del << " " << info.n_ins;
     return out;
   }  
@@ -190,6 +192,6 @@ scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix,
 
 
 void
-compareEditDistanceAlgorithms(size_t n, size_t m, size_t k);
+compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os = std::cout);
 
 #endif

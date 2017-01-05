@@ -99,6 +99,16 @@ public:
   void rewind() {
     next = start;
   }
+
+  std::vector<T> valuesLeq(T maxVal) {
+    std::vector<T> vals;
+    rewind();
+    while(next < maxVal) {
+      vals.push_back(getNext());
+    }
+    return vals;
+  }
+  
 private:
   const double ratio;
   const T start;
@@ -123,6 +133,15 @@ public:
 
   void rewind() {
     next = start;
+  }
+
+  std::vector<T> valuesLeq(T maxVal) {
+    std::vector<T> vals;
+    rewind();
+    while(next < maxVal) {
+      vals.push_back(getNext());
+    }
+    return vals;
   }
   
 private:

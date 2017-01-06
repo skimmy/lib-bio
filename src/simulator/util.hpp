@@ -103,7 +103,7 @@ public:
   std::vector<T> valuesLeq(T maxVal) {
     std::vector<T> vals;
     rewind();
-    while(next < maxVal) {
+    while(next <= maxVal) {
       vals.push_back(getNext());
     }
     return vals;
@@ -138,7 +138,7 @@ public:
   std::vector<T> valuesLeq(T maxVal) {
     std::vector<T> vals;
     rewind();
-    while(next < maxVal) {
+    while(next <= maxVal) {
       vals.push_back(getNext());
     }
     return vals;

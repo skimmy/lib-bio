@@ -2,6 +2,7 @@
 
 import argparse
 import numpy as np
+import math
 
 def parseArguments():
     parser = argparse.ArgumentParser()
@@ -26,6 +27,26 @@ def printDistances(data, Ts):
     for d in data:
         print("\t".join([ str(sum( d[Ts[i]] )) for i in range(len(Ts))]))
 
+def printStatistics(params, Ts):
+    vals = [T for T in Ts if T > 0]
+    list.sort(vals)
+    for v in vals:
+        print("{0}\t{1}\t{2}\t{3}".format(v, params[v][0], math.sqrt(params[v][1]), params[v][2]))
+
+def saveDistributionsToFile(dists, filename, n):
+    Ts = [T for T in dists if T > 0]
+    list.sort(Ts)
+    print Ts
+    fh = open(filename, "w")
+    for i in range(n):
+        s = str(i) + "\t"
+        for T in Ts:
+            s += str(int(dists[T][i])) + "\t"
+        s += "\n"
+        fh.write(s)
+    fh.close()
+        
+        
 '''Returns a dictionary with a numpy vector for each of the entries
 of Ts. Such vector will contain in position 'i' the number of times
 a difference 'i' was observed between exact and approximated version'''
@@ -40,18 +61,22 @@ def computeDistributions(data, Ts, n):
             dists[T][diff] += 1
     return dists
 
-def saveDistributionsToFile(dists, filename, n):
-    Ts = [T for T in dists if T > 0]
-    list.sort(Ts)
-    print Ts
-    fh = open(filename, "w")
-    for i in range(n):
-        s = str(i) + "\t"
-        for T in Ts:
-            s += str(int(dists[T][i])) + "\t"
-        s += "\n"
-        fh.write(s)
-    fh.close()
+def computeStatistics(dists, Ts):
+    params = {}
+    for T in Ts:
+        freqs = dists[T]
+        k = sum(freqs)
+        expectation = 0
+        variance = 0
+        maxDiff = 0
+        for i in range(len(freqs)):
+            pi = freqs[i] / k
+            expectation += pi * i
+            variance += pi * i * i
+            if pi > 0:
+                maxDiff = i
+        params[T] = (expectation, (variance - expectation*expectation), maxDiff)
+    return params
 
 if __name__ == "__main__":
     args = parseArguments()
@@ -69,5 +94,6 @@ if __name__ == "__main__":
         data.append(entry)
     dists = computeDistributions(data, Ts, n)
     saveDistributionsToFile(dists, args.outfile, n)
-    
+    params = computeStatistics(dists, Ts)
+    printStatistics(params,Ts)
     fh.close()

@@ -5,6 +5,8 @@ AC_PROG_RANLIB
 #AM_PROG_AR
 
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
+m4_include([m4/ax_boost_program_options.m4])
+m4_include([m4/ax_boost_base.m4])
 
 AC_CHECK_FUNCS([floor])
 AC_CHECK_FUNCS([memset])
@@ -16,6 +18,9 @@ AC_TYPE_INT64_T
 AC_TYPE_UINT64_T
 AC_TYPE_UINT8_T
 AC_TYPE_SIZE_T
+
+AX_BOOST_BASE
+AX_BOOST_PROGRAM_OPTIONS
 
 
 AC_CONFIG_HEADERS([config.h])

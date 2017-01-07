@@ -972,7 +972,7 @@ private:
 void
 compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
   size_t T_max = n / 2;
-  size_t T_min = 2;
+  size_t T_min = 1;
   GeometricProgression<size_t> geom(2, T_min);
   std::vector<size_t> Ts = geom.valuesLeq(T_max);
   

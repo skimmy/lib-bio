@@ -5,11 +5,7 @@
 #include <iostream>
 #include <limits>
 
-// remove when substituted with the automake corresponding flag
-#define HAVE_BOOST
-
-
-#ifdef HAVE_BOOST
+#ifdef HAVE_BOOST_PROGRAM_OPTIONS
 
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
@@ -168,7 +164,7 @@ void parseArguments(int argc, char** argv) {
 }
 
 
-#ifdef HAVE_BOOST
+#ifdef HAVE_BOOST_PROGRAM_OPTIONS
 
 void
 parseArgumentsBoost(int argc, char** argv) {

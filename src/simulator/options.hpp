@@ -3,6 +3,7 @@
 
 #define HAVE_BOOST
 
+enum class Task { Test, Offline, Online, ScoreEst, AlignScore, EditDist };
 
 enum OpMode { Test, Offline, Online, Oracle, ScoreEst, AlignScore, EditDist };
 
@@ -44,7 +45,7 @@ struct Options {
 void parseArguments(int argc, char** argv);
 
 
-#ifdef HAVE_BOOST
+#ifdef HAVE_BOOST_PROGRAM_OPTIONS
 
 void parseArgumentsBoost(int argc, char** argv);
 

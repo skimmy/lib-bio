@@ -142,4 +142,6 @@ config.h.in
 config.h
 config.status
 configgure.scan
+config.guess
+config.sub
 ar-lib

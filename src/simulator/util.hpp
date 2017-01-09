@@ -43,6 +43,33 @@ void printMatrix(T** mat, size_t n, size_t m, std::string delim = " ") {
   }
 }
 
+template<typename T>
+T* allocVector(size_t n) {
+  return new T[n];
+}
+
+template<typename T>
+void freeVector(T* v) {
+  delete[] v;
+}
+
+template<typename T>
+T** allocMatrix(size_t n, size_t m) {
+  T** mat = new T*[n];
+  for (size_t i = 0; i < n; ++i) {
+    mat[i] = allocVector< T >(m);
+  }
+  return mat;
+}
+
+template<typename T>
+void freeMatrix(size_t n, size_t m, T** mat) {
+  for (size_t i = 0; i < n; ++i) {
+    delete[] mat[i];
+  }
+  delete[] mat;
+}
+
 
 template<typename T>
 void writeVectorOnStream(T v[], size_t n, std::ostream& os, std::string delim = "\n") {
@@ -72,6 +99,16 @@ public:
   void rewind() {
     next = start;
   }
+
+  std::vector<T> valuesLeq(T maxVal) {
+    std::vector<T> vals;
+    rewind();
+    while(next <= maxVal) {
+      vals.push_back(getNext());
+    }
+    return vals;
+  }
+  
 private:
   const double ratio;
   const T start;
@@ -96,6 +133,15 @@ public:
 
   void rewind() {
     next = start;
+  }
+
+  std::vector<T> valuesLeq(T maxVal) {
+    std::vector<T> vals;
+    rewind();
+    while(next <= maxVal) {
+      vals.push_back(getNext());
+    }
+    return vals;
   }
   
 private:

@@ -4,12 +4,19 @@
 #include <memory>
 #include <iostream>
 
+// Edit distance flgas
 #define EDIT_DISTANCE_ESTIMATE_EXHAUSTIVE 0x1
 #define EDIT_DISTANCE_ALGORITHM_QUADRATIC 0x2
 #define EDIT_DISTANCE_INFO_PARTIAL        0x4
 #define EDIT_DISTANCE_INFO_SCRIPT         0x8
 #define EDIT_DISTANCE_SAMPLE_MATRIX       0x10
 #define EDIT_DISTANCE_BOUNDED_ERROR       0x20
+
+// edit distance subtasks
+#define EDIT_DISTANCE_SUBTASK_DEFUALT       0
+#define EDIT_DISTANCE_SUBTASK_SCRIPT_DIST   8
+#define EDIT_DISTANCE_SUBTASK_COMPARE_ALGS  32
+
 
 class EditDistanceSimOutput {
   // This class is more a 'struct' like object that exposes most of
@@ -32,6 +39,8 @@ public:
   size_t n_ins;  
 
   EditDistanceInfo() : n_sub(0), n_del(0), n_ins(0) {}
+  EditDistanceInfo(const EditDistanceInfo& i) :
+    n_sub(i.n_sub), n_del(i.n_del), n_ins(i.n_ins) {}
 
   std::string edit_script = "";
 
@@ -56,7 +65,7 @@ public:
   }
 
  
-  friend std::ostream& operator<<(std::ostream& out, EditDistanceInfo& info) {
+  friend std::ostream& operator<<(std::ostream& out, const EditDistanceInfo& info) {
     out << info.n_sub << " " << info.n_del << " " << info.n_ins;
     return out;
   }  
@@ -112,6 +121,12 @@ void
 editDistanceBacktrack(size_t** dpMatrix, const std::string& s1, const std::string& s2,
 		      EditDistanceInfo& info);
 
+void
+closestToDiagonalBacktrack(size_t n, size_t m, size_t** dpMatrix, EditDistanceInfo& info);
+
+size_t
+editDistanceBandwiseApprox(const std::string& s1, const std::string& s2, size_t T);
+
 
 /**
  * Use a Monte-Carlo sampling technique to estimate the edit distance between
@@ -159,5 +174,24 @@ editDistanceRelativeErrorEstimates(size_t n, double e_model, double precision, d
 
 std::vector<SampleEstimates>
 differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delta, size_t k_max);
+
+/**
+ * Computes a matrix containing in (i,j) the number of times a
+ * 'closest diagonal' path traverses the cell (i,j)
+ *
+ * @param n number of rows of the matrix
+ * @param m number of columns of the matrix
+ * @param k number of samples to be used
+ * @param distMatrix pointer to a matrix that will contain the frequencies (i.e., output)
+ * @param scripts a pointer to a standard vector that will contain the scripts. 
+ *  If set to <code>nullptr</code> no script will be stored
+ */
+void
+scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix,
+			 std::vector<std::string>* scripts = nullptr);
+
+
+void
+compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os = std::cout);
 
 #endif

@@ -4,6 +4,7 @@
 #include <memory>
 #include <cstring>
 #include <cmath>
+#include <map>
 
 
 
@@ -254,6 +255,50 @@ editDistance(const std::string& s1, const std::string& s2) {
 }
 
 // ----------------------------------------------------------------------
+//                    EDIT DISTANCE APPROXIMATIONS
+// ----------------------------------------------------------------------
+
+void
+editDistanceBandwiseApproxMat(const std::string& s1, const std::string& s2, size_t T, size_t** dpMatrix) {
+  size_t n = s1.size();
+  size_t m = s2.size();
+  size_t INF = n+m+1;
+  // init matrix assuming T < min{n,m} (the strictness is crucial to
+  // initialize the 'border' diagonals
+  for (size_t i = 0; i <= T; ++i) {
+    dpMatrix[i][0] = i;
+  }
+  for (size_t j = 0; j <= T; ++j) {
+    dpMatrix[0][j] = j;
+  }
+  for (size_t t = T+1; t <= m; ++t) {
+    dpMatrix[t - (T+1)][t] = INF;
+  }
+  for (size_t t = T+1; t <= n; ++t) {
+    dpMatrix[t][t-(T+1)] = INF;
+  }
+  for (size_t i = 1; i <= n; ++i) {
+    for (size_t j = MAX(0,i-T); j <= MIN(m,i+T); ++j) {
+      size_t delta = (s1[i-1] == s2[j-1]) ? 0 : 1;
+      dpMatrix[i][j] = MIN( dpMatrix[i-1][j-1] + delta,
+			    MIN(dpMatrix[i-1][j] + 1, dpMatrix[i][j-1] + 1));
+    }
+  }
+}
+
+size_t
+editDistanceBandwiseApprox(const std::string& s1, const std::string& s2, size_t T) {
+  size_t n = s1.size();
+  size_t m = s2.size();
+  size_t** dpMatrix = allocMatrix<size_t>(n+1, m+1);
+  editDistanceBandwiseApproxMat(s1, s2, T, dpMatrix);  
+  size_t dist = dpMatrix[n][m];  
+  freeMatrix<size_t>(n+1, m+1, dpMatrix);
+  return dist;
+}
+
+
+// ----------------------------------------------------------------------
 //                        EDIT DISTANCE SAMPLING
 // ----------------------------------------------------------------------
 
@@ -429,6 +474,138 @@ editDistanceBacktrack(size_t** dpMatrix,const std::string& s1, const std::string
     info.edit_script = "I" + info.edit_script;
     j--;
   }
+}
+
+void
+closestToDiagonalBacktrack(size_t n, size_t m, size_t** dpMatrix, EditDistanceInfo& info) {
+  info.n_sub = 0;
+  info.n_del = 0;
+  info.n_ins = 0;
+  info.edit_script = "";
+
+  size_t i = n;
+  size_t j = m;
+  size_t a = 0, b = 0, c = 0, d = 0;
+  // backtrack until one edge is reached
+  while(i > 0 && j > 0) {
+    a = dpMatrix[i-1][j-1];
+    b = dpMatrix[i-1][j];
+    c = dpMatrix[i][j-1];
+    d = dpMatrix[i][j];
+    // DEBUG
+    // std::cout << "(" << i <<", " << j << ")" << "\n";
+    // std::cout << a << "\t" << b << "\n";
+    // std::cout << c << "\t" << d << "\n";
+    
+    // Match
+    if ( (a == d) && ( a <= b) && (a <= c)) {
+      info.edit_script = "M" + info.edit_script;
+      i--; j--;
+      continue;
+    }
+    
+    // Substitution
+    if ( (a < b) && (a < c) ) {
+      info.n_sub++;
+      info.edit_script = "S" + info.edit_script;
+      i--; j--;
+      continue;
+    }
+    // Deletion
+    if ( (b < a) && (b < c) ) {
+      info.n_del++;
+      info.edit_script = "D" + info.edit_script;
+      i--;
+      continue;
+    }
+    // Insertion
+    if ( (c < a) && (c < b) ) {
+      info.n_ins++;
+      info.edit_script = "I" + info.edit_script;
+      j--;
+      continue;
+    }
+    // Tie between all operations
+    if ( (a == b) && (b == c) ) {
+      if (i < j) {
+	info.n_ins++;
+	info.edit_script = "I" + info.edit_script;
+	j--;
+	continue;
+      }
+      if (i == j) {
+	info.n_sub++;
+	info.edit_script = "S" + info.edit_script;
+	i--; j--;
+	continue;
+      }
+      if (i > j) {
+	info.n_del++;
+	info.edit_script = "D" + info.edit_script;
+	i--;
+	continue;
+      }
+    }
+
+    // Tie between sub and del
+    if (a == b) {
+
+      if (i > j) {
+	info.n_del++;
+	info.edit_script = "D" + info.edit_script;
+	i--;
+      } else {
+	info.n_sub++;
+	info.edit_script = "S" + info.edit_script;
+	i--; j--;
+      }
+      continue;	
+    }
+    // Tie between sub and ins
+    if (a == c) {
+      if (i < j) {
+	info.n_ins++;
+	info.edit_script = "I" + info.edit_script;
+	j--;
+      } else {
+	info.n_sub++;
+	info.edit_script = "S" + info.edit_script;
+	i--; j--;
+      }
+      continue;
+    }
+
+    // Tie between del and ins
+    if (b == c) {
+      if (j <= i) {
+	info.n_del++;
+	info.edit_script = "D" + info.edit_script;
+	i--;
+      } else {
+	info.n_ins++;
+	info.edit_script = "I" + info.edit_script;	
+	j--;
+      }
+      continue;
+
+    }
+  }
+
+  // backtrack the left edge (if needed)
+  while(i > 0) {
+    info.n_del++;
+    info.edit_script = "D" + info.edit_script;
+    i--;
+  }
+
+  // bacltrack the top edge (if needed)
+  while(j > 0) {
+    info.n_ins++;
+    info.edit_script  = "I" + info.edit_script;
+    j--;
+  }
+  
+
 }
 
 
@@ -678,6 +855,167 @@ differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delt
   estimates[1] = est_n.toSampleEstimates();
 
   return estimates;
+}
+
+// ----------------------------------------------------------------------
+//                      SCRIPT DISTRIBUTION FUNCTIONS
+// ----------------------------------------------------------------------
+
+void
+scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix, std::vector<std::string>* scripts) {
+  size_t ** dpMatrix = allocMatrix<size_t>(n+1,m+1);
+  for (size_t i = 0; i <= n; ++i) {
+    for (size_t j = 0; j <= m; ++j) {
+      distMatrix[i][j] = 0;
+    }
+  }
+
+  std::string s1(n,'N');
+  std::string s2(n,'N');
+  EditDistanceInfo info;
+
+  for (size_t l = 0; l < k; ++l) {
+    generateIIDString(s1);
+    generateIIDString(s2);
+    editDistanceMat(s1, s2, dpMatrix);
+    closestToDiagonalBacktrack(n, m, dpMatrix, info);
+    // refresh the distribution matrix
+    size_t i = 0, j = 0;
+    distMatrix[i][j]++;
+    //    for (char c : info.edit_script) {
+    for (size_t t = 0; t < info.edit_script.size(); ++t) {
+      char c = info.edit_script[t];
+      switch(c) {
+      case 'M':
+	i++; j++;
+	break;
+      case 'S':
+	i++; j++;
+	break;
+      case 'I':
+	j++;
+	break;
+      case 'D':
+	i++;
+	break;
+      }
+      distMatrix[i][j]++;
+    }
+
+    if (scripts != nullptr) {
+      scripts->push_back(info.edit_script);
+    }
+
+  }
+  printMatrix<size_t>(distMatrix,n+1,m+1);
+  freeMatrix<size_t>(n+1, m+1, dpMatrix);
+}
+
+// ----------------------------------------------------------------------
+//                        ALGORITHMS COMPARISON
+// ----------------------------------------------------------------------
+
+class AlgorithmComparisonResult {
+public:
+  
+  ~AlgorithmComparisonResult() {
+    if (exactAlg) {
+      delete exactAlg;
+    }    
+    if (s1) {
+      delete s1;      
+    }
+    if (s2) {
+      delete s2;
+    }
+  }
+
+  void addExact(const EditDistanceInfo& info) {
+    if (this->exactAlg) {
+      delete this->exactAlg;
+    }
+    this->exactAlg = new EditDistanceInfo(info);
+  }
+
+  void addBandApprox(const EditDistanceInfo& info, size_t T) {
+    this->bandApproxAlg[T] = info;
+  }
+
+  bool hasExact() {
+    return (this->exactAlg != nullptr);
+  }
+
+  bool hasBandApproxWithT(size_t T) {
+    return (this->bandApproxAlg.count(T));
+  }
+
+  EditDistanceInfo getExact() {
+    return *(this->exactAlg);
+  }
+
+  EditDistanceInfo getBandApproxWithT(size_t T) {
+    return this->bandApproxAlg[T];
+  }
+
+private:
+  EditDistanceInfo* exactAlg = nullptr;
+  std::map<size_t, EditDistanceInfo> bandApproxAlg;
+
+  // if needed we may want to return also the string used to calculate
+  // to compute the edit distances. Pointersa re used to minimize the
+  // required memory (destructor will take care of freeing memory).
+  std::string* s1 = nullptr;
+  std::string* s2 = nullptr;
+
+};
+
+void
+compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
+  size_t T_max = n / 2;
+  size_t T_min = 1;
+  GeometricProgression<size_t> geom(2, T_min);
+  std::vector<size_t> Ts = geom.valuesLeq(T_max);
+  
+  
+  size_t** dpMatrix = allocMatrix<size_t>(n+1, m+1);
+  std::vector< std::shared_ptr<AlgorithmComparisonResult> > results;
+  std::string s1(n, 'N');
+  std::string s2(m, 'N');
+  for (size_t l = 0; l < k; ++l) {
+    std::shared_ptr<AlgorithmComparisonResult> res =
+      std::make_shared<AlgorithmComparisonResult>();
+    generateIIDString(s1);
+    generateIIDString(s2);
+
+    // Exact algorithms
+    EditDistanceInfo tmp;
+    editDistanceMat(s1, s2, dpMatrix);
+    closestToDiagonalBacktrack(s1.size(), s2.size(), dpMatrix, tmp);
+    res->addExact(tmp);
+
+    // Approximation for all values of T
+    for (size_t T : Ts) {  
+      editDistanceBandwiseApproxMat(s1, s2, T, dpMatrix);
+      closestToDiagonalBacktrack(s1.size(), s2.size(), dpMatrix, tmp);
+      res->addBandApprox(tmp, T);
+    }
+
+    results.push_back(res);
+  }
+
+  os << "0" << "\t";
+  for (size_t T : Ts) {
+    os << T << "\t";
+  }
+  os << std::endl;
+  for (auto pRes : results) {
+    os << pRes->getExact() << "\t";
+    for (size_t T : Ts) {
+      os << pRes->getBandApproxWithT(T) << "\t";
+    }
+    os << std::endl;
+  }
+  freeMatrix<size_t>(n+1, m+1, dpMatrix);
 }
 
 // ----------------------------------------------------------------------

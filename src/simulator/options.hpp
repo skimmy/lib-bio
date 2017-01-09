@@ -3,7 +3,7 @@
 
 #define HAVE_BOOST
 
-enum class Task { Test, Offline, Online, ScoreEst, AlignScore, EditDist };
+enum class Task { Test, Offline, Online, Oracle, ScoreEst, AlignScore, EditDist, Undefined };
 
 enum OpMode { Test, Offline, Online, Oracle, ScoreEst, AlignScore, EditDist };
 
@@ -28,6 +28,7 @@ struct Options {
 
   size_t floatPrecision; // TODO
 
+  Task task; // --task (will substituted mode in -O)
   OpMode mode;  // -O
   int subTask;  // -B
   int optFlags; // -f

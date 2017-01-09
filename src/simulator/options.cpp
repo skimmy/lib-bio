@@ -90,6 +90,60 @@ setDefualtParams() {
 
 }
 
+// ----------------------------------------------------------------------
+//                      CUSTOM PARSING FUNCTIONS
+// ----------------------------------------------------------------------
+
+Task intToTask(int tCode) {
+  Task task = Task::Undefined;
+  switch(tCode) {
+  case 0:
+    task = Task::Test;
+    break;
+  case 1:
+    task = Task::Offline;
+    break;
+  case 2:
+    task = Task::Online;
+    break;
+  case 3:
+    task = Task::Oracle;
+    break;
+  case 4:
+    task = Task::ScoreEst;
+    break;
+  case 5:
+    task = Task::AlignScore;
+    break;
+  case 6:
+    task = Task::EditDist;
+    break;
+
+  default:
+    task = Task::Undefined;
+  }
+  return task;
+}
+
+std::string taskToString(Task task) {
+  switch(task) {
+  case(Task::Test): return "Test";
+  case(Task::Offline): return "Offline";
+  case(Task::Online): return "Online";
+  case(Task::Oracle): return "Oracle";
+  case(Task::ScoreEst): return "ScoreEst";
+  case(Task::AlignScore): return "AlignScore";
+  case(Task::EditDist): return "EditDist";
+  case(Task::Undefined): return "Undefined";
+  default: return "TBD";
+  }
+}
+
+// ----------------------------------------------------------------------
+//                        ARG PARSING FUNCTIONS
+// ----------------------------------------------------------------------
+
+
 void parseArguments(int argc, char** argv) {
 
   setDefualtParams();
@@ -217,6 +271,7 @@ parseArgumentsBoost(int argc, char** argv) {
     ("approx-level,A", po::value<int>(&Options::opts.approxLevel), // -A, --approx-level
      "Set the approximation level")
 
+    ("task", po::value<std::string>(), "Selects the task to be performed")    
     ("operation-mode,O", po::value<int>(), "Sets the operation mode") // -O, --operation-mode
 
     ("sub-task,B", po::value<int>(&Options::opts.subTask), // -B, --sub-tast
@@ -249,6 +304,16 @@ parseArgumentsBoost(int argc, char** argv) {
     std::cout << std::endl;
     exit(0);
   }
+
+  if (vm.count("task")) {
+    try {
+      Options::opts.task = intToTask(std::stoi(vm["task"].as<std::string>()));
+    } catch(std::invalid_argument) {
+      //Options::opts.task = string2Task(vm["count"]);
+      Options::opts.task = Task::Undefined;
+    }
+  }
+  
   if (vm.count("operation-mode")) {
     Options::opts.mode = static_cast<OpMode>(vm["operation-mode"].as<int>());
   }
@@ -261,6 +326,12 @@ parseArgumentsBoost(int argc, char** argv) {
     Options::opts.verbose = true;
   }
 
+  // DEBUG
+  logInfo("Task: " + taskToString(Options::opts.task));
+
+
 }
 
 #endif
+
+

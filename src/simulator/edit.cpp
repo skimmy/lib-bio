@@ -264,21 +264,27 @@ editDistanceBandwiseApproxMat(const std::string& s1, const std::string& s2, size
   size_t m = s2.size();
   size_t INF = n+m+1;
   // init matrix assuming T < min{n,m} (the strictness is crucial to
-  // initialize the 'border' diagonals
-  for (size_t i = 0; i <= T; ++i) {
+  // initialize the 'border' diagonals  
+  dpMatrix[0][0] = 0;	   
+  for (size_t i = 1; i <= T; ++i) {
     dpMatrix[i][0] = i;
   }
-  for (size_t j = 0; j <= T; ++j) {
+  for (size_t j = 1; j <= T; ++j) {
     dpMatrix[0][j] = j;
   }
-  for (size_t t = T+1; t <= m; ++t) {
-    dpMatrix[t - (T+1)][t] = INF;
+
+  for (size_t t = 0; t <= m - (T+1); ++t) {
+    dpMatrix[t][T+1+t] = INF;
   }
-  for (size_t t = T+1; t <= n; ++t) {
-    dpMatrix[t][t-(T+1)] = INF;
-  }
+
+  for (size_t t = 0; t <= n - (T+1); ++t) {
+    dpMatrix[T+1+t][t] = INF;
+  }  
+
   for (size_t i = 1; i <= n; ++i) {
-    for (size_t j = MAX(0,i-T); j <= MIN(m,i+T); ++j) {
+    size_t j_min = (size_t)std::max<int>(1, (int)(i-T));
+    size_t j_max = (size_t)std::min<int>(m, (int)(i+T));
+    for (size_t j = j_min; j <= j_max; ++j) {      
       size_t delta = (s1[i-1] == s2[j-1]) ? 0 : 1;
       dpMatrix[i][j] = MIN( dpMatrix[i-1][j-1] + delta,
 			    MIN(dpMatrix[i-1][j] + 1, dpMatrix[i][j-1] + 1));
@@ -292,7 +298,7 @@ editDistanceBandwiseApprox(const std::string& s1, const std::string& s2, size_t 
   size_t m = s2.size();
   size_t** dpMatrix = allocMatrix<size_t>(n+1, m+1);
   editDistanceBandwiseApproxMat(s1, s2, T, dpMatrix);  
-  size_t dist = dpMatrix[n][m];  
+  size_t dist = dpMatrix[n][m];
   freeMatrix<size_t>(n+1, m+1, dpMatrix);
   return dist;
 }
@@ -836,10 +842,7 @@ differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delt
       // print density to file
       est_n.writeFrequencyOnFile("/tmp/density2_" + std::to_string(k) + ".txt");
       power_2.getNext();
-      // std::cout << est_n.sampleSize()
-      // 		<< "\t" << mean_n << "\t" << var_n << "\t" << est_n.medianForSampleDistribution()
-      // 		<< "\t" << mean_n_2 << "\t" << var_n_2 << "\t" << est_n_2.medianForSampleDistribution()
-      // 		<< std::endl;
+ 
     }
     
     
@@ -973,9 +976,14 @@ void
 compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
   size_t T_max = n / 2;
   size_t T_min = 1;
+
+  // DEBUG values 
+  //size_t T_max = n / 2;
+  //size_t T_min = n/ 4;
   GeometricProgression<size_t> geom(2, T_min);
   std::vector<size_t> Ts = geom.valuesLeq(T_max);
-  
+
+  std::vector<std::pair<std::string,std::string>> tmpStrings(k);
   
   size_t** dpMatrix = allocMatrix<size_t>(n+1, m+1);
   std::vector< std::shared_ptr<AlgorithmComparisonResult> > results;
@@ -987,19 +995,22 @@ compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
     generateIIDString(s1);
     generateIIDString(s2);
 
+    // s1 = "GCACGTCTGGTCTAGGTTCTACGCAGCGTCTTAGCAACGCTACATTATTGGATATGGTTGGTCG";
+    // s2 = "AGAATCCCACGCTGTTCAGGACGACAGTAGTACCATTGAAACGGCCCAAAGGTACGACGCATTA";
+    //    tmpStrings[l] = {s1,s2};
     // Exact algorithms
+    //    resetMatrix<size_t>(n,m,dpMatrix,n*m);
     EditDistanceInfo tmp;
     editDistanceMat(s1, s2, dpMatrix);
     closestToDiagonalBacktrack(s1.size(), s2.size(), dpMatrix, tmp);
     res->addExact(tmp);
 
     // Approximation for all values of T
-    for (size_t T : Ts) {  
+    for (size_t T : Ts) {
       editDistanceBandwiseApproxMat(s1, s2, T, dpMatrix);
       closestToDiagonalBacktrack(s1.size(), s2.size(), dpMatrix, tmp);
       res->addBandApprox(tmp, T);
     }
-
     results.push_back(res);
   }
 
@@ -1008,11 +1019,14 @@ compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
     os << T << "\t";
   }
   os << std::endl;
+
   for (auto pRes : results) {
     os << pRes->getExact() << "\t";
     for (size_t T : Ts) {
-      os << pRes->getBandApproxWithT(T) << "\t";
+        os << pRes->getBandApproxWithT(T) << "\t";
+
     }
+
     os << std::endl;
   }
   freeMatrix<size_t>(n+1, m+1, dpMatrix);

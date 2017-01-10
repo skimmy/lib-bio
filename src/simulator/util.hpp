@@ -70,6 +70,16 @@ void freeMatrix(size_t n, size_t m, T** mat) {
   delete[] mat;
 }
 
+template<typename T>
+void resetMatrix(size_t n, size_t m, T** mat, T val) {
+  for (size_t i = 0; i < n; ++i) {
+    for (size_t j = 0; j < m; ++j) {
+      mat[i][j] = val;
+    }
+  }
+    
+}
+
 
 template<typename T>
 void writeVectorOnStream(T v[], size_t n, std::ostream& os, std::string delim = "\n") {

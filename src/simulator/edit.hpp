@@ -40,7 +40,7 @@ public:
 
   EditDistanceInfo() : n_sub(0), n_del(0), n_ins(0) {}
   EditDistanceInfo(const EditDistanceInfo& i) :
-    n_sub(i.n_sub), n_del(i.n_del), n_ins(i.n_ins) {}
+    n_sub(i.n_sub), n_del(i.n_del), n_ins(i.n_ins), edit_script(i.edit_script) {}
 
   std::string edit_script = "";
 

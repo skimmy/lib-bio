@@ -40,38 +40,6 @@ std::unique_ptr<double[]> extractInsertionArray(const EditDistanceInfo* v, size_
 }
 
 // ----------------------------------------------------------------------
-//                             DP MATRIX UTILS
-// ----------------------------------------------------------------------
-
-
-size_t**
-allocDPMatrix(size_t n, size_t m) {
-  size_t** dpMatrix = new size_t*[n+1];
-  for (size_t i = 0; i <= n; ++i) {
-    dpMatrix[i] = new size_t[m+1];
-  }
-  return dpMatrix;
-}
-
-void
-freeDPMatrix(size_t** dpMatrix, size_t n, size_t m) {
-  for (size_t i = 0; i <= n; ++i) {
-    delete[] dpMatrix[i];
-  }
-  delete[] dpMatrix;
-}
-
-void
-printDPMatrix(size_t** dpMatrix, size_t n, size_t m) {
-  for (size_t i = 0; i <= n; ++i) {
-    for (size_t j = 0; j <=m; ++j) {
-      std::cout << dpMatrix[i][j] << '\t';
-    }
-    std::cout << std::endl;
-  }
-}
-
-// ----------------------------------------------------------------------
 //                        EDIT DISTANCE COMPUTATION
 // ----------------------------------------------------------------------
 
@@ -351,7 +319,7 @@ editDistSamplesInfo(size_t n, size_t k_samples) {
   std::string s1(n,'N');
   std::string s2(n,'N');
 
-  size_t** dpMatrix = allocDPMatrix(n,n);
+  size_t** dpMatrix = allocMatrix<size_t>(n,n);
 
   for (size_t k = 0; k < k_samples; ++k) {
     generateIIDString(s1);
@@ -361,7 +329,7 @@ editDistSamplesInfo(size_t n, size_t k_samples) {
     editInfoCompute(infos[k]);
   }
   
-  freeDPMatrix(dpMatrix, n, n);
+  freeMatrix<size_t>(n, n, dpMatrix);
   
   return infos;
 }
@@ -498,10 +466,6 @@ closestToDiagonalBacktrack(size_t n, size_t m, size_t** dpMatrix, EditDistanceIn
     b = dpMatrix[i-1][j];
     c = dpMatrix[i][j-1];
     d = dpMatrix[i][j];
-    // DEBUG
-    // std::cout << "(" << i <<", " << j << ")" << "\n";
-    // std::cout << a << "\t" << b << "\n";
-    // std::cout << c << "\t" << d << "\n";
     
     // Match
     if ( (a == d) && ( a <= b) && (a <= c)) {
@@ -885,7 +849,6 @@ scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix, std:
     // refresh the distribution matrix
     size_t i = 0, j = 0;
     distMatrix[i][j]++;
-    //    for (char c : info.edit_script) {
     for (size_t t = 0; t < info.edit_script.size(); ++t) {
       char c = info.edit_script[t];
       switch(c) {
@@ -910,7 +873,7 @@ scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix, std:
     }
 
   }
-  printMatrix<size_t>(distMatrix,n+1,m+1);
+  printMatrix<size_t>(n+1,m+1, distMatrix);
   freeMatrix<size_t>(n+1, m+1, dpMatrix);
 }
 
@@ -977,13 +940,9 @@ compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
   size_t T_max = n / 2;
   size_t T_min = 1;
 
-  // DEBUG values 
-  //size_t T_max = n / 2;
-  //size_t T_min = n/ 4;
   GeometricProgression<size_t> geom(2, T_min);
   std::vector<size_t> Ts = geom.valuesLeq(T_max);
 
-  std::vector<std::pair<std::string,std::string>> tmpStrings(k);
   
   size_t** dpMatrix = allocMatrix<size_t>(n+1, m+1);
   std::vector< std::shared_ptr<AlgorithmComparisonResult> > results;
@@ -995,11 +954,6 @@ compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
     generateIIDString(s1);
     generateIIDString(s2);
 
-    // s1 = "GCACGTCTGGTCTAGGTTCTACGCAGCGTCTTAGCAACGCTACATTATTGGATATGGTTGGTCG";
-    // s2 = "AGAATCCCACGCTGTTCAGGACGACAGTAGTACCATTGAAACGGCCCAAAGGTACGACGCATTA";
-    //    tmpStrings[l] = {s1,s2};
-    // Exact algorithms
-    //    resetMatrix<size_t>(n,m,dpMatrix,n*m);
     EditDistanceInfo tmp;
     editDistanceMat(s1, s2, dpMatrix);
     closestToDiagonalBacktrack(s1.size(), s2.size(), dpMatrix, tmp);
@@ -1019,16 +973,14 @@ compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
     os << T << "\t";
   }
   os << std::endl;
-
   for (auto pRes : results) {
     os << pRes->getExact() << "\t";
     for (size_t T : Ts) {
         os << pRes->getBandApproxWithT(T) << "\t";
-
     }
-
     os << std::endl;
   }
+  
   freeMatrix<size_t>(n+1, m+1, dpMatrix);
 }
 

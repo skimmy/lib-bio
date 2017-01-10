@@ -44,14 +44,13 @@ char baseComplement(char b) {
     return 'C';
 
   case 'T': case 't':
-    return 'A';
-
-    
+    return 'A';    
   }
+  return 'N';
 }
 
 char randomMutation(char c) { 
-  return bases[(revBases[c] + ((rand() % 3) + 1) ) & 0x3];
+  return bases[(revBases[(int)c] + ((rand() % 3) + 1) ) & 0x3];
 }
 
 void simpleIIDErrors(std::string& s, double pe) {

@@ -21,6 +21,7 @@ void generateConstantGenome(size_t N, char* S, char b);
 void simulateReadAt(size_t j, size_t m, const char* S, char* r);
 void generateOfflineReads(const std::string& s, std::priority_queue<Read>& reads);
 Read generateOnlineRead(char* S, size_t j);
+Read randomRead(size_t m);
 
 void complementBases(char* S, size_t n);
 char randomMutation(char c);

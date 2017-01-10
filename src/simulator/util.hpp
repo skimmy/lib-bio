@@ -23,7 +23,6 @@ double** initDoubleMatrix(size_t n, size_t m);
 void clearDoubleMatrix(double** matrix, size_t n, size_t m);
 double elementsSumDoubleMatrix(double** matrix, size_t n, size_t m);
 
-Read randomRead(size_t m);
 
 template<typename T>
 void printVector(T* v, size_t n, char* delim = " ") {
@@ -34,7 +33,7 @@ void printVector(T* v, size_t n, char* delim = " ") {
 }
 
 template<typename T>
-void printMatrix(T** mat, size_t n, size_t m, std::string delim = " ") {
+void printMatrix(size_t n, size_t m, T** mat, std::string delim = " ") {
   for (size_t i = 0; i < n; ++i) {
     for (size_t j = 0; j < m; ++j) {
       std::cout << mat[i][j] << delim;

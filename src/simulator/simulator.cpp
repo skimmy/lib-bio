@@ -12,9 +12,6 @@
 #include <iostream>
 #include <algorithm>
 
-
-char bases[] = {'A', 'C', 'G', 'T'};
-char revBases[128];
 Options Options::opts;
 
 // output quantities (common to online and offline)
@@ -49,16 +46,12 @@ EstimationPoint * oraclePoints;
 EditDistanceSimOutput* edOut;
 
 void initSimulator() {
-  revBases['A'] = revBases['a'] = 0;
-  revBases['C'] = revBases['c'] = 1;
-  revBases['G'] = revBases['g'] = 2;
-  revBases['T'] = revBases['t'] = 3;
-  scoreDist = EmpiricalDistribution(0,1,Options::opts.empiricalDistributionStep);
+  initUtil();    
   initRandomGenerator();
-  initUtil();
   initProbabilities();
   initChainMatrix();
-  // init for oracle points
+    
+  scoreDist = EmpiricalDistribution(0,1,Options::opts.empiricalDistributionStep);
   oraclePoints = new EstimationPoint[Options::opts.m + 1];
   
   for (size_t i = 0; i < Options::opts.m; ++i) {
@@ -255,7 +248,7 @@ void onlineSimulation() {
     current.j = real_position;
 
     // here the probabilities are computed and accumulated
-    if (prev_read.j != -1) {       
+    if (prev_read.j != (size_t)-1) {       
       
       if (d > m) {
 	if (!onHole) {
@@ -286,7 +279,7 @@ void onlineSimulation() {
 
 void oracleSimulation() {  
   size_t n = 2 * Options::opts.m;
-  int m = Options::opts.m;
+  size_t m = Options::opts.m;
   double alpha = 1.0 / ((double)Options::opts.N - 2.0 * m + 1);
   double numDen[2];
   
@@ -379,7 +372,7 @@ editDistanceOpMode() {
   
   if (flags & EDIT_DISTANCE_ESTIMATE_EXHAUSTIVE) {
     // Exhasutve (only quadratic)
-    print_warning("only \033[1;37mqudratic algorithm\033[0m available with exhaustive option");
+    logWarning("only \033[1;37mqudratic algorithm\033[0m available with exhaustive option");
     double avgDist = testExhaustiveEditDistanceEncoded(n, edOut->distPDF);
     std::cout << avgDist << std::endl;    
   }
@@ -400,7 +393,7 @@ editDistanceOpMode() {
 	  }
 	}
 	else {
-	  print_warning("Quadratic info without script not yet implemented");
+	  logWarning("Quadratic info without script not yet implemented");
 	}
       }
     }
@@ -410,7 +403,7 @@ editDistanceOpMode() {
       // LINEAR + Sample
       if (flags & EDIT_DISTANCE_INFO_PARTIAL) {
 	// PARTIAL INFO + Sample + Linear
-	print_warning("Partial info for linear under developement");
+	logWarning("Partial info for linear under developement");
 	std::unique_ptr<EditDistanceInfo[]> samples =
 	  editDistSamplesInfoLinSpace(n,k);
 	

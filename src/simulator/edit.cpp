@@ -7,7 +7,6 @@
 #include <map>
 
 
-
 // ----------------------------------------------------------------------
 //                               INFO CONVERSION
 // ----------------------------------------------------------------------
@@ -52,7 +51,7 @@ size_t
 editDistanceLinSpace(const std::string& s1, const std::string& s2, size_t* v0, size_t* v1) {
   size_t n1 = s1.size();
   size_t n2 = s2.size();
-  size_t n_max = MAX(n1, n2);
+  size_t n_max = std::max(n1, n2);
   for (size_t i = 0; i < n_max+1; ++i) {
     v0[i] = i;
   }
@@ -61,7 +60,7 @@ editDistanceLinSpace(const std::string& s1, const std::string& s2, size_t* v0, s
     v1[0] = i;
     for (size_t j = 1; j <= n2; ++j) {
       size_t delta = (s1[i-1] == s2[j-1]) ? 0 : 1;
-      v1[j] = MIN( MIN( v0[j] + 1, v1[j-1] + 1), v0[j-1] + delta );
+      v1[j] = std::min( std::min( v0[j] + 1, v1[j-1] + 1), v0[j-1] + delta );
     }
     size_t * tmp = v0;
     v0 = v1;
@@ -73,7 +72,7 @@ editDistanceLinSpace(const std::string& s1, const std::string& s2, size_t* v0, s
 EditDistanceInfo editDistanceLinSpaceInfo(const std::string& s1, const std::string& s2, EditDistanceInfo* v0, EditDistanceInfo* v1, EditDistanceInfo** sampleMat) {
   size_t n1 = s1.size();
   size_t n2 = s2.size();
-  size_t n_max = MAX(n1, n2);
+  size_t n_max = std::max(n1, n2);
 
   EditDistanceInfo* tmp = NULL;
 
@@ -139,7 +138,7 @@ editDistanceEncoded(uint64_t s1, size_t n1, uint64_t s2, size_t n2, size_t** dpM
       uint64_t y = ( s2 >> 2*(j-1) ) & 0x3;
       size_t delta = (x == y) ? 0 : 1; // try to find an alternative not involving if
       
-      dpMatrix[i][j] = MIN( MIN(dpMatrix[i-1][j]+1, dpMatrix[i][j-1]+1) , dpMatrix[i-1][j-1] + delta ) ;
+      dpMatrix[i][j] = std::min( std::min(dpMatrix[i-1][j]+1, dpMatrix[i][j-1]+1) , dpMatrix[i-1][j-1] + delta ) ;
     }
   }
   return dpMatrix[n1][n2];
@@ -156,8 +155,8 @@ computeAverageDPMatrix(double** dpMatrix, size_t n, size_t m) {
   }
   for (size_t i = 1; i <= n; ++i) {
     for (size_t j = 1; j <= m; ++j) {
-      double minMatch =    MIN( MIN ( dpMatrix[i-1][j] + 1, dpMatrix[i][j-1] + 1), dpMatrix[i-1][j-1] );
-      double minMismatch = MIN( MIN ( dpMatrix[i-1][j] + 1, dpMatrix[i][j-1] + 1), dpMatrix[i-1][j-1] + 1);
+      double minMatch =    std::min( std::min ( dpMatrix[i-1][j] + 1, dpMatrix[i][j-1] + 1), dpMatrix[i-1][j-1] );
+      double minMismatch = std::min( std::min ( dpMatrix[i-1][j] + 1, dpMatrix[i][j-1] + 1), dpMatrix[i-1][j-1] + 1);
       dpMatrix[i][j] = 0.25 * minMatch + 0.75 * minMismatch;
     }
   }
@@ -197,7 +196,7 @@ editDistanceMat(const std::string& s1, const std::string& s2, size_t** dpMatrix)
   for (size_t i = 1; i < n+1; ++i) {
     for(size_t j = 1; j < m+1; ++j) {
       size_t delta = (s1[i-1] == s2[j-1]) ? 0 : 1;
-      dpMatrix[i][j] = MIN( MIN(dpMatrix[i-1][j]+1, dpMatrix[i][j-1]+1) , dpMatrix[i-1][j-1] + delta ) ;
+      dpMatrix[i][j] = std::min( std::min(dpMatrix[i-1][j]+1, dpMatrix[i][j-1]+1) , dpMatrix[i-1][j-1] + delta ) ;
     }
   }
 
@@ -254,8 +253,8 @@ editDistanceBandwiseApproxMat(const std::string& s1, const std::string& s2, size
     size_t j_max = (size_t)std::min<int>(m, (int)(i+T));
     for (size_t j = j_min; j <= j_max; ++j) {      
       size_t delta = (s1[i-1] == s2[j-1]) ? 0 : 1;
-      dpMatrix[i][j] = MIN( dpMatrix[i-1][j-1] + delta,
-			    MIN(dpMatrix[i-1][j] + 1, dpMatrix[i][j-1] + 1));
+      dpMatrix[i][j] = std::min( dpMatrix[i-1][j-1] + delta,
+			    std::min(dpMatrix[i-1][j] + 1, dpMatrix[i][j-1] + 1));
     }
   }
 }
@@ -942,6 +941,8 @@ compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
 
   GeometricProgression<size_t> geom(2, T_min);
   std::vector<size_t> Ts = geom.valuesLeq(T_max);
+  Ts.push_back(0);
+  
 
   
   size_t** dpMatrix = allocMatrix<size_t>(n+1, m+1);
@@ -968,7 +969,7 @@ compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
     results.push_back(res);
   }
 
-  os << "0" << "\t";
+  os << n << "\t";
   for (size_t T : Ts) {
     os << T << "\t";
   }
@@ -976,10 +977,10 @@ compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
   for (auto pRes : results) {
     os << pRes->getExact() << "\t";
     for (size_t T : Ts) {
-        os << pRes->getBandApproxWithT(T) << "\t";
+      os << pRes->getBandApproxWithT(T) << "\t";
     }
     os << std::endl;
-  }
+    }
   
   freeMatrix<size_t>(n+1, m+1, dpMatrix);
 }

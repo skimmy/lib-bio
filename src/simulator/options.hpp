@@ -36,8 +36,8 @@ struct Options {
   int k; // -k
 
   static  Options opts;
-};
-
+}
+;
 void parseArguments(int argc, char** argv);
 
 #endif

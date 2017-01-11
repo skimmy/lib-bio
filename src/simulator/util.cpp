@@ -8,7 +8,14 @@
 // some util global variables (lookup tables, constants, ...)
 double* power4_lookup = NULL; // contains 4^{-(m-s)} for s=0,...,m
 
+char bases[] = {'A', 'C', 'G', 'T'};
+char revBases[128];
+
 void initUtil() {
+  revBases['A'] = revBases['a'] = 0;
+  revBases['C'] = revBases['c'] = 1;
+  revBases['G'] = revBases['g'] = 2;
+  revBases['T'] = revBases['t'] = 3;
   int m = Options::opts.m;
   power4_lookup = new double[m+1];
   for (int s = 0; s <= m; ++s) {
@@ -21,23 +28,6 @@ void clearUtil() {
   power4_lookup = NULL;
 }
 
-double** initDoubleMatrix(size_t n, size_t m) {
-  double** matrix = new double*[n];
-  for (size_t i = 0; i < n; ++i) {
-    matrix[i] = new double[m];
-    for (size_t j = 0; j < m; ++j) {
-      matrix[i][j] = 0.0;
-    }
-  }
-    return matrix;
-}
-
-void clearDoubleMatrix(double** matrix, size_t n, size_t m) {
-  for (size_t i = 0; i < n; ++i) {
-    delete[] matrix[i];
-  }
-  delete[] matrix;
-}
 
 double elementsSumDoubleMatrix(double** matrix, size_t n, size_t m) {
   double sum = 0.0;
@@ -49,24 +39,9 @@ double elementsSumDoubleMatrix(double** matrix, size_t n, size_t m) {
   return sum;
 }
 
-void printString(char* s, size_t n) {
-  for (size_t i = 0; i < n; ++i) {
-    std::cout << s[i];
-  }
-}
-
-void printDoubleMatrix(double** M, size_t n, size_t m) {
-  for (size_t i = 0; i < n; ++i) {
-    for (size_t j = 0; j < n; ++j) {
-      std::cout << M[i][j] << '\t';
-    }
-    std::cout << '\n';
-  }
-}
-
 // FUNCTIONS FOR 2-BITS ENCODING CONVERSION
 uint64_t string2Encode(const std::string&s) {
-  size_t n = MAX(32, s.size());
+  size_t n = std::max<int>(32, s.size());
   uint64_t mask = 0;
   uint64_t enc = 0;
   for (size_t i = 0; i < n; ++i) {
@@ -148,11 +123,6 @@ Read randomRead(size_t m) {
 void
 fatal_error(const std::string &msg, int exit_code)
 {
-  std::cerr << "[ERROR]  " + msg << std::endl;
+  logError(msg);
   exit(exit_code);
-}
-
-void
-print_warning(const std::string &msg) {
-  std::cerr << "\033[1;31mWarning\033[0m " << msg << std::endl;
 }

@@ -27,14 +27,14 @@ def printDistances(data, Ts):
     for d in data:
         print("\t".join([ str(sum( d[Ts[i]] )) for i in range(len(Ts))]))
 
-def printStatistics(params, Ts):
-    vals = [T for T in Ts if T > 0]
+def printStatistics(params, Ts, n):
+    vals = [T for T in Ts if T < n]
     list.sort(vals)
     for v in vals:
         print("{0}\t{1}\t{2}\t{3}".format(v, params[v][0], math.sqrt(params[v][1]), params[v][2]))
 
 def saveDistributionsToFile(dists, filename, n):
-    Ts = [T for T in dists if T > 0]
+    Ts = [T for T in dists if T < n]
     list.sort(Ts)
     print Ts
     fh = open(filename, "w")
@@ -55,13 +55,13 @@ def computeDistributions(data, Ts, n):
     for T in Ts:
         dists[T] = np.zeros(n)
     for d in data:
-        exact = sum(d[0])
+        exact = sum(d[n])
         for T in Ts:
             diff = sum(d[T]) - exact
             dists[T][diff] += 1
     return dists
 
-def computeStatistics(dists, Ts):
+def computeStatistics(dists, Ts, n):
     params = {}
     for T in Ts:
         freqs = dists[T]
@@ -94,6 +94,6 @@ if __name__ == "__main__":
         data.append(entry)
     dists = computeDistributions(data, Ts, n)
     saveDistributionsToFile(dists, args.outfile, n)
-    params = computeStatistics(dists, Ts)
-    printStatistics(params,Ts)
+    params = computeStatistics(dists, Ts, n)
+    printStatistics(params,Ts, n)
     fh.close()

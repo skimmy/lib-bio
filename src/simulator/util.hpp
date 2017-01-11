@@ -3,11 +3,16 @@
 
 #include <iostream>
 
-#define MAX(X,Y) ( (X) > (Y)  ? (X) : (Y) )
-#define MIN(X,Y) ( (X) < (Y)  ? (X) : (Y) )
+// general variables
+extern char bases[];
+extern char revBases[128];
+extern double* power4_lookup;
+
 
 void initUtil();
 void clearUtil();
+
+void fatal_error(const std::string &msg, int exit_code);
 
 uint64_t string2Encode(const std::string&s);
 std::string encoding2String(uint64_t e, size_t n);
@@ -17,10 +22,7 @@ size_t hammingDistance(const std::string& s1, const std::string& s2, size_t m);
 size_t prefixSuffixHammingDistance(const std::string& s1, const std::string& s2, size_t k);
 size_t bestHammingOverlap(const std::string& s1, const std::string& s2);
 
-void printString(char* s, size_t n);
-void printDoubleMatrix(double** M, size_t n, size_t m);
-double** initDoubleMatrix(size_t n, size_t m);
-void clearDoubleMatrix(double** matrix, size_t n, size_t m);
+// TODO: can be templated
 double elementsSumDoubleMatrix(double** matrix, size_t n, size_t m);
 
 
@@ -161,7 +163,5 @@ private:
 };
 
 
-void print_warning(const std::string &msg);
-void fatal_error(const std::string &msg, int exit_code);
 
 #endif

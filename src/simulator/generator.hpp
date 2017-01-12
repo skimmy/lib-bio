@@ -1,6 +1,9 @@
 #ifndef GENERATOR_H
 #define GENERATOR_H
 
+#include <string>
+#include <queue>
+
 struct Read {
   size_t j;  
   std::string r;

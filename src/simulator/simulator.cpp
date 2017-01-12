@@ -10,6 +10,7 @@
 #include <ctime>
 
 #include <iostream>
+#include <fstream>
 #include <algorithm>
 
 Options Options::opts;

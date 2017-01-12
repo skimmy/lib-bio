@@ -480,9 +480,8 @@ testAverageDPMatrix(size_t n) {
 }
 
 void testAll() {
-  std::cout << "--------------------------------\n";
-  std::cout << "          TESTING MODE          \n";
-  std::cout << "--------------------------------\n";
+  
+  logInfo("TEST MODE");
   //testUtils();
   //testProbFunctions();
   

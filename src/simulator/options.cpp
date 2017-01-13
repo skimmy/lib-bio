@@ -72,7 +72,7 @@ void parseArguments(int argc, char** argv) {
   Options::opts.floatPrecision = std::numeric_limits< double >::max_digits10;
   
 
-  Options::opts.mode = OpMode::Offline;
+  Options::opts.mode = OpMode::Test;
   Options::opts.subTask = 0;
   Options::opts.optFlags = 0;
   Options::opts.online = false;

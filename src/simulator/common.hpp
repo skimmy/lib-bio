@@ -1,41 +1,55 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-// This is config.h generated using autotools. It contains all the variables
-// that should be set at any time and therefore it is at the top of this
-// header rather than in the inclusion section.
+// This is config.h generated using autotools. It contains all the
+// variables that should be set at any time and therefore it is at the
+// top of this header rather than in the inclusion section.
 #include <config.h>
 
+// this is needed for definition of functions below and also for the
+// definition of some types (e.g., size_t) which are used for some
+// type renaming/using/expansion (e.g., lbio_size_t)
+#include <string>
 
-///////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////
 //
-//           DEFINITION OF SOME USEFUL MACROS AND CONSTANTS
+//         DEFINITION OF SOME USEFUL MACROS AND CONSTANTS
 //
-///////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
 // Uncomment if NDEBUG is needed and not generated during compiler
 //#define NDEBUG 
 
 
-// Define a NOP_MACRO to be used to expand no operation. For example this
-// is used to mask output when NDEBUG is set.
-// NB. Code is inspired by <assert.h> (GNU related guard has been removed)
+// Define a NOP_MACRO to be used to expand no operation. For example
+// this is used to mask output when NDEBUG is set.  NB. Code is
+// inspired by <assert.h> (GNU related guard has been removed)
 #if defined __cplusplus 
 # define LBIO_NOOP static_cast<void>
 #else
 # define LBIO_NOOP (void)
 #endif
 
+// Define a custom type for size type, this is just a convenience and
+// it will take long time (if ever) to port every part of the
+// code. For the time being this type exapnds to size_t, but in the
+// future changes there may be needed.
+#if defined __cplusplus 
+using lbio_size_t = size_t;
+#else
+#define lbio_size_t size_t
+#endif
 
-
-///////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 //
-//                  HERE ARE ALL THE INCLUSIONS NEEDED
+//                HERE ARE ALL THE INCLUSIONS NEEDED
 //
-///////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
-// It is bad design to use a single file to include every header in the
-// project. Such solution is, however, convenient for small projects.
+// It is bad design to use a single file to include every header in 
+// the project. Such solution is, however, convenient for small
+// projects.
 
 
 // includes for simulator
@@ -50,9 +64,7 @@
 #include "edit.hpp"
 #include "log.hpp"
 
-// this has likely been included in some of the above files. We just keep
-// it because it is explictly required by definition of function(s) below
-#include <string>
+
 
 // testing functions
 void testAll();

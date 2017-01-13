@@ -407,16 +407,36 @@ editDistanceTests() {
     sMat[i] = new EditDistanceInfo[n];
   }
   editDistSamplesInfoLinSpace(n,100, sMat);
-  //  printMatrix<EditDistanceInfo>(sMat,n,n, "\t");
   for (size_t i = 0; i < n; ++i) {
     delete[] sMat[i];
   }
   delete[] sMat;
 
   std::cout << "\n* Bandwise Approximation Test\n\n";
-  std::string s1 = "ACGTACGT";
-  std::string s2 = "ACGTACGT";
-  editDistanceBandwiseApprox(s1 ,s2, 4);
+  n = 32;
+  std::string s1(n, 'N');
+  std::string s2(n, 'N');
+  std::string An(n, 'A');
+  std::string Gn(n, 'G');
+  generateIIDString(s1);
+  generateIIDString(s2);
+  std::vector<lbio_size_t> bandMonotoneTestV;
+  std::vector<lbio_size_t> bandMonotoneTestInv;
+  std::vector<lbio_size_t> bandMaxDistV;
+  std::vector<lbio_size_t> testedTs {0, 1, 2, 4, 8, 16};
+  for (auto t : testedTs) {
+    bandMonotoneTestV.push_back(editDistanceBandwiseApprox(s1,s2,t));
+    bandMonotoneTestInv.push_back(editDistanceBandwiseApprox(s2,s1,t));
+    bandMaxDistV.push_back(editDistanceBandwiseApprox(An,Gn,t));
+  }
+  std::cout << "\tNot incresing with T: "
+	    << isMonotoneNonIncreasing(bandMonotoneTestV, testedTs.size())<< "\n";
+  std::cout << "\tElementwise equality inverted: "
+	    << areElementwiseEqual(bandMonotoneTestV, bandMonotoneTestInv, testedTs.size()) << "\n";
+  std::cout << "\tT=0 equals Hamming: " << (bandMonotoneTestV[0] == hammingDistance(s1,s2,s1.size())) << "\n";
+  std::cout << "\tConstant for ED(A^n,G^n): " << isConstant(bandMaxDistV, testedTs.size())
+	    << "    ( ED=" << bandMaxDistV.back() << " )\n";
+  //    std::cout << s1 << "\t" << s2 << "\n";  
 }
 
 

@@ -22,6 +22,12 @@ size_t hammingDistance(const std::string& s1, const std::string& s2, size_t m);
 size_t prefixSuffixHammingDistance(const std::string& s1, const std::string& s2, size_t k);
 size_t bestHammingOverlap(const std::string& s1, const std::string& s2);
 
+//////////////////////////////////////////////////////////////////////
+//
+//         FUNCTIONS FOR OPERATING ON VECTOR AND MATRIXES
+//
+//////////////////////////////////////////////////////////////////////
+
 // TODO: can be templated
 double elementsSumDoubleMatrix(double** matrix, size_t n, size_t m);
 
@@ -89,6 +95,17 @@ void writeVectorOnStream(T v[], size_t n, std::ostream& os, std::string delim = 
   }
   os.flush();
 }
+
+//////////////////////////////////////////////////////////////////////
+//
+//                      MATH RELATED FUNCTIONS
+//
+//////////////////////////////////////////////////////////////////////
+
+// Here there are some useful functions and clases for math operations
+// and property testing. So far they are few, if their number
+// increases consider moving to a dedicated header file.
+
 
 template<typename T>
 class GeometricProgression {
@@ -163,5 +180,46 @@ private:
 };
 
 
+// monotonicity tests
+template<typename T>
+bool isMonotoneNonDecreasing(const T& v, lbio_size_t n) {
+  for (lbio_size_t i = 1; i < n; ++i) {
+    if (v[i] < v[i-1]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+template<typename T>
+bool isMonotoneNonIncreasing(const T& v, lbio_size_t n) {
+  for (lbio_size_t i = 1; i < n; ++i) {
+    if (v[i] > v[i-1]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+template<typename T>
+bool isConstant(const T& v, lbio_size_t n) {
+  for (lbio_size_t i = 0; i < n; ++i) {
+    if (v[i] != v[0]) {
+      return false;
+    }
+  }
+  return true;  
+}
+
+// elementwise equality test
+template<typename T>
+bool areElementwiseEqual(const T& v1, const T& v2, lbio_size_t n) {
+  for (lbio_size_t i = 0; i < n; ++i) {
+    if (v1[i] != v2[i]) {
+      return false;
+    }
+  }
+  return true;
+}
 
 #endif

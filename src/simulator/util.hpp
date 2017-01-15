@@ -4,12 +4,12 @@
 #include <iostream>
 
 // general variables
-extern char bases[];
-extern char revBases[128];
+// extern char bases[];
+// extern char revBases[128];
 extern double* power4_lookup;
 
 
-void initUtil();
+void initUtil(size_t m);
 void clearUtil();
 
 void fatal_error(const std::string &msg, int exit_code);

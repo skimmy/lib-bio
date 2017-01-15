@@ -5,6 +5,15 @@
  */
 
 #include "common.hpp"
+#include "generator.hpp"
+#include "online.hpp"
+#include "options.hpp"
+#include "chain.hpp"
+#include "prob.hpp"
+#include "util.hpp"
+#include "align.hpp"
+#include "edit.hpp"
+#include "log.hpp"
 
 #include <cstdlib>
 #include <ctime>
@@ -47,7 +56,7 @@ EstimationPoint * oraclePoints;
 EditDistanceSimOutput* edOut;
 
 void initSimulator() {
-  initUtil();    
+  initUtil(Options::opts.m);
   initRandomGenerator();
   initProbabilities();
   initChainMatrix();
@@ -157,7 +166,7 @@ void offlineSimulation() {
   // once (i.e., emptying the queue) reads will be presented in ordered by
   // position on the reference sequence
   std::priority_queue<Read> reads;
-  generateOfflineReads(s, reads);
+  generateOfflineReads(s, reads, m, Options::opts.M, Options::opts.pe);
 
   // Temporary variables to count the number of holes, in the future a more
   // sophisticated way (e.g., finite state machine) should be used.
@@ -198,6 +207,7 @@ void onlineSimulation() {
 
   size_t N = Options::opts.N;
   size_t m = Options::opts.m;
+  double pe = Options::opts.pe;
   
   GenomeSegment g(N, m, MAX_GENOME_SEGMENT_LENGTH);
   generateFirstGenomeSegment(g);
@@ -244,7 +254,7 @@ void onlineSimulation() {
       remaining_genome -= d;
     }
    
-    Read current = generateOnlineRead(g.genome,current_position);
+    Read current = generateOnlineRead(g.genome,current_position, m, pe);
     actual_M++;
     current.j = real_position;
 
@@ -281,6 +291,7 @@ void onlineSimulation() {
 void oracleSimulation() {  
   size_t n = 2 * Options::opts.m;
   size_t m = Options::opts.m;
+  double pe = Options::opts.pe;
   double alpha = 1.0 / ((double)Options::opts.N - 2.0 * m + 1);
   double numDen[2];
   
@@ -291,7 +302,7 @@ void oracleSimulation() {
     generateIIDGenome(n, genome);
 
     // generate first reads at position 0
-    Read r1 = generateOnlineRead(genome, 0);
+    Read r1 = generateOnlineRead(genome, 0, m, pe);
     // generate inter-arrival d
     size_t d = generateInterReadDistance();
 
@@ -302,7 +313,7 @@ void oracleSimulation() {
       oraclePoints[0].sumScore += alpha;
       oraclePoints[0].count++;
     } else {
-      Read r2 = generateOnlineRead(genome, d);
+      Read r2 = generateOnlineRead(genome, d, m, pe);
       size_t s = m - d;
       oraclePoints[s].hammDist += prefixSuffixHammingDistance(r1.r, r2.r, s);
       double sc = scoreExt(r1.r, r2.r, s,numDen);

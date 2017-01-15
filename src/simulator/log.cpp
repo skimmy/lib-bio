@@ -1,4 +1,4 @@
-#include "common.hpp"
+#include "log.hpp"
 
 #include <iostream>
 
@@ -24,3 +24,9 @@ _logInfo(const std::string& msg) {
   (*logStream) << "\033[1;34mInfo    \033[0m" << msg << std::endl;
 }
 
+void
+fatal_error(const std::string &msg, int exit_code)
+{
+  logError(msg);
+  exit(exit_code);
+}

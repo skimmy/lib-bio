@@ -1,4 +1,8 @@
 #include "common.hpp"
+#include "generator.hpp"
+#include "options.hpp"
+#include "chain.hpp"
+#include "util.hpp"
 
 #include <cstdint>
 #include <cmath>

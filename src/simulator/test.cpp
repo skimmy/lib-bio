@@ -1,5 +1,13 @@
 #include "common.hpp"
 
+#include "generator.hpp"
+#include "options.hpp"
+#include "prob.hpp"
+#include "util.hpp"
+#include "edit.hpp"
+#include "log.hpp"
+
+
 #include <iostream>
 #include <algorithm>
 #include <cstring>
@@ -123,7 +131,7 @@ void testPeq() {
 
 void testLookupTables() {
   clearUtil();
-  initUtil();
+  initUtil(Options::opts.m);
   std::cout << "LOOKUP TABLES TEST\n";
   std::cout << "4^{-(m-s)}\n";
   for (size_t i = 0; i <= Options::opts.m; ++i) {

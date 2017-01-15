@@ -1,3 +1,4 @@
+#include "generator.hpp"
 #include "common.hpp"
 
 #include <iostream>
@@ -83,17 +84,23 @@ void generateConstantGenome(size_t N, char* S, char b) {
   }
 }
 
+Read randomRead(size_t m) {
+  char * tmp = new char[m];
+  generateIIDGenome(m,tmp);
+  Read r(std::string(tmp), 0);
+  delete[] tmp;
+  return r;
+}
+
 void simulateReadAt(size_t j, size_t m, const char* S, char* r) {
   for (size_t l = 0; l < m; ++l) {
     r[l] = S[j+l];
   }
 }
 
-void generateOfflineReads(const std::string& s, std::priority_queue<Read>& reads) {
+void generateOfflineReads(const std::string& s, std::priority_queue<Read>& reads, size_t m, size_t M, double pe) {
   size_t N = s.length();
   const char* pS = s.c_str();
-  size_t m = Options::opts.m;
-  size_t M = Options::opts.M;
   size_t barN = N - m + 1;
   char* r = new char[m + 1]; // +1 accomodates null terminating symbol
   for (size_t i = 0; i < M; ++i) {
@@ -101,7 +108,7 @@ void generateOfflineReads(const std::string& s, std::priority_queue<Read>& reads
     simulateReadAt(j,m,pS,r);
     r[m] = 0;
     Read read(std::string(r),j);
-    simpleIIDErrors(read.r, Options::opts.pe);
+    simpleIIDErrors(read.r, pe);
     reads.push(read);
   }
   delete[] r;
@@ -110,11 +117,11 @@ void generateOfflineReads(const std::string& s, std::priority_queue<Read>& reads
 /**
  * Generates a noisy read starting at position j of S for online simulations
  */
-Read generateOnlineRead(char* S, size_t j) {  
-  char* r = new char[Options::opts.m+1];
-  simulateReadAt(j, Options::opts.m, S, r);
+Read generateOnlineRead(char* S, size_t j, size_t m, double pe) {  
+  char* r = new char[m+1];
+  simulateReadAt(j, m, S, r);
   Read read(std::string(r),j);
-  simpleIIDErrors(read.r, Options::opts.pe);
+  simpleIIDErrors(read.r, pe);
   delete[] r;
   return read;
 }

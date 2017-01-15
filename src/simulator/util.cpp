@@ -8,17 +8,9 @@
 // some util global variables (lookup tables, constants, ...)
 double* power4_lookup = NULL; // contains 4^{-(m-s)} for s=0,...,m
 
-char bases[] = {'A', 'C', 'G', 'T'};
-char revBases[128];
-
-void initUtil() {
-  revBases['A'] = revBases['a'] = 0;
-  revBases['C'] = revBases['c'] = 1;
-  revBases['G'] = revBases['g'] = 2;
-  revBases['T'] = revBases['t'] = 3;
-  int m = Options::opts.m;
+void initUtil(size_t m) {
   power4_lookup = new double[m+1];
-  for (int s = 0; s <= m; ++s) {
+  for (size_t s = 0; s <= m; ++s) {
     power4_lookup[s] = pow(4, s-m);
   }
 }
@@ -104,25 +96,4 @@ void printVec(size_t* v, size_t n) {
     std::cout << v[i] << ' ';
   }
   std::cout << std::endl;
-}
-
-// Most of these function are used for debug and dev purpose, but they can be
-// useful in other situations (perhaps in the future development of simulator)
-
-Read randomRead(size_t m) {
-  char * tmp = new char[m];
-  generateIIDGenome(m,tmp);
-  Read r(std::string(tmp), 0);
-  delete[] tmp;
-  return r;
-}
-
-// Error and warnings
-
-
-void
-fatal_error(const std::string &msg, int exit_code)
-{
-  logError(msg);
-  exit(exit_code);
 }

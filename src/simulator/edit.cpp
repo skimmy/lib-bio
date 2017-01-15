@@ -1,5 +1,11 @@
 #include "common.hpp"
 
+#include "generator.hpp"
+#include "options.hpp"
+#include "prob.hpp"
+#include "util.hpp"
+#include "edit.hpp"
+
 #include <iostream>
 #include <fstream>
 #include <map>

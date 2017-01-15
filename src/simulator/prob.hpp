@@ -1,3 +1,8 @@
+#ifndef SIM_PROB_H
+#define SIM_PROB_H
+
+#include <vector>
+
 // Class representing empirical distribution as histogram array
 class EmpiricalDistribution {  
 public:
@@ -111,3 +116,4 @@ size_t medianFromFrequency(T f[], size_t n) {
   return n-1;
 }
 
+#endif

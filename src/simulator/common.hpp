@@ -53,16 +53,32 @@ using lbio_size_t = size_t;
 
 
 // includes for simulator
-#include "generator.hpp"
-#include "online.hpp"
-#include "options.hpp"
-#include "chain.hpp"
-#include "prob.hpp"
-#include "util.hpp"
-#include "align.hpp"
-#include "io.hpp"
-#include "edit.hpp"
-#include "log.hpp"
+// #include "generator.hpp"
+// #include "online.hpp"
+// #include "options.hpp"
+// #include "chain.hpp"
+// #include "prob.hpp"
+// #include "util.hpp"
+// #include "align.hpp"
+// #include "io.hpp"
+// #include "edit.hpp"
+// #include "log.hpp"
+
+// The followinf arrays are used to translate int to bases and
+// vice-versa. They are declare constexpr to allow compiler
+// optimizations (when possible).
+constexpr char bases[] = {'A', 'C', 'G', 'T'};
+// all but ACGTacgt are mapped to 127
+constexpr char revBases[] = {
+  127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 
+  127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 
+  127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 
+  127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 
+  127, 0,   127, 1,   127, 127, 127, 2,   127, 127, 127, 127, 127, 127, 127, 127, 
+  127, 127, 127, 127, 3,   127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 
+  127, 0,   127, 1,   127, 127, 127, 2,   127, 127, 127, 127, 127, 127, 127, 127, 
+  127, 127, 127, 127, 3, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127,
+};
 
 
 

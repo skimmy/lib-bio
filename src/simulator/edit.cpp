@@ -309,8 +309,8 @@ editDistSamples(size_t n, size_t k_samples) {
   std::unique_ptr<size_t[]> v(new size_t[k_samples]);
   std::string s1(n,'N');
   std::string s2(n,'N');
-  size_t* v0 = new size_t[n];
-  size_t* v1 = new size_t[n];
+  size_t* v0 = new size_t[n+1];
+  size_t* v1 = new size_t[n+1];
   for (size_t k = 0; k < k_samples; ++k) {
     generateIIDString(s1);
     generateIIDString(s2);

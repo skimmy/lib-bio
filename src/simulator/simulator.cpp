@@ -22,6 +22,12 @@
 #include <fstream>
 #include <algorithm>
 
+// testing functions from test.cpp. This has not been inserted in
+// other includes (e.g., common.hpp) since this is the only place
+// where it used. Moreover in case of unit testing code development
+// this tests will become deprecated.
+void testAll();
+
 Options Options::opts;
 
 // output quantities (common to online and offline)

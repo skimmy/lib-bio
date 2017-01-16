@@ -20,4 +20,6 @@ void _logError(const std::string& msg);
 void _logWarning(const std::string& msg);
 void _logInfo(const std::string& msg);
 
+void fatal_error(const std::string &msg, int exit_code = 1);
+
 #endif

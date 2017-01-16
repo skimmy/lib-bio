@@ -41,35 +41,21 @@ using lbio_size_t = size_t;
 #define lbio_size_t size_t
 #endif
 
-//////////////////////////////////////////////////////////////////////
-//
-//                HERE ARE ALL THE INCLUSIONS NEEDED
-//
-//////////////////////////////////////////////////////////////////////
+// TODO find a way to test the support to 'constexpr' (there is a
+// macro in boost but to use that we should also define a macro that
+// works even in absence of boost libraries
+#if defined __cplusplus
+#define CONSTEXPR_OR_CONST constexpr
+#else
+#define CONSTEXPR_OR_CONST const
+#endif
 
-// It is bad design to use a single file to include every header in 
-// the project. Such solution is, however, convenient for small
-// projects.
-
-
-// includes for simulator
-// #include "generator.hpp"
-// #include "online.hpp"
-// #include "options.hpp"
-// #include "chain.hpp"
-// #include "prob.hpp"
-// #include "util.hpp"
-// #include "align.hpp"
-// #include "io.hpp"
-// #include "edit.hpp"
-// #include "log.hpp"
-
-// The followinf arrays are used to translate int to bases and
+// The following arrays are used to translate int to bases and
 // vice-versa. They are declare constexpr to allow compiler
 // optimizations (when possible).
-constexpr char bases[] = {'A', 'C', 'G', 'T'};
+CONSTEXPR_OR_CONST char bases[] = {'A', 'C', 'G', 'T'};
 // all but ACGTacgt are mapped to 127
-constexpr char revBases[] = {
+CONSTEXPR_OR_CONST char revBases[] = {
   127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 
   127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 
   127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 
@@ -81,9 +67,4 @@ constexpr char revBases[] = {
 };
 
 
-
-// testing functions
-void testAll();
-void fatal_error(const std::string &msg, int exit_code = 1);
-
-#endif
+#endif // COMMON_H

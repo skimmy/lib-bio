@@ -612,7 +612,7 @@ void editDistanceWithInfo(const std::string& s1, const std::string& s2, EditDist
 
 
 SampleEstimates
-editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta) {
+editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta, size_t k_min) {
 
   size_t* v0 = new size_t[n+1];
   size_t* v1 = new size_t[n+1];
@@ -633,7 +633,8 @@ editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta) {
     cumulative_quad_sum += (sample * sample);
     mean_k = cumulative_sum / ((double)k);
     var_k = ( cumulative_quad_sum - k*(mean_k*mean_k)  ) / ((double)(k-1));
-    if (var_k * ( z_delta*z_delta ) < ((double)k) * ( precision * precision )) {
+    if  ( (var_k * ( z_delta*z_delta ) < ((double)k) * ( precision * precision ))
+	  && (k > k_min) ){
       break;
     }
   }

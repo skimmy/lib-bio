@@ -375,7 +375,7 @@ editDistanceOpMode() {
   }
 
   // Task - Default (0)
-  if (flags & EDIT_DISTANCE_BOUNDED_ERROR) {
+  if (flags & EDIT_DISTANCE_DIFF_BOUNDED_ERROR) {
     size_t k_max = Options::opts.k;
     double precision = Options::opts.precision;
     double z_confidence = Options::opts.confidence;
@@ -385,6 +385,14 @@ editDistanceOpMode() {
 	      << est[0].sampleMean  << "\t" << est[0].sampleVariance << "\n";    
     std::cout << n << "\t" << est[1].sampleSize
 	      << "\t" << est[1].sampleMean  << "\t" << est[1].sampleVariance << "\n";
+    return;
+  }
+
+  if (flags & EDIT_DISTANCE_BOUNDED_ERROR) {
+    double precision = Options::opts.precision;
+    double z_confidence = Options::opts.confidence;
+    SampleEstimates beEst = editDistanceErrorBoundedEstimates(n, precision, z_confidence);
+    std::cout << beEst.sampleSize << "\t" << beEst.sampleMean << "\t" << beEst.sampleVariance << "\n";
     return;
   }
   

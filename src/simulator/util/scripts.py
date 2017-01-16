@@ -12,6 +12,8 @@ def parseArguments():
                         default="max.txt")
     parser.add_argument("--dist-file", dest="distFile", help="Name od file where distributions of operations will be saved",
                         default="dist.txt")
+    parser.add_argument("--mat-row", dest="matrixRow", help="Prints the content of the specified row of the frequency matrix")
+    parser.add_argument("--mat-col", dest="matrixColumn", help="Prints the content of the specified column of the frequency matrix")
     # parser.add_argument("opt", help="Required option")
     # parser.add_argument("-o", "--optional", dest='o', help="Optional flag", action='store_true')
     # parser.add_argument("-d", "--default", help="SWith default", default="Hello")
@@ -81,6 +83,50 @@ def calculateScriptsStats(n, scripts):
         maxDistr[maxOscill] += 1
     return mat, maxDistr
 
+def horizontalCross(script, r):
+    i = 0
+    j = 0
+    for op in script:
+        next_i = i
+        next_j = j
+        if (op == 'M') or (op == 'S') or (op == 'D'):
+            next_i = i+1
+        if (op == 'M') or (op == 'S') or (op == 'I'):
+            next_j = j+1
+        if (next_j >= r):
+            return (i,j)
+        i = next_i
+        j = next_j
+
+def calculateHorizontalFlow(n, scripts, r):
+    f = np.zeros(n)
+    for s in scripts:
+        i,j = horizontalCross(s,r)
+        f[i] += 1
+    return f
+
+def verticalCross(script, c):
+    i = 0
+    j = 0
+    for op in script:
+        next_i = i
+        next_j = j
+        if (op == 'M') or (op == 'S') or (op == 'D'):
+            next_i = i+1
+        if (op == 'M') or (op == 'S') or (op == 'I'):
+            next_j = j+1
+        if (next_i >= c):
+            return (i,j)
+        i = next_i
+        j = next_j
+
+def calculateVerticalFlow(n, scripts, c):
+    f = np.zeros(n)
+    for s in scripts:
+        i,j = verticalCross(s, c)
+        f[j] += 1
+    return f
+
 if __name__ == "__main__":
     args = parseArguments()
     n = int(args.n)
@@ -98,7 +144,15 @@ if __name__ == "__main__":
     np.savetxt(args.distFile ,zip(np.arange(n+1), mDist, sDist, dDist, iDist), delimiter="\t")
     np.savetxt(args.matFile, freqMat, delimiter="\n")
     np.savetxt(args.maxFile, maxDistr, delimiter="\n")
-    
-    
+    if args.matrixRow:
+        r = int(args.matrixRow)
+        flow_r = calculateHorizontalFlow(n+1, allScripts, r)
+        for i in range(n+1):            
+            print( "{0}\t{1}".format( i, int(flow_r[i]) ) )
+    if args.matrixColumn:
+        c = int(args.matrixColumn)
+        flow_c = calculateVerticalFlow(n+1, allScripts, c)
+        for j in range(n+1):
+            print( "{0}\t{1}".format( j, int(flow_c[j]) ) )
     
     

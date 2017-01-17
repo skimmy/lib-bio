@@ -30,3 +30,7 @@ fatal_error(const std::string &msg, int exit_code)
   logError(msg);
   exit(exit_code);
 }
+
+std::string colorifyString(const std::string& plain, const std::string& color) {
+  return (color + plain + TermColEndColor);
+}

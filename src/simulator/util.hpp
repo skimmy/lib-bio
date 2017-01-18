@@ -167,7 +167,7 @@ public:
     std::vector<T> vals;
     rewind();
     while(next <= maxVal) {
-      vals.push_back(getNext());
+      vals.push_back(this->getNext());
     }
     return vals;
   }

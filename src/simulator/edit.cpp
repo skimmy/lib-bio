@@ -15,10 +15,132 @@
 #include <cmath>
 
 
+//////////////////////////////////////////////////////////////////////
+//
+//             EDIT DISTANCE STRUCTS AND CLASSES
+//
+//////////////////////////////////////////////////////////////////////
 
-// ----------------------------------------------------------------------
-//                               INFO CONVERSION
-// ----------------------------------------------------------------------
+// This is an attempt to make different edit distance algorithms fit a
+// common interface. This is a work-in-progresso and is subject to
+// many changes. The ultimate goal is to obtain an infrastructure that
+// allows (almost) seamingless change of the algorithm without changes
+// to the client code.
+
+/** 
+ * \brief This struct contains the minimal amount of data to support
+ * dynamic programming algorithms, namely: the matrix and its sizes.
+*/
+template<typename T>
+struct DynamicProgramming {
+  T** dp_matrix;
+  lbio_size_t n;
+  lbio_size_t m;
+
+  DynamicProgramming(lbio_size_t n_, lbio_size_t m_)
+    : n(n_), m(m_)
+  {
+    dp_matrix = allocMatrix<T>(n+1,m+1);
+  }
+
+  ~DynamicProgramming() { freeMatrix<T>(n, m, dp_matrix); }
+};
+
+/**
+ * \brief This class represents the standard Wagner and Fischer edit
+ * distance dynamic programming algorithm.
+ */
+template<typename CostType, typename IndexedType>
+class EditDistanceWF {
+public:
+    typedef std::vector<CostType> CostVector;
+
+private:
+  DynamicProgramming<CostType> dp_struct;
+  // costs are in vector [W_S, W_D, W_I] (i.e., [0] -> Sub, [1] -> Del, [2] -> Ins)
+  CostVector costs_vector;
+  
+public:
+
+  #define iS_ 0
+  #define iD_ 1
+  #define iI_ 2
+  
+  EditDistanceWF(lbio_size_t n, lbio_size_t m)
+    : dp_struct {n, m}, costs_vector {1, 1, 1}
+  {  }
+
+  EditDistanceWF(lbio_size_t n, lbio_size_t m, const CostVector& costs)
+    : dp_struct{n, m}, costs_vector {costs}
+  { }
+
+  
+  void init() {
+    dp_struct.dp_matrix[0][0] = 0;
+    for (lbio_size_t i = 1; i <= dp_struct.n; ++i) {
+      dp_struct.dp_matrix[i][0]
+	= dp_struct.dp_matrix[i-1][0] + costs_vector[iD_];
+    }
+    for (lbio_size_t j = 1; j <= dp_struct.m; ++j) {
+      dp_struct.dp_matrix[0][j]
+	= dp_struct.dp_matrix[0][j-1] + costs_vector[iI_];
+    }
+  }
+
+  CostType calculate(const IndexedType& s1, const IndexedType& s2) {
+    for (lbio_size_t i = 1; i <= dp_struct.n; ++i) {
+      for(lbio_size_t j = 1; j <= dp_struct.m; ++j) {
+	CostType delta = ( s1[i-1] == s2[j-1] ) ? 0 : costs_vector[iS_];
+	CostType A_ = dp_struct.dp_matrix[i-1][j-1] + delta; 
+	CostType B_ = dp_struct.dp_matrix[i-1][j] + costs_vector[iD_];
+	CostType C_ = dp_struct.dp_matrix[i][j-1] + costs_vector[iI_];
+	dp_struct.dp_matrix[i][j] = std::min(A_,std::min(B_, C_ ));
+      }
+    }
+    return dp_struct.dp_matrix[dp_struct.n][dp_struct.m];
+  }
+
+  void print_dp_matrix() {
+    printMatrix<CostType>(dp_struct.n+1, dp_struct.m+1, dp_struct.dp_matrix);
+  }
+};
+
+// Proptotype test function to be removed
+void test_edit_distance_class() {
+  lbio_size_t n = 128;
+  std::string s1(n, 'A');
+  std::string s2(n, 'T');
+  
+  EditDistanceWF<lbio_size_t,std::string> edit_distance_wf(n,n);
+  edit_distance_wf.init();
+  //  edit_distance_wf.calculate(s1, s2);
+  //  edit_distance_wf.print_dp_matrix();
+
+  EditDistanceWF<lbio_size_t,std::string> edit_distance_wf_no_unif(n, n, {1,0,2} );
+  edit_distance_wf_no_unif.init();
+  //  edit_distance_wf_no_unif.calculate(s1, s2);
+  //  edit_distance_wf_no_unif.print_dp_matrix();
+
+  EditDistanceWF<lbio_size_t, std::string> edit_distance_wf_no_unif_inv(n, n, {1,2,0});
+  edit_distance_wf_no_unif_inv.init();
+
+  lbio_size_t k = 40;
+  for (lbio_size_t l = 0; l < k; ++l) {
+    generateIIDString(s1);
+    generateIIDString(s2);
+    lbio_size_t ed = edit_distance_wf.calculate(s1, s2);
+    lbio_size_t ed_no_unif = edit_distance_wf_no_unif.calculate(s1, s2);
+    lbio_size_t ed_no_unif_inv = edit_distance_wf_no_unif_inv.calculate(s1, s2);
+    std::cout << ed << "\t" << ed_no_unif << "\t" << ed_no_unif_inv << "\n";
+    
+  }
+}
+
+
+
+//////////////////////////////////////////////////////////////////////
+//                         INFO CONVERSION
+//////////////////////////////////////////////////////////////////////
 
 std::unique_ptr<double[]> extractSubstitutionArray(const EditDistanceInfo* v, size_t k) {
   std::unique_ptr<double[]> o(new double[k]);

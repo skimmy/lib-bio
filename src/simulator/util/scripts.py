@@ -16,7 +16,8 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-redErrorMsg = bcolors.FAIL + "Error" + bcolors.ENDC 
+redErrorMsg = bcolors.FAIL + "Error" + bcolors.ENDC
+yellowWarnMsg = bcolors.WARNING + "Warning" + bcolors.ENDC
 
 def parseArguments():
     parser = argparse.ArgumentParser()
@@ -30,9 +31,6 @@ def parseArguments():
     parser.add_argument("--mat-row", dest="matrixRow", help="Prints the content of the specified row of the frequency matrix")
     parser.add_argument("--mat-col", dest="matrixColumn", help="Prints the content of the specified column of the frequency matrix")
     parser.add_argument("-a", "--archive-dir", dest="archive", help="Creates an 'archived' version in the directory given as parameter")
-    # parser.add_argument("opt", help="Required option")
-    # parser.add_argument("-o", "--optional", dest='o', help="Optional flag", action='store_true')
-    # parser.add_argument("-d", "--default", help="SWith default", default="Hello")
     return parser.parse_args()
 
 def scriptOperationsParse(script):
@@ -155,8 +153,13 @@ if __name__ == "__main__":
     # n+1 because the DP goes from (0,0) to (n,n) included
     freqMat, maxDistr = calculateScriptsStats(n+1, allScripts)
     mDist, sDist, dDist, iDist = operationsDistribution(n+1, allScripts)
+
+    # WARNING: Using python3 the savetxt with zip fails    
     # pack into one file distributions vector for all operations along with the header
-    np.savetxt(args.distFile ,zip(np.arange(n+1), mDist, sDist, dDist, iDist), delimiter="\t")
+    if sys.version_info.major <= 2:
+        np.savetxt(args.distFile ,zip(np.arange(n+1), mDist, sDist, dDist, iDist), delimiter="\t")
+    else:
+        print("{0} {1} file not produced (Python{2} issue)".format(yellowWarnMsg, args.distFile, sys.version_info.major))
     np.savetxt(args.matFile, freqMat, delimiter="\n")
     np.savetxt(args.maxFile, maxDistr, delimiter="\n")
     # cross distribution requested
@@ -174,6 +177,7 @@ if __name__ == "__main__":
         flow_c = calculateVerticalFlow(n+1, allScripts, c)
         for j in range(n+1):
             print( "{0}\t{1}".format( j, int(flow_c[j]) ) )
+            
     # The archive options puts all files in binary numpy format into
     # the archiviation directory. This is useful to load afterwards
     # with the ndarray.fromfile function (useful e.g., for plotting).
@@ -188,18 +192,18 @@ if __name__ == "__main__":
             sys.exit(1)
         if not existPath:
             os.mkdir(archivePath)
-        freqMat.tofile (os.path.join(archivePath, args.matFile + ".ar"))
+        np.save(os.path.join(archivePath, args.matFile), freqMat )
         # make one file for each type of operation to make loading easire
-        mDist.tofile(os.path.join(archivePath, "M_" + args.distFile + ".ar"))
-        sDist.tofile(os.path.join(archivePath, "S_" + args.distFile + ".ar"))
-        dDist.tofile(os.path.join(archivePath, "D_" + args.distFile + ".ar"))
-        iDist.tofile(os.path.join(archivePath, "I_" + args.distFile + ".ar"))
-        maxDistr.tofile(os.path.join(archivePath, args.maxFile + ".ar"))
+        np.save(os.path.join(archivePath, "M_" + args.distFile), mDist)
+        np.save(os.path.join(archivePath, "S_" + args.distFile), sDist)
+        np.save(os.path.join(archivePath, "D_" + args.distFile), dDist)
+        np.save(os.path.join(archivePath, "I_" + args.distFile), iDist)
+        np.save(os.path.join(archivePath, args.maxFile), maxDistr)
         # save also crossing distributions if calculated
         if args.matrixRow:
-            flow_r.tofile(os.path.join(archivePath, "HCross_" + str(r) + ".ar" ))
+            np.save(os.path.join(archivePath, "HCross_" + str(r)), flow_r)
         if args.matrixColumn:
-            flow_c.tofile(os.path.join(archivePath, "VCross_" + str(c) + ".ar" ))
+            np.save(os.path.join(archivePath, "VCross_" + str(c)), flow_c )
 
         
     

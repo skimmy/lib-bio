@@ -469,8 +469,6 @@ int main(int argc, char** argv) {
   parseArguments(argc,argv);
   initSimulator();
 
-  std::cout << colorifyString("Hey there", TermColHeader + TermColBold + TermColUnderline) << " welcome\n";   
-
   switch (Options::opts.mode) {
   case (OpMode::Test):
     testAll();

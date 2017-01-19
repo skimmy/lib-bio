@@ -9,8 +9,10 @@
 #define EDIT_DISTANCE_ALGORITHM_QUADRATIC 0x2
 #define EDIT_DISTANCE_INFO_PARTIAL        0x4
 #define EDIT_DISTANCE_INFO_SCRIPT         0x8
-#define EDIT_DISTANCE_SAMPLE_MATRIX       0x10
-#define EDIT_DISTANCE_BOUNDED_ERROR       0x20
+#define EDIT_DISTANCE_SAMPLE_MATRIX       0x10 // 16
+
+#define EDIT_DISTANCE_BOUNDED_ERROR       0x20 // 32
+#define EDIT_DISTANCE_DIFF_BOUNDED_ERROR  0x40 // 64
 
 // edit distance subtasks
 #define EDIT_DISTANCE_SUBTASK_DEFUALT       0
@@ -40,7 +42,7 @@ public:
 
   EditDistanceInfo() : n_sub(0), n_del(0), n_ins(0) {}
   EditDistanceInfo(const EditDistanceInfo& i) :
-    n_sub(i.n_sub), n_del(i.n_del), n_ins(i.n_ins) {}
+    n_sub(i.n_sub), n_del(i.n_del), n_ins(i.n_ins), edit_script(i.edit_script) {}
 
   std::string edit_script = "";
 
@@ -167,7 +169,7 @@ void
 computeAverageDPMatrix(double** dpMatrix, size_t n, size_t m);
 
 SampleEstimates
-editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta);
+editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta, size_t k_min = 16);
 
 SampleEstimates
 editDistanceRelativeErrorEstimates(size_t n, double e_model, double precision, double z_delta);

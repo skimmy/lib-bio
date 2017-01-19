@@ -1,5 +1,14 @@
 #include "common.hpp"
 
+#include "generator.hpp"
+#include "options.hpp"
+#include "prob.hpp"
+#include "util.hpp"
+#include "edit.hpp"
+#include "log.hpp"
+
+#include "extensions/boost_ext.hpp"
+
 #include <iostream>
 #include <algorithm>
 #include <cstring>
@@ -9,6 +18,8 @@
 #define TEST_READ_LENGTH 100
 
 const int MC_SAMPLES = 2 << 22;
+
+void test_edit_distance_class();
 
 void
 testUtils() {
@@ -123,7 +134,7 @@ void testPeq() {
 
 void testLookupTables() {
   clearUtil();
-  initUtil();
+  initUtil(Options::opts.m);
   std::cout << "LOOKUP TABLES TEST\n";
   std::cout << "4^{-(m-s)}\n";
   for (size_t i = 0; i <= Options::opts.m; ++i) {
@@ -337,15 +348,6 @@ editDistanceTests() {
   EditDistanceInfo v00[100];
   EditDistanceInfo v11[100];
 
-
-  /* 	GAGCAACC	TTCGGCGA
-  //  editDistanceLinSpaceInfo(std::string("GTCAATGG"), std::string("CCGTTATA"), v00, v11);
-  EditDistanceInfo infLin, infQuad;
-  infLin = editDistanceLinSpaceInfo(std::string("AGGCCCCT"), std::string("TTCCAATG"), v00, v11);
-  std::cout << "\n\n\n";
-  editDistanceWithInfo(std::string("AGGCCCCT"), std::string("TTCCAATG"), infQuad);
-  std::cout << infLin << std::endl << infQuad << std::endl;*/
-
   std::string st1(8,'N');
   std::string st2(8,'N');
   for (int i = 0; i < 200; ++i) {
@@ -401,23 +403,82 @@ editDistanceTests() {
 
   std::cout << "\n* Sample Matrix Test\n\n";
   
-  n = 8;
+  n = 16;
   EditDistanceInfo** sMat = new EditDistanceInfo*[n];
   for (size_t i = 0; i < n; ++i) {
     sMat[i] = new EditDistanceInfo[n];
   }
   editDistSamplesInfoLinSpace(n,100, sMat);
-  //  printMatrix<EditDistanceInfo>(sMat,n,n, "\t");
   for (size_t i = 0; i < n; ++i) {
     delete[] sMat[i];
   }
   delete[] sMat;
 
   std::cout << "\n* Bandwise Approximation Test\n\n";
-  std::string s1 = "ACGTACGT";
-  std::string s2 = "ACGTACGT";
-  editDistanceBandwiseApprox(s1 ,s2, 4);
-}
+  n = 128;
+  // random string
+  std::string s1(n, 'N');
+  generateIIDString(s1);
+  std::string s2(n, 'N');
+  generateIIDString(s2);
+  // constant (different) strings
+  std::string An(n, 'A');
+  std::string Gn(n, 'G');
+  // reverse strings
+  std::string s1Rev {s1};
+  std::reverse(s1Rev.begin(), s1Rev.end());
+  std::string s2Rev {s2};
+  std::reverse(s2Rev.begin(), s2Rev.end());
+  // shifted strings
+  std::string s1Shift(n, 'T');
+  std::string s2Shift(n, 'C');
+  lbio_size_t common = n - n/4;
+  std::string tmp(common, 'N');
+  generateIIDString(tmp);
+  std::string::iterator s2ShiftIter =  s2Shift.begin();
+  std::advance(s2ShiftIter, n - common);
+  std::copy_n(tmp.begin(), common, s2ShiftIter);
+  std::copy_n(tmp.begin(), common, s1Shift.begin());
+  
+  std::vector<lbio_size_t> bandMonotoneTestV;
+  std::vector<lbio_size_t> bandMonotoneTestInv;
+  std::vector<lbio_size_t> bandMaxDistV;
+  std::vector<lbio_size_t> bandReverseTestV;
+  std::vector<lbio_size_t> bandShiftedTestV;
+  LinearProgression<lbio_size_t> t_progression(1,0);
+  std::vector<lbio_size_t> testedTs = t_progression.valuesLeq(n-1);
+
+  lbio_size_t exactShift = editDistance(s1Shift, s2Shift);
+  
+  for (auto t : testedTs) {
+    bandMonotoneTestV.push_back(editDistanceBandwiseApprox(s1,s2,t));
+    bandMonotoneTestInv.push_back(editDistanceBandwiseApprox(s2,s1,t));
+    bandMaxDistV.push_back(editDistanceBandwiseApprox(An,Gn,t));
+    bandReverseTestV.push_back(editDistanceBandwiseApprox(s1Rev, s2Rev, t));
+    bandShiftedTestV.push_back(editDistanceBandwiseApprox(s1Shift, s2Shift, t));
+  }
+  std::cout << "\tNot incresing with T: "
+	    << isMonotoneNonIncreasing(bandMonotoneTestV, testedTs.size())<< "\n";
+  std::cout << "\tElementwise equality inverted: "
+	    << areElementwiseEqual(bandMonotoneTestV, bandMonotoneTestInv, testedTs.size()) << "\n";
+  std::cout << "\tT=0 equals Hamming: " << (bandMonotoneTestV[0] == hammingDistance(s1,s2,s1.size())) << "\n";
+  std::cout << "\tConstant for ED(A^n,G^n): " << isConstant(bandMaxDistV, testedTs.size())
+	    << "    ( ED=" << bandMaxDistV.back() << " )\n";
+  std::cout << "\tReversed strings: "
+	    << areElementwiseEqual(bandReverseTestV, bandMonotoneTestV, testedTs.size()) << "\n";
+  std::cout << "\tShifted strings monotone: "
+	    << isMonotoneNonIncreasing(bandShiftedTestV, testedTs.size()) << " ("
+	    << exactShift << "  " << bandShiftedTestV.back() << ")\n";
+  std::vector<lbio_size_t>::reverse_iterator tIterVec = testedTs.rbegin();
+  std::vector<lbio_size_t>::reverse_iterator shiftIterVec = bandShiftedTestV.rbegin();
+  while(*shiftIterVec == exactShift) {
+    ++shiftIterVec;
+    ++tIterVec;
+  }
+  if ( (tIterVec != testedTs.rend()) and (shiftIterVec != bandShiftedTestV.rend()) ) {
+    std::cout << "\tShifted first T != exact: " <<  *tIterVec << " (" << *shiftIterVec << ")\n";
+  }
+} 
 
 
 class InverseSquareRootFunction
@@ -480,9 +541,8 @@ testAverageDPMatrix(size_t n) {
 }
 
 void testAll() {
-  std::cout << "--------------------------------\n";
-  std::cout << "          TESTING MODE          \n";
-  std::cout << "--------------------------------\n";
+  
+  logInfo("TEST MODE");
   //testUtils();
   //testProbFunctions();
   
@@ -491,10 +551,19 @@ void testAll() {
   //  testLookupTables();
   //testPeq();
   //testApproximatedExpectedScore();
-  
-  
-  editDistanceTests();
+
+ 
+  //  editDistanceTests();
+  //  test_edit_distance_class();
 
   //editDistanceVerifySecondOrderFunction();
   //  testAverageDPMatrix(Options::opts.N);
+  
+#if defined(SIM_BOOST_EXTENSIONS)
+  std::cout << "Boost extension available\n";
+  DynamicProgrammingBoost<int>(16,16);
+
+#else  
+  std::cout << "No boost extensions :(\n";  
+#endif
 }

@@ -5,16 +5,29 @@
  */
 
 #include "common.hpp"
+#include "generator.hpp"
+#include "online.hpp"
+#include "options.hpp"
+#include "chain.hpp"
+#include "prob.hpp"
+#include "util.hpp"
+#include "align.hpp"
+#include "edit.hpp"
+#include "log.hpp"
 
 #include <cstdlib>
 #include <ctime>
 
 #include <iostream>
+#include <fstream>
 #include <algorithm>
 
+// testing functions from test.cpp. This has not been inserted in
+// other includes (e.g., common.hpp) since this is the only place
+// where it used. Moreover in case of unit testing code development
+// this tests will become deprecated.
+void testAll();
 
-char bases[] = {'A', 'C', 'G', 'T'};
-char revBases[128];
 Options Options::opts;
 
 // output quantities (common to online and offline)
@@ -49,16 +62,12 @@ EstimationPoint * oraclePoints;
 EditDistanceSimOutput* edOut;
 
 void initSimulator() {
-  revBases['A'] = revBases['a'] = 0;
-  revBases['C'] = revBases['c'] = 1;
-  revBases['G'] = revBases['g'] = 2;
-  revBases['T'] = revBases['t'] = 3;
-  scoreDist = EmpiricalDistribution(0,1,Options::opts.empiricalDistributionStep);
+  initUtil(Options::opts.m);
   initRandomGenerator();
-  initUtil();
   initProbabilities();
   initChainMatrix();
-  // init for oracle points
+    
+  scoreDist = EmpiricalDistribution(0,1,Options::opts.empiricalDistributionStep);
   oraclePoints = new EstimationPoint[Options::opts.m + 1];
   
   for (size_t i = 0; i < Options::opts.m; ++i) {
@@ -163,7 +172,7 @@ void offlineSimulation() {
   // once (i.e., emptying the queue) reads will be presented in ordered by
   // position on the reference sequence
   std::priority_queue<Read> reads;
-  generateOfflineReads(s, reads);
+  generateOfflineReads(s, reads, m, Options::opts.M, Options::opts.pe);
 
   // Temporary variables to count the number of holes, in the future a more
   // sophisticated way (e.g., finite state machine) should be used.
@@ -204,6 +213,7 @@ void onlineSimulation() {
 
   size_t N = Options::opts.N;
   size_t m = Options::opts.m;
+  double pe = Options::opts.pe;
   
   GenomeSegment g(N, m, MAX_GENOME_SEGMENT_LENGTH);
   generateFirstGenomeSegment(g);
@@ -250,12 +260,12 @@ void onlineSimulation() {
       remaining_genome -= d;
     }
    
-    Read current = generateOnlineRead(g.genome,current_position);
+    Read current = generateOnlineRead(g.genome,current_position, m, pe);
     actual_M++;
     current.j = real_position;
 
     // here the probabilities are computed and accumulated
-    if (prev_read.j != -1) {       
+    if (prev_read.j != (size_t)-1) {       
       
       if (d > m) {
 	if (!onHole) {
@@ -286,7 +296,8 @@ void onlineSimulation() {
 
 void oracleSimulation() {  
   size_t n = 2 * Options::opts.m;
-  int m = Options::opts.m;
+  size_t m = Options::opts.m;
+  double pe = Options::opts.pe;
   double alpha = 1.0 / ((double)Options::opts.N - 2.0 * m + 1);
   double numDen[2];
   
@@ -297,7 +308,7 @@ void oracleSimulation() {
     generateIIDGenome(n, genome);
 
     // generate first reads at position 0
-    Read r1 = generateOnlineRead(genome, 0);
+    Read r1 = generateOnlineRead(genome, 0, m, pe);
     // generate inter-arrival d
     size_t d = generateInterReadDistance();
 
@@ -308,7 +319,7 @@ void oracleSimulation() {
       oraclePoints[0].sumScore += alpha;
       oraclePoints[0].count++;
     } else {
-      Read r2 = generateOnlineRead(genome, d);
+      Read r2 = generateOnlineRead(genome, d, m, pe);
       size_t s = m - d;
       oraclePoints[s].hammDist += prefixSuffixHammingDistance(r1.r, r2.r, s);
       double sc = scoreExt(r1.r, r2.r, s,numDen);
@@ -364,7 +375,7 @@ editDistanceOpMode() {
   }
 
   // Task - Default (0)
-  if (flags & EDIT_DISTANCE_BOUNDED_ERROR) {
+  if (flags & EDIT_DISTANCE_DIFF_BOUNDED_ERROR) {
     size_t k_max = Options::opts.k;
     double precision = Options::opts.precision;
     double z_confidence = Options::opts.confidence;
@@ -376,10 +387,18 @@ editDistanceOpMode() {
 	      << "\t" << est[1].sampleMean  << "\t" << est[1].sampleVariance << "\n";
     return;
   }
+
+  if (flags & EDIT_DISTANCE_BOUNDED_ERROR) {
+    double precision = Options::opts.precision;
+    double z_confidence = Options::opts.confidence;
+    SampleEstimates beEst = editDistanceErrorBoundedEstimates(n, precision, z_confidence);
+    std::cout << beEst.sampleSize << "\t" << beEst.sampleMean << "\t" << beEst.sampleVariance << "\n";
+    return;
+  }
   
   if (flags & EDIT_DISTANCE_ESTIMATE_EXHAUSTIVE) {
     // Exhasutve (only quadratic)
-    print_warning("only \033[1;37mqudratic algorithm\033[0m available with exhaustive option");
+    logWarning("only \033[1;37mqudratic algorithm\033[0m available with exhaustive option");
     double avgDist = testExhaustiveEditDistanceEncoded(n, edOut->distPDF);
     std::cout << avgDist << std::endl;    
   }
@@ -400,7 +419,7 @@ editDistanceOpMode() {
 	  }
 	}
 	else {
-	  print_warning("Quadratic info without script not yet implemented");
+	  logWarning("Quadratic info without script not yet implemented");
 	}
       }
     }
@@ -410,7 +429,7 @@ editDistanceOpMode() {
       // LINEAR + Sample
       if (flags & EDIT_DISTANCE_INFO_PARTIAL) {
 	// PARTIAL INFO + Sample + Linear
-	print_warning("Partial info for linear under developement");
+	logWarning("Partial info for linear under developement");
 	std::unique_ptr<EditDistanceInfo[]> samples =
 	  editDistSamplesInfoLinSpace(n,k);
 	
@@ -478,6 +497,6 @@ int main(int argc, char** argv) {
   }
   outputResults();
   clearSimulator();
-  
+
   return 0;
 }

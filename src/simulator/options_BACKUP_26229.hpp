@@ -1,12 +1,13 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
+<<<<<<< HEAD
 #define HAVE_BOOST
 
 enum class Task { Test, Offline, Online, Oracle, ScoreEst, AlignScore, EditDist, Undefined };
-
+=======
 #include <string>
-
+>>>>>>> master
 
 enum OpMode { Test, Offline, Online, Oracle, ScoreEst, AlignScore, EditDist };
 

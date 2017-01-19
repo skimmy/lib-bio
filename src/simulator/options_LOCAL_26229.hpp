@@ -5,9 +5,6 @@
 
 enum class Task { Test, Offline, Online, Oracle, ScoreEst, AlignScore, EditDist, Undefined };
 
-#include <string>
-
-
 enum OpMode { Test, Offline, Online, Oracle, ScoreEst, AlignScore, EditDist };
 
 // options parsing
@@ -44,8 +41,8 @@ struct Options {
   int k; // -k
 
   static  Options opts;
-}
-;
+};
+
 void parseArguments(int argc, char** argv);
 
 

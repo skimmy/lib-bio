@@ -1,7 +1,6 @@
-#include "common.hpp"
+#include "options.hpp"
 
 #include <getopt.h>
-#include <cstdlib>
 #include <iostream>
 #include <limits>
 
@@ -81,7 +80,7 @@ setDefualtParams() {
   Options::opts.floatPrecision = std::numeric_limits< double >::max_digits10;
   
 
-  Options::opts.mode = OpMode::Offline;
+  Options::opts.mode = OpMode::Test;
   Options::opts.subTask = 0;
   Options::opts.optFlags = 0;
   Options::opts.online = false;

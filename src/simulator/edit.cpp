@@ -1,16 +1,146 @@
 #include "common.hpp"
 
+#include "generator.hpp"
+#include "options.hpp"
+#include "prob.hpp"
+#include "util.hpp"
+#include "edit.hpp"
+
 #include <iostream>
+#include <fstream>
+#include <map>
 #include <memory>
+
 #include <cstring>
 #include <cmath>
-#include <map>
+
+
+//////////////////////////////////////////////////////////////////////
+//
+//             EDIT DISTANCE STRUCTS AND CLASSES
+//
+//////////////////////////////////////////////////////////////////////
+
+// This is an attempt to make different edit distance algorithms fit a
+// common interface. This is a work-in-progresso and is subject to
+// many changes. The ultimate goal is to obtain an infrastructure that
+// allows (almost) seamingless change of the algorithm without changes
+// to the client code.
+
+/** 
+ * \brief This struct contains the minimal amount of data to support
+ * dynamic programming algorithms, namely: the matrix and its sizes.
+*/
+template<typename T>
+struct DynamicProgramming {
+  T** dp_matrix;
+  lbio_size_t n;
+  lbio_size_t m;
+
+  DynamicProgramming(lbio_size_t n_, lbio_size_t m_)
+    : n(n_), m(m_)
+  {
+    dp_matrix = allocMatrix<T>(n+1,m+1);
+  }
+
+  ~DynamicProgramming() { freeMatrix<T>(n, m, dp_matrix); }
+};
+
+/**
+ * \brief This class represents the standard Wagner and Fischer edit
+ * distance dynamic programming algorithm.
+ */
+template<typename CostType, typename IndexedType>
+class EditDistanceWF {
+public:
+    typedef std::vector<CostType> CostVector;
+
+private:
+  DynamicProgramming<CostType> dp_struct;
+  // costs are in vector [W_S, W_D, W_I] (i.e., [0] -> Sub, [1] -> Del, [2] -> Ins)
+  CostVector costs_vector;
+  
+public:
+
+  #define iS_ 0
+  #define iD_ 1
+  #define iI_ 2
+  
+  EditDistanceWF(lbio_size_t n, lbio_size_t m)
+    : dp_struct {n, m}, costs_vector {1, 1, 1}
+  {  }
+
+  EditDistanceWF(lbio_size_t n, lbio_size_t m, const CostVector& costs)
+    : dp_struct{n, m}, costs_vector {costs}
+  { }
+
+  
+  void init() {
+    dp_struct.dp_matrix[0][0] = 0;
+    for (lbio_size_t i = 1; i <= dp_struct.n; ++i) {
+      dp_struct.dp_matrix[i][0]
+	= dp_struct.dp_matrix[i-1][0] + costs_vector[iD_];
+    }
+    for (lbio_size_t j = 1; j <= dp_struct.m; ++j) {
+      dp_struct.dp_matrix[0][j]
+	= dp_struct.dp_matrix[0][j-1] + costs_vector[iI_];
+    }
+  }
+
+  CostType calculate(const IndexedType& s1, const IndexedType& s2) {
+    for (lbio_size_t i = 1; i <= dp_struct.n; ++i) {
+      for(lbio_size_t j = 1; j <= dp_struct.m; ++j) {
+	CostType delta = ( s1[i-1] == s2[j-1] ) ? 0 : costs_vector[iS_];
+	CostType A_ = dp_struct.dp_matrix[i-1][j-1] + delta; 
+	CostType B_ = dp_struct.dp_matrix[i-1][j] + costs_vector[iD_];
+	CostType C_ = dp_struct.dp_matrix[i][j-1] + costs_vector[iI_];
+	dp_struct.dp_matrix[i][j] = std::min(A_,std::min(B_, C_ ));
+      }
+    }
+    return dp_struct.dp_matrix[dp_struct.n][dp_struct.m];
+  }
+
+  void print_dp_matrix() {
+    printMatrix<CostType>(dp_struct.n+1, dp_struct.m+1, dp_struct.dp_matrix);
+  }
+};
+
+// Proptotype test function to be removed
+void test_edit_distance_class() {
+  lbio_size_t n = 128;
+  std::string s1(n, 'A');
+  std::string s2(n, 'T');
+  
+  EditDistanceWF<lbio_size_t,std::string> edit_distance_wf(n,n);
+  edit_distance_wf.init();
+  //  edit_distance_wf.calculate(s1, s2);
+  //  edit_distance_wf.print_dp_matrix();
+
+  EditDistanceWF<lbio_size_t,std::string> edit_distance_wf_no_unif(n, n, {1,0,2} );
+  edit_distance_wf_no_unif.init();
+  //  edit_distance_wf_no_unif.calculate(s1, s2);
+  //  edit_distance_wf_no_unif.print_dp_matrix();
+
+  EditDistanceWF<lbio_size_t, std::string> edit_distance_wf_no_unif_inv(n, n, {1,2,0});
+  edit_distance_wf_no_unif_inv.init();
+
+  lbio_size_t k = 40;
+  for (lbio_size_t l = 0; l < k; ++l) {
+    generateIIDString(s1);
+    generateIIDString(s2);
+    lbio_size_t ed = edit_distance_wf.calculate(s1, s2);
+    lbio_size_t ed_no_unif = edit_distance_wf_no_unif.calculate(s1, s2);
+    lbio_size_t ed_no_unif_inv = edit_distance_wf_no_unif_inv.calculate(s1, s2);
+    std::cout << ed << "\t" << ed_no_unif << "\t" << ed_no_unif_inv << "\n";
+    
+  }
+}
 
 
 
-// ----------------------------------------------------------------------
-//                               INFO CONVERSION
-// ----------------------------------------------------------------------
+//////////////////////////////////////////////////////////////////////
+//                         INFO CONVERSION
+//////////////////////////////////////////////////////////////////////
 
 std::unique_ptr<double[]> extractSubstitutionArray(const EditDistanceInfo* v, size_t k) {
   std::unique_ptr<double[]> o(new double[k]);
@@ -40,38 +170,6 @@ std::unique_ptr<double[]> extractInsertionArray(const EditDistanceInfo* v, size_
 }
 
 // ----------------------------------------------------------------------
-//                             DP MATRIX UTILS
-// ----------------------------------------------------------------------
-
-
-size_t**
-allocDPMatrix(size_t n, size_t m) {
-  size_t** dpMatrix = new size_t*[n+1];
-  for (size_t i = 0; i <= n; ++i) {
-    dpMatrix[i] = new size_t[m+1];
-  }
-  return dpMatrix;
-}
-
-void
-freeDPMatrix(size_t** dpMatrix, size_t n, size_t m) {
-  for (size_t i = 0; i <= n; ++i) {
-    delete[] dpMatrix[i];
-  }
-  delete[] dpMatrix;
-}
-
-void
-printDPMatrix(size_t** dpMatrix, size_t n, size_t m) {
-  for (size_t i = 0; i <= n; ++i) {
-    for (size_t j = 0; j <=m; ++j) {
-      std::cout << dpMatrix[i][j] << '\t';
-    }
-    std::cout << std::endl;
-  }
-}
-
-// ----------------------------------------------------------------------
 //                        EDIT DISTANCE COMPUTATION
 // ----------------------------------------------------------------------
 
@@ -84,7 +182,7 @@ size_t
 editDistanceLinSpace(const std::string& s1, const std::string& s2, size_t* v0, size_t* v1) {
   size_t n1 = s1.size();
   size_t n2 = s2.size();
-  size_t n_max = MAX(n1, n2);
+  size_t n_max = std::max(n1, n2);
   for (size_t i = 0; i < n_max+1; ++i) {
     v0[i] = i;
   }
@@ -93,7 +191,7 @@ editDistanceLinSpace(const std::string& s1, const std::string& s2, size_t* v0, s
     v1[0] = i;
     for (size_t j = 1; j <= n2; ++j) {
       size_t delta = (s1[i-1] == s2[j-1]) ? 0 : 1;
-      v1[j] = MIN( MIN( v0[j] + 1, v1[j-1] + 1), v0[j-1] + delta );
+      v1[j] = std::min( std::min( v0[j] + 1, v1[j-1] + 1), v0[j-1] + delta );
     }
     size_t * tmp = v0;
     v0 = v1;
@@ -105,7 +203,7 @@ editDistanceLinSpace(const std::string& s1, const std::string& s2, size_t* v0, s
 EditDistanceInfo editDistanceLinSpaceInfo(const std::string& s1, const std::string& s2, EditDistanceInfo* v0, EditDistanceInfo* v1, EditDistanceInfo** sampleMat) {
   size_t n1 = s1.size();
   size_t n2 = s2.size();
-  size_t n_max = MAX(n1, n2);
+  size_t n_max = std::max(n1, n2);
 
   EditDistanceInfo* tmp = NULL;
 
@@ -171,7 +269,7 @@ editDistanceEncoded(uint64_t s1, size_t n1, uint64_t s2, size_t n2, size_t** dpM
       uint64_t y = ( s2 >> 2*(j-1) ) & 0x3;
       size_t delta = (x == y) ? 0 : 1; // try to find an alternative not involving if
       
-      dpMatrix[i][j] = MIN( MIN(dpMatrix[i-1][j]+1, dpMatrix[i][j-1]+1) , dpMatrix[i-1][j-1] + delta ) ;
+      dpMatrix[i][j] = std::min( std::min(dpMatrix[i-1][j]+1, dpMatrix[i][j-1]+1) , dpMatrix[i-1][j-1] + delta ) ;
     }
   }
   return dpMatrix[n1][n2];
@@ -188,8 +286,8 @@ computeAverageDPMatrix(double** dpMatrix, size_t n, size_t m) {
   }
   for (size_t i = 1; i <= n; ++i) {
     for (size_t j = 1; j <= m; ++j) {
-      double minMatch =    MIN( MIN ( dpMatrix[i-1][j] + 1, dpMatrix[i][j-1] + 1), dpMatrix[i-1][j-1] );
-      double minMismatch = MIN( MIN ( dpMatrix[i-1][j] + 1, dpMatrix[i][j-1] + 1), dpMatrix[i-1][j-1] + 1);
+      double minMatch =    std::min( std::min ( dpMatrix[i-1][j] + 1, dpMatrix[i][j-1] + 1), dpMatrix[i-1][j-1] );
+      double minMismatch = std::min( std::min ( dpMatrix[i-1][j] + 1, dpMatrix[i][j-1] + 1), dpMatrix[i-1][j-1] + 1);
       dpMatrix[i][j] = 0.25 * minMatch + 0.75 * minMismatch;
     }
   }
@@ -229,7 +327,7 @@ editDistanceMat(const std::string& s1, const std::string& s2, size_t** dpMatrix)
   for (size_t i = 1; i < n+1; ++i) {
     for(size_t j = 1; j < m+1; ++j) {
       size_t delta = (s1[i-1] == s2[j-1]) ? 0 : 1;
-      dpMatrix[i][j] = MIN( MIN(dpMatrix[i-1][j]+1, dpMatrix[i][j-1]+1) , dpMatrix[i-1][j-1] + delta ) ;
+      dpMatrix[i][j] = std::min( std::min(dpMatrix[i-1][j]+1, dpMatrix[i][j-1]+1) , dpMatrix[i-1][j-1] + delta ) ;
     }
   }
 
@@ -264,24 +362,30 @@ editDistanceBandwiseApproxMat(const std::string& s1, const std::string& s2, size
   size_t m = s2.size();
   size_t INF = n+m+1;
   // init matrix assuming T < min{n,m} (the strictness is crucial to
-  // initialize the 'border' diagonals
-  for (size_t i = 0; i <= T; ++i) {
+  // initialize the 'border' diagonals  
+  dpMatrix[0][0] = 0;	   
+  for (size_t i = 1; i <= T; ++i) {
     dpMatrix[i][0] = i;
   }
-  for (size_t j = 0; j <= T; ++j) {
+  for (size_t j = 1; j <= T; ++j) {
     dpMatrix[0][j] = j;
   }
-  for (size_t t = T+1; t <= m; ++t) {
-    dpMatrix[t - (T+1)][t] = INF;
+
+  for (size_t t = 0; t <= m - (T+1); ++t) {
+    dpMatrix[t][T+1+t] = INF;
   }
-  for (size_t t = T+1; t <= n; ++t) {
-    dpMatrix[t][t-(T+1)] = INF;
-  }
+
+  for (size_t t = 0; t <= n - (T+1); ++t) {
+    dpMatrix[T+1+t][t] = INF;
+  }  
+
   for (size_t i = 1; i <= n; ++i) {
-    for (size_t j = MAX(0,i-T); j <= MIN(m,i+T); ++j) {
+    size_t j_min = (size_t)std::max<int>(1, (int)(i-T));
+    size_t j_max = (size_t)std::min<int>(m, (int)(i+T));
+    for (size_t j = j_min; j <= j_max; ++j) {      
       size_t delta = (s1[i-1] == s2[j-1]) ? 0 : 1;
-      dpMatrix[i][j] = MIN( dpMatrix[i-1][j-1] + delta,
-			    MIN(dpMatrix[i-1][j] + 1, dpMatrix[i][j-1] + 1));
+      dpMatrix[i][j] = std::min( dpMatrix[i-1][j-1] + delta,
+			    std::min(dpMatrix[i-1][j] + 1, dpMatrix[i][j-1] + 1));
     }
   }
 }
@@ -292,7 +396,7 @@ editDistanceBandwiseApprox(const std::string& s1, const std::string& s2, size_t 
   size_t m = s2.size();
   size_t** dpMatrix = allocMatrix<size_t>(n+1, m+1);
   editDistanceBandwiseApproxMat(s1, s2, T, dpMatrix);  
-  size_t dist = dpMatrix[n][m];  
+  size_t dist = dpMatrix[n][m];
   freeMatrix<size_t>(n+1, m+1, dpMatrix);
   return dist;
 }
@@ -327,8 +431,8 @@ editDistSamples(size_t n, size_t k_samples) {
   std::unique_ptr<size_t[]> v(new size_t[k_samples]);
   std::string s1(n,'N');
   std::string s2(n,'N');
-  size_t* v0 = new size_t[n];
-  size_t* v1 = new size_t[n];
+  size_t* v0 = new size_t[n+1];
+  size_t* v1 = new size_t[n+1];
   for (size_t k = 0; k < k_samples; ++k) {
     generateIIDString(s1);
     generateIIDString(s2);
@@ -345,7 +449,7 @@ editDistSamplesInfo(size_t n, size_t k_samples) {
   std::string s1(n,'N');
   std::string s2(n,'N');
 
-  size_t** dpMatrix = allocDPMatrix(n,n);
+  size_t** dpMatrix = allocMatrix<size_t>(n,n);
 
   for (size_t k = 0; k < k_samples; ++k) {
     generateIIDString(s1);
@@ -355,7 +459,7 @@ editDistSamplesInfo(size_t n, size_t k_samples) {
     editInfoCompute(infos[k]);
   }
   
-  freeDPMatrix(dpMatrix, n, n);
+  freeMatrix<size_t>(n, n, dpMatrix);
   
   return infos;
 }
@@ -492,10 +596,6 @@ closestToDiagonalBacktrack(size_t n, size_t m, size_t** dpMatrix, EditDistanceIn
     b = dpMatrix[i-1][j];
     c = dpMatrix[i][j-1];
     d = dpMatrix[i][j];
-    // DEBUG
-    // std::cout << "(" << i <<", " << j << ")" << "\n";
-    // std::cout << a << "\t" << b << "\n";
-    // std::cout << c << "\t" << d << "\n";
     
     // Match
     if ( (a == d) && ( a <= b) && (a <= c)) {
@@ -634,7 +734,7 @@ void editDistanceWithInfo(const std::string& s1, const std::string& s2, EditDist
 
 
 SampleEstimates
-editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta) {
+editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta, size_t k_min) {
 
   size_t* v0 = new size_t[n+1];
   size_t* v1 = new size_t[n+1];
@@ -655,7 +755,8 @@ editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta) {
     cumulative_quad_sum += (sample * sample);
     mean_k = cumulative_sum / ((double)k);
     var_k = ( cumulative_quad_sum - k*(mean_k*mean_k)  ) / ((double)(k-1));
-    if (var_k * ( z_delta*z_delta ) < ((double)k) * ( precision * precision )) {
+    if  ( (var_k * ( z_delta*z_delta ) < ((double)k) * ( precision * precision ))
+	  && (k > k_min) ){
       break;
     }
   }
@@ -836,10 +937,7 @@ differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delt
       // print density to file
       est_n.writeFrequencyOnFile("/tmp/density2_" + std::to_string(k) + ".txt");
       power_2.getNext();
-      // std::cout << est_n.sampleSize()
-      // 		<< "\t" << mean_n << "\t" << var_n << "\t" << est_n.medianForSampleDistribution()
-      // 		<< "\t" << mean_n_2 << "\t" << var_n_2 << "\t" << est_n_2.medianForSampleDistribution()
-      // 		<< std::endl;
+ 
     }
     
     
@@ -882,7 +980,6 @@ scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix, std:
     // refresh the distribution matrix
     size_t i = 0, j = 0;
     distMatrix[i][j]++;
-    //    for (char c : info.edit_script) {
     for (size_t t = 0; t < info.edit_script.size(); ++t) {
       char c = info.edit_script[t];
       switch(c) {
@@ -907,7 +1004,7 @@ scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix, std:
     }
 
   }
-  printMatrix<size_t>(distMatrix,n+1,m+1);
+  printMatrix<size_t>(n+1,m+1, distMatrix);
   freeMatrix<size_t>(n+1, m+1, dpMatrix);
 }
 
@@ -973,9 +1070,12 @@ void
 compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
   size_t T_max = n / 2;
   size_t T_min = 1;
+
   GeometricProgression<size_t> geom(2, T_min);
   std::vector<size_t> Ts = geom.valuesLeq(T_max);
+  Ts.push_back(0);
   
+
   
   size_t** dpMatrix = allocMatrix<size_t>(n+1, m+1);
   std::vector< std::shared_ptr<AlgorithmComparisonResult> > results;
@@ -987,23 +1087,21 @@ compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
     generateIIDString(s1);
     generateIIDString(s2);
 
-    // Exact algorithms
     EditDistanceInfo tmp;
     editDistanceMat(s1, s2, dpMatrix);
     closestToDiagonalBacktrack(s1.size(), s2.size(), dpMatrix, tmp);
     res->addExact(tmp);
 
     // Approximation for all values of T
-    for (size_t T : Ts) {  
+    for (size_t T : Ts) {
       editDistanceBandwiseApproxMat(s1, s2, T, dpMatrix);
       closestToDiagonalBacktrack(s1.size(), s2.size(), dpMatrix, tmp);
       res->addBandApprox(tmp, T);
     }
-
     results.push_back(res);
   }
 
-  os << "0" << "\t";
+  os << n << "\t";
   for (size_t T : Ts) {
     os << T << "\t";
   }
@@ -1014,7 +1112,8 @@ compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
       os << pRes->getBandApproxWithT(T) << "\t";
     }
     os << std::endl;
-  }
+    }
+  
   freeMatrix<size_t>(n+1, m+1, dpMatrix);
 }
 

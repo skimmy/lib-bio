@@ -1,5 +1,11 @@
 #include "common.hpp"
 
+#include "options.hpp"
+#include "align.hpp"
+#include "io.hpp"
+#include "log.hpp"
+
+#include <list>
 #include <iostream>
 
 void

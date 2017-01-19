@@ -1,12 +1,7 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
-#define HAVE_BOOST
-
-enum class Task { Test, Offline, Online, Oracle, ScoreEst, AlignScore, EditDist, Undefined };
-
 #include <string>
-
 
 enum OpMode { Test, Offline, Online, Oracle, ScoreEst, AlignScore, EditDist };
 
@@ -31,7 +26,6 @@ struct Options {
 
   size_t floatPrecision; // TODO
 
-  Task task; // --task (will substituted mode in -O)
   OpMode mode;  // -O
   int subTask;  // -B
   int optFlags; // -f
@@ -47,12 +41,5 @@ struct Options {
 }
 ;
 void parseArguments(int argc, char** argv);
-
-
-#ifdef HAVE_BOOST_PROGRAM_OPTIONS
-
-void parseArgumentsBoost(int argc, char** argv);
-
-#endif
 
 #endif

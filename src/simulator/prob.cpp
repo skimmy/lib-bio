@@ -1,5 +1,10 @@
 #include "common.hpp"
 
+#include "options.hpp"
+#include "prob.hpp"
+#include "util.hpp"
+
+#include <vector>
 #include <iostream>
 #include <random>
 

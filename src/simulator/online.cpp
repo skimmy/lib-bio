@@ -1,4 +1,6 @@
 #include "common.hpp"
+#include "generator.hpp"
+#include "online.hpp"
 
 #include <cstring>
 

@@ -1,6 +1,9 @@
 #ifndef GENERATOR_H
 #define GENERATOR_H
 
+#include <string>
+#include <queue>
+
 struct Read {
   size_t j;  
   std::string r;
@@ -19,8 +22,9 @@ void generateIIDString(std::string& s);
 void generateConstantGenome(size_t N, char* S, char b);
 
 void simulateReadAt(size_t j, size_t m, const char* S, char* r);
-void generateOfflineReads(const std::string& s, std::priority_queue<Read>& reads);
-Read generateOnlineRead(char* S, size_t j);
+void generateOfflineReads(const std::string& s, std::priority_queue<Read>& reads, size_t m, size_t M, double pe);
+Read generateOnlineRead(char* S, size_t j, size_t m, double pe);
+Read randomRead(size_t m);
 
 void complementBases(char* S, size_t n);
 char randomMutation(char c);

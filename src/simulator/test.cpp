@@ -7,6 +7,7 @@
 #include "edit.hpp"
 #include "log.hpp"
 
+#include "extensions/boost_ext.hpp"
 
 #include <iostream>
 #include <algorithm>
@@ -550,11 +551,19 @@ void testAll() {
   //  testLookupTables();
   //testPeq();
   //testApproximatedExpectedScore();
-  
-  
+
+ 
   //  editDistanceTests();
-  test_edit_distance_class();
+  //  test_edit_distance_class();
 
   //editDistanceVerifySecondOrderFunction();
   //  testAverageDPMatrix(Options::opts.N);
+  
+#if defined(SIM_BOOST_EXTENSIONS)
+  std::cout << "Boost extension available\n";
+  DynamicProgrammingBoost<int>(16,16);
+
+#else  
+  std::cout << "No boost extensions :(\n";  
+#endif
 }

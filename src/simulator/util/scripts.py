@@ -30,7 +30,10 @@ def parseArguments():
                         default="dist.txt")
     parser.add_argument("--mat-row", dest="matrixRow", help="Prints the content of the specified row of the frequency matrix")
     parser.add_argument("--mat-col", dest="matrixColumn", help="Prints the content of the specified column of the frequency matrix")
+    parser.add_argument("--stretch-stat", dest="stretchStat", default=None,
+                        help="Name of the files (one per operation) where statistic of stretches will be saved")
     parser.add_argument("-a", "--archive-dir", dest="archive", help="Creates an 'archived' version in the directory given as parameter")
+    
     return parser.parse_args()
 
 def scriptOperationsParse(script):
@@ -74,6 +77,29 @@ def operationsDistribution(n, scripts):
         delDist[nDel] += 1
         matchDist[nMatch] += 1
     return (matchDist, subDist, delDist, insDist)
+
+def computeStretchesDistribution(n, scripts):
+    dictOfDists = {}
+    mSDist = np.zeros(n)
+    sSDist = np.zeros(n)
+    dSDist = np.zeros(n)
+    iSDist = np.zeros(n)
+    dictOfDists['M'] = mSDist
+    dictOfDists['S'] = sSDist
+    dictOfDists['D'] = dSDist
+    dictOfDists['I'] = iSDist
+    for script in scripts:
+        currentChar = script[0]
+        countedChar = 0
+        for s in script:            
+            if (s == currentChar):
+                countedChar += 1
+            else:
+                dictOfDists[currentChar][countedChar] += 1
+                currentChar = s
+                countedChar = 1
+        dictOfDists[currentChar][countedChar] += 1
+    return (mSDist, sSDist, dSDist, iSDist)
 
 def calculateScriptsStats(n, scripts):
     mat = np.zeros((n,n))
@@ -177,6 +203,9 @@ if __name__ == "__main__":
         flow_c = calculateVerticalFlow(n+1, allScripts, c)
         for j in range(n+1):
             print( "{0}\t{1}".format( j, int(flow_c[j]) ) )
+
+    if (args.stretchStat is not None):
+        mStretch, sStretch, dStretch, iStretch = computeStretchesDistribution(n+1, allScripts)
             
     # The archive options puts all files in binary numpy format into
     # the archiviation directory. This is useful to load afterwards
@@ -205,6 +234,11 @@ if __name__ == "__main__":
         if args.matrixColumn:
             np.save(os.path.join(archivePath, "VCross_" + str(c)), flow_c )
 
-        
+        # save stretches
+        if (args.stretchStat is not None):
+            np.save(os.path.join(archivePath, "M_" + args.stretchStat), mStretch)
+            np.save(os.path.join(archivePath, "S_" + args.stretchStat), sStretch)
+            np.save(os.path.join(archivePath, "D_" + args.stretchStat), dStretch)
+            np.save(os.path.join(archivePath, "I_" + args.stretchStat), iStretch)
     
     

@@ -66,5 +66,15 @@ CONSTEXPR_OR_CONST char revBases[] = {
   127, 127, 127, 127, 3, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127,
 };
 
+// Here we define all the guards related to the boost library. In
+// particular if HAVE_BOOST (set by autoconf) is not set then we
+// define a LBIO_NO_BOOST guard to cope with code that requires boost
+// library (possibly giving alternative code)
+#if defined(HAVE_BOOST)
+#define LBIO_EDIT_BOOST_EXTENSIONS
+#else
+#define LBIO_NO_BOOST
+#endif
+
 
 #endif // COMMON_H

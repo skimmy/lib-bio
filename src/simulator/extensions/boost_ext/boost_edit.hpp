@@ -4,7 +4,10 @@
 // This file contains the extensions for edit distance module that
 // uses boost features: uBlas, ...
 
-#include "../../common.hpp"
+// The following guard is set in common.hpp therefore when defined we
+// can assume that common.hpp has been included and that basic
+// definition have already happened (e.g., lbio_size_t)
+#if defined(LBIO_EDIT_BOOST_EXTENSIONS)
 
 #include <boost/numeric/ublas/matrix.hpp>
 
@@ -20,5 +23,7 @@ struct DynamicProgrammingBoost {
   DynamicProgrammingBoost(lbio_size_t n_, lbio_size_t m_)
     : n(n_), m(m_), dp_matrix(n_,m_) { }
 };
+
+#endif
 
 #endif

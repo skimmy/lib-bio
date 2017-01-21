@@ -7,7 +7,7 @@
 #include "edit.hpp"
 #include "log.hpp"
 
-#include "extensions/boost_ext.hpp"
+#include "extensions/boost_ext/boost_edit.hpp"
 
 #include <iostream>
 #include <algorithm>

@@ -10,6 +10,7 @@
 #include <fstream>
 #include <map>
 #include <memory>
+#include <algorithm>
 
 #include <cstring>
 #include <cmath>
@@ -118,21 +119,30 @@ public:
   typedef std::vector<CostType> CostVector;
   
 private:
-  DynamicProgramming<IndexedType> dp_struct;
+  DynamicProgramming<CostType> dp_struct;
   CostVector costs;
   lbio_size_t bandwidth;
   lbio_size_t n;
   lbio_size_t m;
+  lbio_size_t max_size;
   const CostType Inf;
 
 public:
-  EditDistanceBandApproxLinSpace(lbio_size_t n_, lbio_size_t m_, lbio_size_t t)
-    : dp_struct {std::max(n_,m_), 2}, costs {1,1,1}, bandwidth {t},
-      n {n_}, m {m_}, Inf {2*(n_+m_+1)}
-  { }
+  EditDistanceBandApproxLinSpace(lbio_size_t n_, lbio_size_t m_, lbio_size_t T)
+    : dp_struct {2, std::max(n_,m_)}, costs {1,1,1}, bandwidth {T},
+      n {n_}, m {m_},  max_size {std::max(n_, m_)},  
+      Inf {(*std::max_element(costs.begin(), costs.end())) * 2*(n_+m_+1)}
+  {
+  }
 
-  void init() {
-    // TODO: Initialization
+  void init() {    
+    dp_struct.dp_matrix[0][0] = 0;
+    for (lbio_size_t j = 1; j <= bandwidth; ++j) {
+      dp_struct.dp_matrix[0][j] = dp_struct.dp_matrix[0][j-1] + costs[iI_];
+    }
+    for (lbio_size_t j = bandwidth+1; j <= max_size; ++j) {
+      dp_struct.dp_matrix[0][j] = Inf;
+    }
   }
 
   CostType calculate(const IndexedType& s1, const IndexedType& s2) {
@@ -143,9 +153,31 @@ public:
     // wasting some time. For this reason caller may skip the init and
     // leave the calculate method to take care of initialization
     init();
+    for (lbio_size_t i = 0; i <= n; ++i) {
+      // the fact the we used unsigned for indexes here becomes a pain
+      // but I'd rather explicitly cast them back to int when
+      // performed substraction than changing semantic. The j_max
+      // calculation does not suffer of this problem because result
+      // can not be negative (there are no differences involved)
+      lbio_size_t j_min = std::max<int>(1, static_cast<int>(i - bandwidth));
+      lbio_size_t j_max = std::min<int>(m, i + bandwidth);
+      for (lbio_size_t j = j_min; j <= j_max; ++j) {
+	CostType delta { (s1[i-1] == s2[j-1]) ? 0 : costs[iS_] };
+	dp_struct.dp_matrix[1][j]
+	  = std::min<CostType>(delta + dp_struct.dp_matrix[0][j-1],
+			       std::min(dp_struct.dp_matrix[0][j] + costs[iD_],
+					dp_struct.dp_matrix[1][j-1] + costs[iI_]));
+      }
+      // swap the two vectors
+      std::swap<CostType*>(dp_struct.dp_matrix[0], dp_struct.dp_matrix[1]);
+    }
     
     // TODO: Calculation
-    return dp_struct.dp_matrix[1][m];
+    return dp_struct.dp_matrix[0][m];
+  }
+
+  void print_dp_matrix() const {
+    printMatrix<CostType>(2, max_size + 1, dp_struct.dp_matrix);
   }
 			       
 }; // end of  EditDistanceBandApproxLinSpace 
@@ -155,7 +187,7 @@ public:
 //          PROPTOTYPE TEST FUNCTION (RO REMOVE)
 //////////////////////////////////////////////////////////////////////
 void test_edit_distance_class() {
-  lbio_size_t n = 128;
+  lbio_size_t n = 16;
   std::string s1(n, 'A');
   std::string s2(n, 'T');
 
@@ -169,18 +201,20 @@ void test_edit_distance_class() {
   EditDistanceWF<lbio_size_t, std::string> edit_distance_wf_no_unif_inv(n, n, {1,2,0});
   edit_distance_wf_no_unif_inv.init();
 
+  EditDistanceBandApproxLinSpace<lbio_size_t, std::string> edit_distance_band_lin(n,n, n/2);  
+
   lbio_size_t k = 40;
   for (lbio_size_t l = 0; l < k; ++l) {
     generateIIDString(s1);
     generateIIDString(s2);
+    lbio_size_t ed_no_class = editDistance(s1, s2);
     lbio_size_t ed = edit_distance_wf.calculate(s1, s2);
     lbio_size_t ed_no_unif = edit_distance_wf_no_unif.calculate(s1, s2);
     lbio_size_t ed_no_unif_inv = edit_distance_wf_no_unif_inv.calculate(s1, s2);
-    std::cout << ed << "\t" << ed_no_unif << "\t" << ed_no_unif_inv << "\n";    
+    lbio_size_t ed_band_approx_lin = edit_distance_band_lin.calculate(s1, s2);
+    std::cout << ed_no_class << "\t" << ed << "\t" << ed_no_unif << "\t"
+	      << ed_no_unif_inv <<"\t" << ed_band_approx_lin << "\n";    
   }
-
-  std::cout << "Test of EditDistanceBandApproxLinSpace\n";
-  EditDistanceBandApproxLinSpace<lbio_size_t, std::string> edit_distance_band_lin(n,n, n>>1);
 }
 
 

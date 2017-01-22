@@ -554,7 +554,7 @@ void testAll() {
 
  
   //  editDistanceTests();
-  //  test_edit_distance_class();
+  test_edit_distance_class();
 
   //editDistanceVerifySecondOrderFunction();
   //  testAverageDPMatrix(Options::opts.N);

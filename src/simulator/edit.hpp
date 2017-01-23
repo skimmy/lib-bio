@@ -134,11 +134,15 @@ public:
   
   EditDistanceWF(lbio_size_t n, lbio_size_t m)
     : dp_struct {n, m}, costs_vector {1, 1, 1}
-  {  }
+  {
+    init();
+  }
 
   EditDistanceWF(lbio_size_t n, lbio_size_t m, const CostVector& costs)
     : dp_struct{n, m}, costs_vector {costs}
-  { }
+  {
+    init();
+  }
 
   
   void init() {
@@ -154,8 +158,10 @@ public:
   }
 
   CostType calculate(const IndexedType& s1, const IndexedType& s2) {
-    for (lbio_size_t i = 1; i <= dp_struct.n; ++i) {
-      for(lbio_size_t j = 1; j <= dp_struct.m; ++j) {
+    lbio_size_t n = s1.size();
+    lbio_size_t m = s2.size();
+    for (lbio_size_t i = 1; i <= n; ++i) {
+      for(lbio_size_t j = 1; j <= m; ++j) {
 	CostType delta = ( s1[i-1] == s2[j-1] ) ? 0 : costs_vector[iS_];
 	CostType A_ = dp_struct.dp_matrix[i-1][j-1] + delta; 
 	CostType B_ = dp_struct.dp_matrix[i-1][j] + costs_vector[iD_];
@@ -163,7 +169,7 @@ public:
 	dp_struct.dp_matrix[i][j] = std::min(A_,std::min(B_, C_ ));
       }
     }
-    return dp_struct.dp_matrix[dp_struct.n][dp_struct.m];
+    return dp_struct.dp_matrix[n][m];
   }
 
   void print_dp_matrix() {
@@ -202,6 +208,10 @@ public:
   }
 
   CostType calculate(const IndexedType& s1, const IndexedType& s2) {
+    n = s1.size();
+    m = s2.size();
+    
+    
     // This is a design decision but since at each calculation the DP
     // matrix (which are two vectors in this case) needs
     // initialization (which is not needed for the entire matrix
@@ -243,9 +253,6 @@ public:
 			       std::min(dp_struct.dp_matrix[0][j] + costs[iD_],
 					dp_struct.dp_matrix[1][j-1] + costs[iI_]));
       }
-      
-      // print_dp_matrix();
-      // std::cout << "\n";
       
       // swap the two vectors
       std::swap<CostType*>(dp_struct.dp_matrix[0], dp_struct.dp_matrix[1]);
@@ -327,6 +334,41 @@ size_t
 editDistanceBandwiseApprox(const std::string& s1, const std::string& s2, size_t T);
 
 
+double
+testExhaustiveEditDistanceEncoded(size_t n, double* freq);
+
+void
+computeAverageDPMatrix(double** dpMatrix, size_t n, size_t m);
+
+SampleEstimates
+editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta, size_t k_min = 16);
+
+SampleEstimates
+editDistanceRelativeErrorEstimates(size_t n, double e_model, double precision, double z_delta);
+
+/**
+ * Computes a matrix containing in (i,j) the number of times a
+ * 'closest diagonal' path traverses the cell (i,j)
+ *
+ * @param n number of rows of the matrix
+ * @param m number of columns of the matrix
+ * @param k number of samples to be used
+ * @param distMatrix pointer to a matrix that will contain the frequencies (i.e., output)
+ * @param scripts a pointer to a standard vector that will contain the scripts. 
+ *  If set to <code>nullptr</code> no script will be stored
+ */
+void
+scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix,
+			 std::vector<std::string>* scripts = nullptr);
+
+
+void
+compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os = std::cout);
+
+//////////////////////////////////////////////////////////////////////
+//            EDIT DISTANCE ESTIMATION AND SAMPLING
+//////////////////////////////////////////////////////////////////////
+
 /**
  * Use a Monte-Carlo sampling technique to estimate the edit distance between
  * random strings of same length.
@@ -358,39 +400,42 @@ editDistSamplesInfo(size_t n, size_t k_samples);
 std::unique_ptr<EditDistanceInfo[]>
 editDistSamplesInfoLinSpace(size_t n, size_t k_samples, EditDistanceInfo** sampleMat = NULL);
 
-
-double
-testExhaustiveEditDistanceEncoded(size_t n, double* freq);
-
-void
-computeAverageDPMatrix(double** dpMatrix, size_t n, size_t m);
-
-SampleEstimates
-editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta, size_t k_min = 16);
-
-SampleEstimates
-editDistanceRelativeErrorEstimates(size_t n, double e_model, double precision, double z_delta);
-
-std::vector<SampleEstimates>
-differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delta, size_t k_max);
-
 /**
- * Computes a matrix containing in (i,j) the number of times a
- * 'closest diagonal' path traverses the cell (i,j)
- *
- * @param n number of rows of the matrix
- * @param m number of columns of the matrix
- * @param k number of samples to be used
- * @param distMatrix pointer to a matrix that will contain the frequencies (i.e., output)
- * @param scripts a pointer to a standard vector that will contain the scripts. 
- *  If set to <code>nullptr</code> no script will be stored
+ * \brief This class is a generator of edit distances, it can be used
+ * to sample the edit distance distribution for gven n and m. 
+
+ * The class is not to be used when also partition of the operation is
+ * needed. 
+
+ * The class is templated by an algorithm that actually computes the
+ * distance. This class must be an instantiation of algorithms class
+ * defined above with cost type `lbio_size_t` and indexed type
+ * `std::string` moreover.
+ * - the class must have a constructor accepting dimensions n and m of type
+ *   `lbio_size_t` (or type implicitly converting from `lbio_size_t`)
+ * - it must contain a method `calculate` accepting two indexed input
  */
-void
-scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix,
-			 std::vector<std::string>* scripts = nullptr);
 
+template<typename EDAlg_>
+class EditDistanceSample {
+private:
+  std::string A_;
+  std::string B_;
+  
+public:
+  EditDistanceSample(lbio_size_t n, lbio_size_t m)
+    : A_(n, 'N'), B_(m, 'N') {  }
+  
+  lbio_size_t operator()(EDAlg_& algorithm) {
+    generateIIDString(A_);
+    generateIIDString(B_);
+    return algorithm.calculate(A_, B_);
+  }
 
-void
-compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os = std::cout);
+  std::pair<std::string, std::string> latest_strings() {
+    return std::pair<std::string, std::string>(A_, B_);
+  }
+  
+};
 
 #endif

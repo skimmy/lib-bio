@@ -13,6 +13,7 @@
 #include "util.hpp"
 #include "align.hpp"
 #include "edit.hpp"
+#include "edit_estimates.hpp"
 #include "log.hpp"
 
 #include <cstdlib>
@@ -379,7 +380,15 @@ editDistanceOpMode() {
     size_t k_max = Options::opts.k;
     double precision = Options::opts.precision;
     double z_confidence = Options::opts.confidence;
-    std::vector<SampleEstimates> est = differenceBoundedRelativeErrorEstimate(n, precision, z_confidence, k_max);
+    lbio_size_t T = Options::opts.approxLevel;
+
+    using Algorithm = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
+    Algorithm alg(n, n, T);
+
+    // using Algorithm = EditDistanceWF<lbio_size_t, std::string>;
+    // Algorithm alg(n, n);
+    
+    std::vector<SampleEstimates> est = differenceBoundedRelativeErrorEstimate(n, precision, z_confidence, k_max, alg);
     std::cout << std::endl;
     std::cout << (n>>1) << "\t" << est[0].sampleSize << "\t"
 	      << est[0].sampleMean  << "\t" << est[0].sampleVariance << "\n";    

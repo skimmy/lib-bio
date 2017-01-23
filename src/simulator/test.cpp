@@ -6,6 +6,7 @@
 #include "util.hpp"
 #include "edit.hpp"
 #include "log.hpp"
+#include "edit_estimates.hpp"
 
 #include "extensions/boost_ext/boost_edit.hpp"
 
@@ -379,8 +380,7 @@ editDistanceTests() {
   n = 100;
   double e_model = 0;
 
-  // n = 35000;
-  // double e_model = 18070;
+
   prec = 0.1;
   z = 2;
   estimates = editDistanceRelativeErrorEstimates(n, e_model, prec, z);
@@ -389,32 +389,24 @@ editDistanceTests() {
 
   std::cout << "\n* Relative Error Difference Test\n\n";
 
-  prec = 0;
+  prec = 0.05;
   z=2;
-  n = 128;
-  std::vector<SampleEstimates> allEst = differenceBoundedRelativeErrorEstimate(n, prec, z, Options::opts.k);
+  n = 512;
+  using Algorithm = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
+
+  Algorithm alg(n, n, std::sqrt(n));
+
+  std::vector<SampleEstimates> allEst = differenceBoundedRelativeErrorEstimate(n, prec, z, Options::opts.k, alg);
   estimates = allEst[1];
 
-  std::cout << estimates.sampleSize << "\t" << estimates.sampleMean << "\t"
-	    << estimates.sampleVariance << "\n";
-
-  Options::opts.k = old_opt_k;
-
-
-  std::cout << "\n* Sample Matrix Test\n\n";
+  std::cout << allEst[0].sampleSize << "\t" << allEst[0].sampleMean << "\t" << allEst[0].sampleVariance << "\n"
+	    << allEst[1].sampleSize << "\t" << allEst[1].sampleMean << "\t" << allEst[1].sampleVariance << "\n"
+	    << 2*allEst[0].sampleMean - allEst[1].sampleMean << "\n";
   
-  n = 16;
-  EditDistanceInfo** sMat = new EditDistanceInfo*[n];
-  for (size_t i = 0; i < n; ++i) {
-    sMat[i] = new EditDistanceInfo[n];
-  }
-  editDistSamplesInfoLinSpace(n,100, sMat);
-  for (size_t i = 0; i < n; ++i) {
-    delete[] sMat[i];
-  }
-  delete[] sMat;
 
-  std::cout << "\n* Bandwise Approximation Test\n\n";
+  Options::opts.k = old_opt_k; 
+
+  std::cout << "\n* Bandwise Approximation Test\n";
   n = 128;
   // random string
   std::string s1(n, 'N');
@@ -447,9 +439,6 @@ editDistanceTests() {
   std::vector<lbio_size_t> bandShiftedTestV;
 
   std::vector<lbio_size_t> bandMonotoneTestVLin;
-  // std::vector<lbio_size_t> bandMonotoneTestInvLin;
-  // std::vector<lbio_size_t> bandMaxDistVLin;
-  // std::vector<lbio_size_t> bandReverseTestVLin;
   std::vector<lbio_size_t> bandShiftedTestVLin;
   
   LinearProgression<lbio_size_t> t_progression(1,0);
@@ -468,27 +457,24 @@ editDistanceTests() {
     EditDistanceBandApproxLinSpace<lbio_size_t,std::string> edApprox(n,n, t);
 
     bandMonotoneTestVLin.push_back(edApprox.calculate(s1,s2));
-    // bandMonotoneTestInv.push_back(edApprox.calculate(s2,s1));
-    // bandMaxDistV.push_back(edApprox.calculate(An,Gn));
-    // bandReverseTestV.push_back(edApprox.calculate(s1Rev, s2Rev));
     bandShiftedTestVLin.push_back(edApprox.calculate(s1Shift, s2Shift));
   }
   
-  std::cout << "\tNot incresing with T: "
+  std::cout << "\t- Not incresing with T: "
 	    << isMonotoneNonIncreasing(bandMonotoneTestV, testedTs.size())<< "\n";
-  std::cout << "\tElementwise equality inverted: "
+  std::cout << "\t- Elementwise equality inverted: "
 	    << areElementwiseEqual(bandMonotoneTestV, bandMonotoneTestInv, testedTs.size()) << "\n";
-  std::cout << "\tT=0 equals Hamming: " << (bandMonotoneTestV[0] == hammingDistance(s1,s2,s1.size())) << "\n";
-  std::cout << "\tConstant for ED(A^n,G^n): " << isConstant(bandMaxDistV, testedTs.size())
+  std::cout << "\t- T=0 equals Hamming: " << (bandMonotoneTestV[0] == hammingDistance(s1,s2,s1.size())) << "\n";
+  std::cout << "\t- Constant for ED(A^n,G^n): " << isConstant(bandMaxDistV, testedTs.size())
 	    << "    ( ED=" << bandMaxDistV.back() << " )\n";
-  std::cout << "\tReversed strings: "
+  std::cout << "\t- Reversed strings: "
 	    << areElementwiseEqual(bandReverseTestV, bandMonotoneTestV, testedTs.size()) << "\n";
-  std::cout << "\tShifted strings monotone: "
+  std::cout << "\t- Shifted strings monotone: "
 	    << isMonotoneNonIncreasing(bandShiftedTestV, testedTs.size()) << " ("
 	    << exactShift << "  " << bandShiftedTestV.back() << ")\n";
-  std::cout << "\tLinear equals quadratic: "
+  std::cout << "\t- Linear equals quadratic: "
 	    << areElementwiseEqual(bandMonotoneTestV, bandMonotoneTestVLin, testedTs.size()) << "\n";
-  std::cout << "\tLinear equals quadratic (shift): "
+  std::cout << "\t- Linear equals quadratic (shift): "
 	    << areElementwiseEqual(bandShiftedTestV, bandShiftedTestVLin, testedTs.size()) << "\n";
   
   std::vector<lbio_size_t>::reverse_iterator tIterVec = testedTs.rbegin();
@@ -498,7 +484,7 @@ editDistanceTests() {
     ++tIterVec;
   }
   if ( (tIterVec != testedTs.rend()) and (shiftIterVec != bandShiftedTestV.rend()) ) {
-    std::cout << "\tShifted first T != exact: " <<  *tIterVec << " (" << *shiftIterVec << ")\n";
+    std::cout << "\t- Shifted first T != exact: " <<  *tIterVec << " (" << *shiftIterVec << ")\n\n";
   }
 } 
 

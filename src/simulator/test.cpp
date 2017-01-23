@@ -445,10 +445,18 @@ editDistanceTests() {
   std::vector<lbio_size_t> bandMaxDistV;
   std::vector<lbio_size_t> bandReverseTestV;
   std::vector<lbio_size_t> bandShiftedTestV;
+
+  std::vector<lbio_size_t> bandMonotoneTestVLin;
+  // std::vector<lbio_size_t> bandMonotoneTestInvLin;
+  // std::vector<lbio_size_t> bandMaxDistVLin;
+  // std::vector<lbio_size_t> bandReverseTestVLin;
+  std::vector<lbio_size_t> bandShiftedTestVLin;
+  
   LinearProgression<lbio_size_t> t_progression(1,0);
   std::vector<lbio_size_t> testedTs = t_progression.valuesLeq(n-1);
 
-  lbio_size_t exactShift = editDistance(s1Shift, s2Shift);
+  lbio_size_t exactShift = editDistance(s1Shift, s2Shift);  
+  
   
   for (auto t : testedTs) {
     bandMonotoneTestV.push_back(editDistanceBandwiseApprox(s1,s2,t));
@@ -456,7 +464,16 @@ editDistanceTests() {
     bandMaxDistV.push_back(editDistanceBandwiseApprox(An,Gn,t));
     bandReverseTestV.push_back(editDistanceBandwiseApprox(s1Rev, s2Rev, t));
     bandShiftedTestV.push_back(editDistanceBandwiseApprox(s1Shift, s2Shift, t));
+
+    EditDistanceBandApproxLinSpace<lbio_size_t,std::string> edApprox(n,n, t);
+
+    bandMonotoneTestVLin.push_back(edApprox.calculate(s1,s2));
+    // bandMonotoneTestInv.push_back(edApprox.calculate(s2,s1));
+    // bandMaxDistV.push_back(edApprox.calculate(An,Gn));
+    // bandReverseTestV.push_back(edApprox.calculate(s1Rev, s2Rev));
+    bandShiftedTestVLin.push_back(edApprox.calculate(s1Shift, s2Shift));
   }
+  
   std::cout << "\tNot incresing with T: "
 	    << isMonotoneNonIncreasing(bandMonotoneTestV, testedTs.size())<< "\n";
   std::cout << "\tElementwise equality inverted: "
@@ -469,6 +486,11 @@ editDistanceTests() {
   std::cout << "\tShifted strings monotone: "
 	    << isMonotoneNonIncreasing(bandShiftedTestV, testedTs.size()) << " ("
 	    << exactShift << "  " << bandShiftedTestV.back() << ")\n";
+  std::cout << "\tLinear equals quadratic: "
+	    << areElementwiseEqual(bandMonotoneTestV, bandMonotoneTestVLin, testedTs.size()) << "\n";
+  std::cout << "\tLinear equals quadratic (shift): "
+	    << areElementwiseEqual(bandShiftedTestV, bandShiftedTestVLin, testedTs.size()) << "\n";
+  
   std::vector<lbio_size_t>::reverse_iterator tIterVec = testedTs.rbegin();
   std::vector<lbio_size_t>::reverse_iterator shiftIterVec = bandShiftedTestV.rbegin();
   while(*shiftIterVec == exactShift) {
@@ -481,17 +503,17 @@ editDistanceTests() {
 } 
 
 
-class InverseSquareRootFunction
-{
-private:
-  double gamma, beta;
-public:
-  InverseSquareRootFunction(double gam, double bet) {
-    gamma = gam;
-    beta = bet;
-  }
-  double operator() (double x) { return ( gamma / std::pow(x, beta) ); }
-};
+// class InverseSquareRootFunction
+// {
+// private:
+//   double gamma, beta;
+// public:
+//   InverseSquareRootFunction(double gam, double bet) {
+//     gamma = gam;
+//     beta = bet;
+//   }
+//   double operator() (double x) { return ( gamma / std::pow(x, beta) ); }
+// };
 
 // TODO Move to edit.hpp as soon as good
 // This will eventally become the code to verify the model
@@ -500,7 +522,7 @@ void
 editDistanceVerifySecondOrderFunction() {
   size_t n_max = std::pow(2,14);
   size_t n = std::pow(2,0);
-  InverseSquareRootFunction g(1.0, 2.0);
+  // InverseSquareRootFunction g(1.0, 2.0);
   double prec = 0.001; //Options::opts.precision;
   double z = 2; //Options::opts.confidence;
   Options::opts.k = 50000;
@@ -553,8 +575,8 @@ void testAll() {
   //testApproximatedExpectedScore();
 
  
-  //  editDistanceTests();
-  test_edit_distance_class();
+  editDistanceTests();
+  //test_edit_distance_class();
 
   //editDistanceVerifySecondOrderFunction();
   //  testAverageDPMatrix(Options::opts.N);

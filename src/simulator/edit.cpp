@@ -17,177 +17,10 @@
 
 
 //////////////////////////////////////////////////////////////////////
-//
-//             EDIT DISTANCE STRUCTS AND CLASSES
-//
-//////////////////////////////////////////////////////////////////////
-
-// This is an attempt to make different edit distance algorithms fit a
-// common interface. This is a work-in-progresso and is subject to
-// many changes. The ultimate goal is to obtain an infrastructure that
-// allows (almost) seamingless change of the algorithm without changes
-// to the client code.
-
-// Define macros for the indexes of costs in the cost vector. Used for
-// mnemonics. This is not a good design and should be andanoned once a
-// better way to pass costs will b eimplemented
-#define iS_ 0
-#define iD_ 1
-#define iI_ 2
-
-/** 
- * \brief This struct contains the minimal amount of data to support
- * dynamic programming algorithms, namely: the matrix and its sizes.
-*/
-template<typename T>
-struct DynamicProgramming {
-  T** dp_matrix;
-  lbio_size_t n;
-  lbio_size_t m;
-
-  DynamicProgramming(lbio_size_t n_, lbio_size_t m_)
-    : n(n_), m(m_)
-  {
-    dp_matrix = allocMatrix<T>(n+1,m+1);
-  }
-
-  ~DynamicProgramming() { freeMatrix<T>(n, m, dp_matrix); }
-};
-
-/**
- * \brief This class represents the standard Wagner and Fischer edit
- * distance dynamic programming algorithm.
- */
-template<typename CostType, typename IndexedType>
-class EditDistanceWF {
-public:
-    typedef std::vector<CostType> CostVector;
-
-private:
-  DynamicProgramming<CostType> dp_struct;
-  // costs are in vector [W_S, W_D, W_I]
-  // (i.e., [0] -> Sub, [1] -> Del, [2] -> Ins).
-  // We should consider a better design for costs possible alternatives are
-  // - a custom struct with fields for the csos
-  // - a caller that is invoked when costs are needed (should be constexpr)
-  CostVector costs_vector;
-  
-public:
-  
-  EditDistanceWF(lbio_size_t n, lbio_size_t m)
-    : dp_struct {n, m}, costs_vector {1, 1, 1}
-  {  }
-
-  EditDistanceWF(lbio_size_t n, lbio_size_t m, const CostVector& costs)
-    : dp_struct{n, m}, costs_vector {costs}
-  { }
-
-  
-  void init() {
-    dp_struct.dp_matrix[0][0] = 0;
-    for (lbio_size_t i = 1; i <= dp_struct.n; ++i) {
-      dp_struct.dp_matrix[i][0]
-	= dp_struct.dp_matrix[i-1][0] + costs_vector[iD_];
-    }
-    for (lbio_size_t j = 1; j <= dp_struct.m; ++j) {
-      dp_struct.dp_matrix[0][j]
-	= dp_struct.dp_matrix[0][j-1] + costs_vector[iI_];
-    }
-  }
-
-  CostType calculate(const IndexedType& s1, const IndexedType& s2) {
-    for (lbio_size_t i = 1; i <= dp_struct.n; ++i) {
-      for(lbio_size_t j = 1; j <= dp_struct.m; ++j) {
-	CostType delta = ( s1[i-1] == s2[j-1] ) ? 0 : costs_vector[iS_];
-	CostType A_ = dp_struct.dp_matrix[i-1][j-1] + delta; 
-	CostType B_ = dp_struct.dp_matrix[i-1][j] + costs_vector[iD_];
-	CostType C_ = dp_struct.dp_matrix[i][j-1] + costs_vector[iI_];
-	dp_struct.dp_matrix[i][j] = std::min(A_,std::min(B_, C_ ));
-      }
-    }
-    return dp_struct.dp_matrix[dp_struct.n][dp_struct.m];
-  }
-
-  void print_dp_matrix() {
-    printMatrix<CostType>(dp_struct.n+1, dp_struct.m+1, dp_struct.dp_matrix);
-  }
-}; // end of EditDistanceWF
-
-template<typename CostType, typename IndexedType>
-class EditDistanceBandApproxLinSpace {
-public:
-  typedef std::vector<CostType> CostVector;
-  
-private:
-  DynamicProgramming<CostType> dp_struct;
-  CostVector costs;
-  lbio_size_t bandwidth;
-  lbio_size_t n;
-  lbio_size_t m;
-  lbio_size_t max_size;
-  const CostType Inf;
-
-public:
-  EditDistanceBandApproxLinSpace(lbio_size_t n_, lbio_size_t m_, lbio_size_t T)
-    : dp_struct {2, std::max(n_,m_)}, costs {1,1,1}, bandwidth {T},
-      n {n_}, m {m_},  max_size {std::max(n_, m_)},  
-      Inf {(*std::max_element(costs.begin(), costs.end())) * 2*(n_+m_+1)}
-  {
-  }
-
-  void init() {    
-    dp_struct.dp_matrix[0][0] = 0;
-    for (lbio_size_t j = 1; j <= bandwidth; ++j) {
-      dp_struct.dp_matrix[0][j] = dp_struct.dp_matrix[0][j-1] + costs[iI_];
-    }
-    for (lbio_size_t j = bandwidth+1; j <= max_size; ++j) {
-      dp_struct.dp_matrix[0][j] = Inf;
-    }
-  }
-
-  CostType calculate(const IndexedType& s1, const IndexedType& s2) {
-    // This is a design decision but since at each calculation the DP
-    // matrix (which are two vectors in this case) needs
-    // initialization (which is not needed for the entire matrix
-    // approach), the calculate method performs init at a cost of
-    // wasting some time. For this reason caller may skip the init and
-    // leave the calculate method to take care of initialization
-    init();
-    for (lbio_size_t i = 0; i <= n; ++i) {
-      // the fact the we used unsigned for indexes here becomes a pain
-      // but I'd rather explicitly cast them back to int when
-      // performed substraction than changing semantic. The j_max
-      // calculation does not suffer of this problem because result
-      // can not be negative (there are no differences involved)
-      lbio_size_t j_min = std::max<int>(1, static_cast<int>(i - bandwidth));
-      lbio_size_t j_max = std::min<int>(m, i + bandwidth);
-      for (lbio_size_t j = j_min; j <= j_max; ++j) {
-	CostType delta { (s1[i-1] == s2[j-1]) ? 0 : costs[iS_] };
-	dp_struct.dp_matrix[1][j]
-	  = std::min<CostType>(delta + dp_struct.dp_matrix[0][j-1],
-			       std::min(dp_struct.dp_matrix[0][j] + costs[iD_],
-					dp_struct.dp_matrix[1][j-1] + costs[iI_]));
-      }
-      // swap the two vectors
-      std::swap<CostType*>(dp_struct.dp_matrix[0], dp_struct.dp_matrix[1]);
-    }
-    
-    // TODO: Calculation
-    return dp_struct.dp_matrix[0][m];
-  }
-
-  void print_dp_matrix() const {
-    printMatrix<CostType>(2, max_size + 1, dp_struct.dp_matrix);
-  }
-			       
-}; // end of  EditDistanceBandApproxLinSpace 
-
-
-//////////////////////////////////////////////////////////////////////
 //          PROPTOTYPE TEST FUNCTION (RO REMOVE)
 //////////////////////////////////////////////////////////////////////
 void test_edit_distance_class() {
-  lbio_size_t n = 16;
+  lbio_size_t n = 8 ;
   std::string s1(n, 'A');
   std::string s2(n, 'T');
 
@@ -201,9 +34,9 @@ void test_edit_distance_class() {
   EditDistanceWF<lbio_size_t, std::string> edit_distance_wf_no_unif_inv(n, n, {1,2,0});
   edit_distance_wf_no_unif_inv.init();
 
-  EditDistanceBandApproxLinSpace<lbio_size_t, std::string> edit_distance_band_lin(n,n, n/2);  
+  EditDistanceBandApproxLinSpace<lbio_size_t, std::string> edit_distance_band_lin(n,n, 0);  
 
-  lbio_size_t k = 40;
+  lbio_size_t k = 1;
   for (lbio_size_t l = 0; l < k; ++l) {
     generateIIDString(s1);
     generateIIDString(s2);
@@ -213,7 +46,8 @@ void test_edit_distance_class() {
     lbio_size_t ed_no_unif_inv = edit_distance_wf_no_unif_inv.calculate(s1, s2);
     lbio_size_t ed_band_approx_lin = edit_distance_band_lin.calculate(s1, s2);
     std::cout << ed_no_class << "\t" << ed << "\t" << ed_no_unif << "\t"
-	      << ed_no_unif_inv <<"\t" << ed_band_approx_lin << "\n";    
+	      << ed_no_unif_inv <<"\t" << ed_band_approx_lin << "\n";
+    edit_distance_band_lin.resetMatrix();
   }
 }
 

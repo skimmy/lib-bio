@@ -17,43 +17,6 @@
 
 
 //////////////////////////////////////////////////////////////////////
-//          PROPTOTYPE TEST FUNCTION (RO REMOVE)
-//////////////////////////////////////////////////////////////////////
-void test_edit_distance_class() {
-  lbio_size_t n = 8 ;
-  std::string s1(n, 'A');
-  std::string s2(n, 'T');
-
-  std::cout << "Test of EditDistanceWF\n";
-  EditDistanceWF<lbio_size_t,std::string> edit_distance_wf(n,n);
-  edit_distance_wf.init();
-
-  EditDistanceWF<lbio_size_t,std::string> edit_distance_wf_no_unif(n, n, {1,0,2} );
-  edit_distance_wf_no_unif.init();
-
-  EditDistanceWF<lbio_size_t, std::string> edit_distance_wf_no_unif_inv(n, n, {1,2,0});
-  edit_distance_wf_no_unif_inv.init();
-
-  EditDistanceBandApproxLinSpace<lbio_size_t, std::string> edit_distance_band_lin(n,n, 0);  
-
-  lbio_size_t k = 1;
-  for (lbio_size_t l = 0; l < k; ++l) {
-    generateIIDString(s1);
-    generateIIDString(s2);
-    lbio_size_t ed_no_class = editDistance(s1, s2);
-    lbio_size_t ed = edit_distance_wf.calculate(s1, s2);
-    lbio_size_t ed_no_unif = edit_distance_wf_no_unif.calculate(s1, s2);
-    lbio_size_t ed_no_unif_inv = edit_distance_wf_no_unif_inv.calculate(s1, s2);
-    lbio_size_t ed_band_approx_lin = edit_distance_band_lin.calculate(s1, s2);
-    std::cout << ed_no_class << "\t" << ed << "\t" << ed_no_unif << "\t"
-	      << ed_no_unif_inv <<"\t" << ed_band_approx_lin << "\n";
-    edit_distance_band_lin.resetMatrix();
-  }
-}
-
-
-
-//////////////////////////////////////////////////////////////////////
 //                         INFO CONVERSION
 //////////////////////////////////////////////////////////////////////
 
@@ -84,9 +47,9 @@ std::unique_ptr<double[]> extractInsertionArray(const EditDistanceInfo* v, size_
   return o;
 }
 
-// ----------------------------------------------------------------------
-//                        EDIT DISTANCE COMPUTATION
-// ----------------------------------------------------------------------
+//////////////////////////////////////////////////////////////////////
+//                      EDIT DISTANCE COMPUTATION
+//////////////////////////////////////////////////////////////////////
 
 /**
  * \brief Conputes the edit distance between strings s1 and s2 using only
@@ -168,7 +131,6 @@ EditDistanceInfo editDistanceLinSpaceInfo(const std::string& s1, const std::stri
     v1 = tmp;
 
   }
-  //  printVector<EditDistanceInfo>(v0,n2+1,"\t"); std::cout << std::endl;
   return v0[n2];
 }
 
@@ -267,9 +229,9 @@ editDistance(const std::string& s1, const std::string& s2) {
   return dist;
 }
 
-// ----------------------------------------------------------------------
+//////////////////////////////////////////////////////////////////////
 //                    EDIT DISTANCE APPROXIMATIONS
-// ----------------------------------------------------------------------
+//////////////////////////////////////////////////////////////////////
 
 void
 editDistanceBandwiseApproxMat(const std::string& s1, const std::string& s2, size_t T, size_t** dpMatrix) {
@@ -317,9 +279,9 @@ editDistanceBandwiseApprox(const std::string& s1, const std::string& s2, size_t 
 }
 
 
-// ----------------------------------------------------------------------
-//                        EDIT DISTANCE SAMPLING
-// ----------------------------------------------------------------------
+//////////////////////////////////////////////////////////////////////
+//                       EDIT DISTANCE SAMPLING
+//////////////////////////////////////////////////////////////////////
 
 
 void
@@ -412,9 +374,9 @@ sampleEditDistanceDistribution(size_t n, size_t* v0, size_t* v1) {
 }
 
 
-// -----------------------------------------------------------------------------
-//                            EXHASUTIVE AND BACKTRACK
-// -----------------------------------------------------------------------------
+//////////////////////////////////////////////////////////////////////
+//                      EXHASUTIVE AND BACKTRACK
+//////////////////////////////////////////////////////////////////////
 
 
 double
@@ -729,104 +691,10 @@ editDistanceRelativeErrorEstimates(size_t n, double e_model, double precision, d
 
 
 
-/*template<typename Algorithm>
-std::vector<SampleEstimates>
-differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delta, size_t k_max, Algorithm& alg) {
 
-
-  // Generators
-  EditDistanceSample<Algorithm> generator_n(n, n);
-  EditDistanceSample<Algorithm> generator_n_2(n >> 1, n >> 1);
-  
-  
-  // TODO Need a way to parametrize the output checkpoints
-  GeometricProgression<size_t> power_2(2,8);
-  LinearProgression<size_t> step_10(8,16);
-
-    
-
-  lbio_size_t k = 1;
-  // create sampling process structures (one for 'n' and one for 'n/2' )
-  SamplingEstimationProcess est_n(n);
-  SamplingEstimationProcess est_n_2(n >> 1);
-
-  // generate new sample
-  lbio_size_t sample_n = generator_n(alg);
-  lbio_size_t sample_n_2 = generator_n_2(alg);
-  
-  //  size_t sample_n = sampleEditDistanceDistribution(n, v0, v1);
-  //  size_t sample_n_2 = sampleEditDistanceDistribution(n >> 1, v0, v1);
-
-  // refresh process and variables
-  est_n.newSample(sample_n);
-  est_n_2.newSample(sample_n_2);  
-  // sample means, variances (0 with 1 sample) and diff 2e(n/2) - e(n)
-  double mean_n = est_n.sampleMean();
-  double mean_n_2 = est_n_2.sampleMean();
-  double diff_n = 2 * mean_n_2 - mean_n;
-  double var_n = 0;
-  double var_n_2 = 0;
-  // error term
-  double rho = 0;
-
-  do {
-    k++;
-    // generate new sample
-    // sample_n = sampleEditDistanceDistribution(n, v0, v1);
-    //sample_n_2 = sampleEditDistanceDistribution(n >> 1, v0, v1);
-    sample_n = generator_n(alg);
-    sample_n_2 = generator_n_2(alg);
-  
-    // refresh sample processes
-    est_n.newSample(sample_n);
-    est_n_2.newSample(sample_n_2);
-    // get recomputed params...
-    mean_n = est_n.sampleMean();
-    mean_n_2 = est_n_2.sampleMean();    
-    diff_n = 2 * mean_n_2 - mean_n;
-    var_n = est_n.sampleVariance();
-    var_n_2 = est_n_2.sampleVariance();
-    // ...and error terms
-    rho = std::sqrt( (4*var_n_2 + var_n) / ((double)k) );
-
-    // middle checkpoint
-    if (k == step_10.getCurrent() && Options::opts.verbose) {
-
-      std::cout << est_n.sampleSize()
-		<< "\t" << mean_n << "\t" << var_n << "\t" << est_n.medianForSampleDistribution()
-		<< "\t" << mean_n_2 << "\t" << var_n_2 << "\t" << est_n_2.medianForSampleDistribution()
-		<< std::endl;
-      step_10.getNext();
-    }
-    
-    if (k == power_2.getCurrent()) {
-      
-      // print density to file
-      est_n.writeFrequencyOnFile("/tmp/density2_" + std::to_string(k) + ".txt");
-      power_2.getNext();
- 
-    }
-    
-    
-    // continue looping as long as
-    //      rho > threshold
-    // and maximum iterations threshold is not reached
-  } while(k < k_max && ( rho > precision * diff_n / z_delta ));
-    
-
-  std::vector<SampleEstimates> estimates(2);
-  estimates[0] = est_n_2.toSampleEstimates();
-  estimates[1] = est_n.toSampleEstimates();
-
-  return estimates;
-}
-*/
-
-
-
-// ----------------------------------------------------------------------
-//                      SCRIPT DISTRIBUTION FUNCTIONS
-// ----------------------------------------------------------------------
+//////////////////////////////////////////////////////////////////////
+//                    SCRIPT DISTRIBUTION FUNCTIONS
+//////////////////////////////////////////////////////////////////////
 
 void
 scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix, std::vector<std::string>* scripts) {
@@ -986,14 +854,8 @@ compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
   freeMatrix<size_t>(n+1, m+1, dpMatrix);
 }
 
-// ----------------------------------------------------------------------
-//                        OUTPUT RESULT CLASS
-// ----------------------------------------------------------------------
 
-
-EditDistanceSimOutput::~EditDistanceSimOutput() {
-  if (this->distPDF) {
-    delete[] this->distPDF;
-    this->distPDF = NULL;
-  }
-}
+//////////////////////////////////////////////////////////////////////
+//          PROPTOTYPE TEST FUNCTION (RO REMOVE)
+//////////////////////////////////////////////////////////////////////
+void test_edit_distance_class() { }

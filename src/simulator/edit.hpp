@@ -21,15 +21,6 @@
 #define EDIT_DISTANCE_SUBTASK_COMPARE_ALGS  32
 
 
-class EditDistanceSimOutput {
-  // This class is more a 'struct' like object that exposes most of
-  // its attributes (which are indeed filled during simulations).  
-public:
-  double* distPDF = NULL;
-  ~EditDistanceSimOutput();
-};
-
-
 /**
  * This is a structure to store information about how edit distance is
  * divided into substitution,
@@ -436,6 +427,19 @@ public:
     return std::pair<std::string, std::string>(A_, B_);
   }
   
+};
+
+/**
+ * \brief Convience struct to manage vecotrs, this is a bad design and
+ * should be changed.
+ */
+struct EditDistanceSimOutput {
+  double* distPDF = NULL;
+  
+  ~EditDistanceSimOutput() {
+    delete[] this->distPDF;
+    this->distPDF = NULL;
+  }
 };
 
 #endif

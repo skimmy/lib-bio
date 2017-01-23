@@ -1,7 +1,10 @@
 #ifndef SIM_PROB_H
 #define SIM_PROB_H
 
+#include "util.hpp"
+
 #include <vector>
+#include <fstream>
 
 // Class representing empirical distribution as histogram array
 class EmpiricalDistribution {  
@@ -115,5 +118,72 @@ size_t medianFromFrequency(T f[], size_t n) {
   }
   return n-1;
 }
+
+/**
+ * \brief This class is used to represent sampling processes.
+ * 
+ * The class provides facility to compute sample mean and sample
+ * variance progressively as samples are supplied.
+ */
+class SamplingEstimationProcess {
+public:
+  SamplingEstimationProcess(size_t n_)
+    :  n {n_}, cumulativeSum {0}, cumulativeSumSquare {0}, k {0}
+  {
+    this->frequency = new size_t[n+1];
+    std::fill_n(this->frequency, n+1, 0);
+  }
+  ~SamplingEstimationProcess() {
+    delete[] frequency;
+  }
+
+  void newSample(size_t sample) {
+    this->frequency[sample]++;
+    this->cumulativeSum += sample;
+    this->cumulativeSumSquare += (sample * sample);
+    this->k++;
+  }
+
+  double sampleMean() const {
+    return ( (double)cumulativeSum ) / ( (double)k);
+  }
+
+  double sampleVariance() const {
+    double sMean = sampleMean();
+    double meanTerm = ((double)k) * sMean * sMean;
+    return ( ( this->cumulativeSumSquare - meanTerm ) / ((double)k-1));
+  }
+
+  size_t medianForSampleDistribution() const {
+    return medianFromFrequency<size_t>(frequency, n+1);
+  }
+
+  size_t sampleSize() const {
+    return k;
+  }
+
+  void writeFrequencyOnFile(const std::string& path) {
+    std::ofstream os(path, std::ofstream::out);
+    writeVectorOnStream<size_t>(frequency, n+1, os);
+    os.close();
+  }
+
+  SampleEstimates toSampleEstimates() const {
+    SampleEstimates est;
+    est.sampleSize = k;
+    est.sampleMean = sampleMean();
+    est.sampleVariance = sampleVariance();
+    return est;
+  }
+
+private:
+  size_t n;
+  double cumulativeSum;
+  double cumulativeSumSquare;
+  size_t k;
+
+  size_t* frequency;
+};
+
 
 #endif

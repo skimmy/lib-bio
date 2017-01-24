@@ -87,9 +87,15 @@ public:
 /** 
  * \brief This struct contains the minimal amount of data to support
  * dynamic programming algorithms, namely: the matrix and its sizes.
+ *
+ * The members are public so that matrix and its sizes can be
+ * acccessed and using directly. It is however reccomended to use the
+ * methods and operator to guarantee maximum portability of the
+ * software (e.g., in case of internal changes to the struct)
 */
 template<typename T>
 struct DynamicProgramming {
+  
   T** dp_matrix;
   lbio_size_t n;
   lbio_size_t m;
@@ -101,7 +107,25 @@ struct DynamicProgramming {
   }
 
   ~DynamicProgramming() { freeMatrix<T>(n, m, dp_matrix); }
-};
+
+  /**
+   * \brief This operator allows accessing (read and write) elements
+   * of the dynamic programming matrix.
+   */
+  T& operator()(lbio_size_t i, lbio_size_t j) {
+    return dp_matrix[i][j];
+  }
+
+  void swap_rows(lbio_size_t i1, lbio_size_t i2) {
+    std::swap<T*>(dp_matrix[0], dp_matrix[1]); 
+  }
+
+  void print_matrix() {
+    printMatrix<T>(2, m + 1, dp_matrix);
+  }
+}; // DynamicProgramming D
+
+
 
 /**
  * \brief This class represents the standard Wagner and Fischer edit
@@ -137,14 +161,14 @@ public:
 
   
   void init() {
-    dp_struct.dp_matrix[0][0] = 0;
+    dp_struct(0, 0) = 0;
     for (lbio_size_t i = 1; i <= dp_struct.n; ++i) {
-      dp_struct.dp_matrix[i][0]
-	= dp_struct.dp_matrix[i-1][0] + costs_vector[iD_];
+      dp_struct(i, 0)
+	= dp_struct(i-1, 0) + costs_vector[iD_];
     }
     for (lbio_size_t j = 1; j <= dp_struct.m; ++j) {
-      dp_struct.dp_matrix[0][j]
-	= dp_struct.dp_matrix[0][j-1] + costs_vector[iI_];
+      dp_struct(0, j)
+	= dp_struct(0, j-1) + costs_vector[iI_];
     }
   }
 
@@ -154,19 +178,19 @@ public:
     for (lbio_size_t i = 1; i <= n; ++i) {
       for(lbio_size_t j = 1; j <= m; ++j) {
 	CostType delta = ( s1[i-1] == s2[j-1] ) ? 0 : costs_vector[iS_];
-	CostType A_ = dp_struct.dp_matrix[i-1][j-1] + delta; 
-	CostType B_ = dp_struct.dp_matrix[i-1][j] + costs_vector[iD_];
-	CostType C_ = dp_struct.dp_matrix[i][j-1] + costs_vector[iI_];
-	dp_struct.dp_matrix[i][j] = std::min(A_,std::min(B_, C_ ));
+	CostType A_ = dp_struct(i-1, j-1) + delta; 
+	CostType B_ = dp_struct(i-1, j)   + costs_vector[iD_];
+	CostType C_ = dp_struct(i, j-1)   + costs_vector[iI_];
+	dp_struct(i, j) = std::min(A_,std::min(B_, C_ ));
       }
     }
-    return dp_struct.dp_matrix[n][m];
+    return dp_struct(n, m);
   }
 
   void print_dp_matrix() {
-    printMatrix<CostType>(dp_struct.n+1, dp_struct.m+1, dp_struct.dp_matrix);
+    dp_struct.print_matrix();
   }
-}; // end of EditDistanceWF
+}; // EditDistanceWF
 
 template<typename CostType, typename IndexedType>
 class EditDistanceBandApproxLinSpace {
@@ -185,88 +209,63 @@ public:
   EditDistanceBandApproxLinSpace(lbio_size_t n_, lbio_size_t m_, lbio_size_t T)
     : dp_struct {2, std::max(n_,m_)}, costs {1,1,1}, bandwidth {T}, n {n_}, m {m_},
       Inf {(*std::max_element(costs.begin(), costs.end())) * 2*(n_+m_+1)}
-  {
-  }
+  { }
 
   void init() {    
-    dp_struct.dp_matrix[0][0] = 0;
+    dp_struct(0, 0) = 0;
     for (lbio_size_t j = 1; j <= bandwidth; ++j) {
-      dp_struct.dp_matrix[0][j] = dp_struct.dp_matrix[0][j-1] + costs[iI_];
+      dp_struct(0, j) = dp_struct(0, j-1) + costs[iI_];
     }
-    /*for (lbio_size_t j = bandwidth+1; j <= m; ++j) {
-      dp_struct.dp_matrix[0][j] = Inf;
-      }*/
   }
 
   CostType calculate(const IndexedType& s1, const IndexedType& s2) {
     n = s1.size();
-    m = s2.size();
+    m = s2.size();    
     
-    
-    // This is a design decision but since at each calculation the DP
-    // matrix (which are two vectors in this case) needs
-    // initialization (which is not needed for the entire matrix
-    // approach), the calculate method performs init at a cost of
-    // wasting some time. For this reason caller may skip the init and
-    // leave the calculate method to take care of initialization
+    // initialization is done here rather than in the constructor
+    // because needed at each calculation (i.e., vectors will contain
+    // values from older calculations if any)
     init();
+    
     for (lbio_size_t i = 1; i <= n; ++i) {
-      // 'Standard' initialization of the first column 
-      dp_struct.dp_matrix[1][0] = (i <= bandwidth) ?
-	dp_struct.dp_matrix[0][0] + costs[iD_] : Inf;
-
-      // This takes care of 'diagonals' initialization (upper and
-      // lower respectively)
-
-      // TODO: Check the negative case
+      // initialization of 'border' and 'diagonals'
+      dp_struct(1, 0) = (i <= bandwidth) ?
+	dp_struct(0, 0) + costs[iD_] : Inf;
       if (i <= m - bandwidth) {
-	dp_struct.dp_matrix[0][i+bandwidth] = Inf;
+	dp_struct(0, i+bandwidth) = Inf;
       }
-
       if (i >= bandwidth+1) {
-	// Second index should always be >= 0 because of the if
-	dp_struct.dp_matrix[1][i-(bandwidth+1)] = Inf;
-	
+	dp_struct(1, i-(bandwidth+1) ) = Inf;	
       }
 	
-	
-      // the fact the we used unsigned for indexes here becomes a pain
-      // but I'd rather explicitly cast them back to int when
-      // performed substraction than changing semantic. The j_max
-      // calculation does not suffer of this problem because result
-      // can not be negative (there are no differences involved)
+      // casts are necessary to cope with negative 
       lbio_size_t j_min = std::max<int>(1, static_cast<int>(i - bandwidth));
       lbio_size_t j_max = std::min<int>(m, i + bandwidth);
       for (lbio_size_t j = j_min; j <= j_max; ++j) {
 	CostType delta { (s1[i-1] == s2[j-1]) ? 0 : costs[iS_] };
-	dp_struct.dp_matrix[1][j]
-	  = std::min<CostType>(delta + dp_struct.dp_matrix[0][j-1],
-			       std::min(dp_struct.dp_matrix[0][j] + costs[iD_],
-					dp_struct.dp_matrix[1][j-1] + costs[iI_]));
-      }
-      
+	dp_struct(1, j)
+	  = std::min<CostType>(delta + dp_struct(0, j-1),
+			       std::min(dp_struct(0, j) + costs[iD_],
+					dp_struct(1, j-1) + costs[iI_]));
+      }      
       // swap the two vectors
-      std::swap<CostType*>(dp_struct.dp_matrix[0], dp_struct.dp_matrix[1]);
-    }
-    
-    // TODO: Calculation
-    return dp_struct.dp_matrix[0][m];
-  }
-
-  void print_dp_matrix() const {
-    printMatrix<CostType>(2, m + 1, dp_struct.dp_matrix);
-  }
-
-  // This is here mostly for debugging purpose so it is not optimized
-  // and may be removed in the future
-  void resetMatrix() {
-    for (lbio_size_t j = 0; j <= m; ++j) {
-      dp_struct.dp_matrix[0][j] = 0;
-      dp_struct.dp_matrix[1][j] = 0;
+      dp_struct.swap_rows(0, 1);      
     }    
+    return dp_struct(0, m);
+  }
+
+  
+  void print_dp_matrix() const {
+    dp_struct.print_matrix();
   }
 			       
-}; // end of  EditDistanceBandApproxLinSpace 
+}; // EditDistanceBandApproxLinSpace
+
+
+
+//////////////////////////////////////////////////////////////////////
+//                      CONVERSION FUNCTIONS
+//////////////////////////////////////////////////////////////////////
 
 /**
  * \brief Extracts the substitutions array from an array of EditDistanceInfo
@@ -283,6 +282,9 @@ std::unique_ptr<double[]> extractDeletionArray(const EditDistanceInfo* v, size_t
  */
 std::unique_ptr<double[]> extractInsertionArray(const EditDistanceInfo* v, size_t k);
 
+//////////////////////////////////////////////////////////////////////
+//              EDIT DISTANCE CALCULATION FUNCTION
+//////////////////////////////////////////////////////////////////////
 
 /**
  * \brief computes the edit distance between strings s1 and s2
@@ -303,6 +305,15 @@ void editDistanceMat(const std::string& s1, const std::string& s2, size_t** dpMa
 
 void editDistanceWithInfo(const std::string& s1, const std::string& s2, EditDistanceInfo& info);
 
+
+size_t
+editDistanceBandwiseApprox(const std::string& s1, const std::string& s2, size_t T);
+
+
+//////////////////////////////////////////////////////////////////////
+//                          BACKTRACKING
+//////////////////////////////////////////////////////////////////////
+
 /**
  * \breif Reconstruct the edit script from the dynamic programming matrix.
  * The script and other informations are stored in the passed EditDistanceInfo 
@@ -321,8 +332,18 @@ editDistanceBacktrack(size_t** dpMatrix, const std::string& s1, const std::strin
 void
 closestToDiagonalBacktrack(size_t n, size_t m, size_t** dpMatrix, EditDistanceInfo& info);
 
-size_t
-editDistanceBandwiseApprox(const std::string& s1, const std::string& s2, size_t T);
+//////////////////////////////////////////////////////////////////////
+//           COMPARISON OF ALGORITHMS FOR EDIT DISTANCE
+//////////////////////////////////////////////////////////////////////
+
+void
+compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os = std::cout);
+
+
+//////////////////////////////////////////////////////////////////////
+//            EDIT DISTANCE ESTIMATION AND SAMPLING
+//                 (TO BE MOVED TO EDIT_EST.HPP)
+//////////////////////////////////////////////////////////////////////
 
 
 double
@@ -352,13 +373,6 @@ void
 scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix,
 			 std::vector<std::string>* scripts = nullptr);
 
-
-void
-compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os = std::cout);
-
-//////////////////////////////////////////////////////////////////////
-//            EDIT DISTANCE ESTIMATION AND SAMPLING
-//////////////////////////////////////////////////////////////////////
 
 /**
  * Use a Monte-Carlo sampling technique to estimate the edit distance between

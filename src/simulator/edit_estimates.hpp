@@ -10,11 +10,21 @@
 #include <fstream>
 #include <cmath>
 
-
-// Computes 2 e(n/2) - e(n) with error < (precison) * (value)
-template<typename Algorithm>
-std::vector<SampleEstimates>
-differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delta, size_t k_max , Algorithm& alg) {
+/**
+ * @brief Computes 2 e(n/2) - e(n) with error < (precison) * (value)
+ *
+ * @tparam Algorithm Class for edit distance algorithm.
+ *
+ * @param n          The size of strings to be generated.
+ * @param precision  The desired _relative precision_.
+ * @param z_delta    The number of standard deviation for confidence.
+ * @param k_max      The maximum number of iterations
+ * @param alg        An instance of `Algorithm` used to calculate the distance
+ */
+template<class Algorithm>
+std::vector<SampleEstimates> 
+difference_stimate(size_t n, double precision, double z_delta,
+		   size_t k_max, Algorithm& alg) {
   
   // Generators
   EditDistanceSample<Algorithm> generator_n(n, n);
@@ -23,7 +33,7 @@ differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delt
   lbio_size_t k = 1;
   // create sampling process structures (one for 'n' and one for 'n/2' )
   SamplingEstimationProcess est_n(n);
-  SamplingEstimationProcess est_n_2(n >> 1);
+  SamplingEstimationProcess est_n_2(n / 2);
 
   // generate new sample and refresh sampling processes
   lbio_size_t sample_n = generator_n(alg);
@@ -62,7 +72,8 @@ differenceBoundedRelativeErrorEstimate(size_t n, double precision, double z_delt
   } while(k < k_max && ( rho >= precision * diff_n / z_delta ));
     
 
-  return std::vector<SampleEstimates>({ est_n_2.toSampleEstimates(), est_n.toSampleEstimates()}) ;
+  return std::vector<SampleEstimates>
+    ({ est_n_2.toSampleEstimates(), est_n.toSampleEstimates()}) ;
 }
 
 #endif

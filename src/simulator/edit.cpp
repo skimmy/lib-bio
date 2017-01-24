@@ -6,13 +6,8 @@
 #include "util.hpp"
 #include "edit.hpp"
 
-#include <iostream>
 #include <fstream>
 #include <map>
-#include <memory>
-#include <algorithm>
-
-#include <cstring>
 #include <cmath>
 
 

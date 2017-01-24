@@ -396,7 +396,7 @@ editDistanceTests() {
 
   Algorithm alg(n, n, std::sqrt(n));
 
-  std::vector<SampleEstimates> allEst = differenceBoundedRelativeErrorEstimate(n, prec, z, Options::opts.k, alg);
+  std::vector<SampleEstimates> allEst = difference_stimate(n, prec, z, Options::opts.k, alg);
   estimates = allEst[1];
 
   std::cout << allEst[0].sampleSize << "\t" << allEst[0].sampleMean << "\t" << allEst[0].sampleVariance << "\n"
@@ -567,11 +567,4 @@ void testAll() {
   //editDistanceVerifySecondOrderFunction();
   //  testAverageDPMatrix(Options::opts.N);
   
-#if defined(SIM_BOOST_EXTENSIONS)
-  std::cout << "Boost extension available\n";
-  DynamicProgrammingBoost<int>(16,16);
-
-#else  
-  std::cout << "No boost extensions :(\n";  
-#endif
 }

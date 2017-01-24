@@ -15,6 +15,8 @@
 #include <cstring>
 #include <cmath>
 
+using namespace lbio::sim;
+
 #define TEST_GENOME_LENGTH 65536
 #define TEST_READ_LENGTH 100
 
@@ -396,7 +398,7 @@ editDistanceTests() {
 
   Algorithm alg(n, n, std::sqrt(n));
 
-  std::vector<SampleEstimates> allEst = difference_stimate(n, prec, z, Options::opts.k, alg);
+  std::vector<SampleEstimates> allEst = edit::difference_stimate(n, prec, z, Options::opts.k, alg);
   estimates = allEst[1];
 
   std::cout << allEst[0].sampleSize << "\t" << allEst[0].sampleMean << "\t" << allEst[0].sampleVariance << "\n"
@@ -488,66 +490,6 @@ editDistanceTests() {
   }
 } 
 
-
-// class InverseSquareRootFunction
-// {
-// private:
-//   double gamma, beta;
-// public:
-//   InverseSquareRootFunction(double gam, double bet) {
-//     gamma = gam;
-//     beta = bet;
-//   }
-//   double operator() (double x) { return ( gamma / std::pow(x, beta) ); }
-// };
-
-// TODO Move to edit.hpp as soon as good
-// This will eventally become the code to verify the model
-// E[ed(X,Y)] = \xi n + \gam n^{1-\bet}
-void
-editDistanceVerifySecondOrderFunction() {
-  size_t n_max = std::pow(2,14);
-  size_t n = std::pow(2,0);
-  // InverseSquareRootFunction g(1.0, 2.0);
-  double prec = 0.001; //Options::opts.precision;
-  double z = 2; //Options::opts.confidence;
-  Options::opts.k = 50000;
-  while (n <= n_max) {
-    SampleEstimates est =
-      editDistanceRelativeErrorEstimates(n, 0, prec, z);
-    std::cout << n << "\t" << est.sampleMean << "\t" << est.sampleVariance << "\t" << est.sampleSize << std::endl;
-    n *= 2;
-    
-  }
-  std::cout << std::endl;
-}
-
-void
-testAverageDPMatrix(size_t n) {
-  double** dpMatrix = new double*[n+1];
-  for (size_t i = 0; i <= n; ++i) {
-    dpMatrix[i] = new double[n+1];
-  }
-
-  computeAverageDPMatrix(dpMatrix, n, n);
-
-  for (size_t i = 0; i <= n; ++i) {
-    std::cout << dpMatrix[i][i] << std::endl;
-  }
-
-  for (size_t i = 0; i <= n; ++i) {
-    for (size_t j = 0; j <=n; ++j) {
-      std::cout << dpMatrix[i][j] << "\t";
-    }
-    std::cout << "\n";
-  }
-
-  for (size_t i = 0; i <= n; ++i) {
-    delete[] dpMatrix[i];
-  }
-  delete[] dpMatrix;
-}
-
 void testAll() {
   
   logInfo("TEST MODE");
@@ -561,10 +503,6 @@ void testAll() {
   //testApproximatedExpectedScore();
 
  
-  editDistanceTests();
-  //test_edit_distance_class();
-
-  //editDistanceVerifySecondOrderFunction();
-  //  testAverageDPMatrix(Options::opts.N);
-  
+  //editDistanceTests();
+  test_edit_distance_class();
 }

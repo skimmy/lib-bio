@@ -10,7 +10,6 @@
 #define EDIT_DISTANCE_ALGORITHM_QUADRATIC 0x2
 #define EDIT_DISTANCE_INFO_PARTIAL        0x4
 #define EDIT_DISTANCE_INFO_SCRIPT         0x8
-#define EDIT_DISTANCE_SAMPLE_MATRIX       0x10 // 16
 
 #define EDIT_DISTANCE_BOUNDED_ERROR       0x20 // 32
 #define EDIT_DISTANCE_DIFF_BOUNDED_ERROR  0x40 // 64
@@ -22,30 +21,41 @@
 
 
 /**
- * This is a structure to store information about how edit distance is
- * divided into substitution,
+ * @brief This is a structure to store information about how edit
+ * distance is divided into substitution,
  */
 class EditDistanceInfo
 {
 public:
   size_t n_sub;
   size_t n_del;
-  size_t n_ins;  
-
-  EditDistanceInfo() : n_sub(0), n_del(0), n_ins(0) {}
-  EditDistanceInfo(const EditDistanceInfo& i) :
-    n_sub(i.n_sub), n_del(i.n_del), n_ins(i.n_ins), edit_script(i.edit_script) {}
-
+  size_t n_ins;
   std::string edit_script = "";
 
-  size_t distance() { return n_sub + n_ins + n_del; }
+  EditDistanceInfo() : n_sub(0), n_del(0), n_ins(0)
+  { }
+  
+  EditDistanceInfo(const EditDistanceInfo& i) :
+    n_sub(i.n_sub), n_del(i.n_del), n_ins(i.n_ins),
+    edit_script(i.edit_script)
+  { }  
+
+  size_t distance() const { return n_sub + n_ins + n_del; }
+  
   void reset() { n_sub = 0; n_del = 0; n_ins = 0; }
+
+  bool operator<(const EditDistanceInfo& i) {
+    return (this->distance() < i.distance());
+  }
+  
   bool operator==(const EditDistanceInfo& i) {
     return (n_sub == i.n_sub && n_del == i.n_del && n_ins == i.n_ins);
   }
+  
   bool operator!=(const EditDistanceInfo& i) {
     return !(*this == i);
   }
+  
   EditDistanceInfo& operator+=(const EditDistanceInfo& rhs) {
     n_sub += rhs.n_sub;
     n_del += rhs.n_del;
@@ -349,9 +359,6 @@ compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os = s
 double
 testExhaustiveEditDistanceEncoded(size_t n, double* freq);
 
-void
-computeAverageDPMatrix(double** dpMatrix, size_t n, size_t m);
-
 SampleEstimates
 editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta, size_t k_min = 16);
 
@@ -372,32 +379,6 @@ editDistanceRelativeErrorEstimates(size_t n, double e_model, double precision, d
 void
 scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix,
 			 std::vector<std::string>* scripts = nullptr);
-
-
-/**
- * Use a Monte-Carlo sampling technique to estimate the edit distance between
- * random strings of same length.
- *
- * \param n_min The minimum length to be tested
- * \param n_max The maximum lengths to be tested
- * \param n_step The incremente on length 
- * \param k_max The number of samples for each length
- * 
- */
-void
-editDistanceEstimations(size_t n_min, size_t n_max, size_t n_step, size_t k_max);
-
-/*
- * \brief Computes k_the edit distance for k_samples pairs of random strings
- * with length n. The distances are stored in an array whose (smart) pointer 
- * is returned.
- *
- * \param n the length of the strings
- * \param k_samples the number of pairs to compute
- * \return a (smart) pointer to an array containing all the distances
- */
-std::unique_ptr<size_t[]>
-editDistSamples(size_t n, size_t k_samples);
 
 std::unique_ptr<EditDistanceInfo[]>
 editDistSamplesInfo(size_t n, size_t k_samples);

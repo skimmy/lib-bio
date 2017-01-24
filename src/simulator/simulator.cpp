@@ -24,6 +24,9 @@
 #include <fstream>
 #include <algorithm>
 
+// TODO Convert to use proper ns
+using namespace lbio::sim;
+
 // testing functions from test.cpp. This has not been inserted in
 // other includes (e.g., common.hpp) since this is the only place
 // where it used. Moreover in case of unit testing code development
@@ -342,6 +345,8 @@ void oracleSimulation() {
 
 void
 editDistanceOpMode() {
+
+  using AlgorithmBand = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
   // The default edit distance mode is
   // Sample
   // Linear Alg
@@ -388,11 +393,11 @@ editDistanceOpMode() {
     double z_confidence = Options::opts.confidence;
     lbio_size_t T = Options::opts.approxLevel;
 
-    using Algorithm = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
-    Algorithm alg(n, n, T);
+
+    AlgorithmBand alg(n, n, T);
     
     std::vector<SampleEstimates> est =
-      difference_stimate(n, precision, z_confidence, k_max, alg);
+      edit::difference_stimate(n, precision, z_confidence, k_max, alg);
     std::cout << std::endl;
     std::cout << (n>>1) << "\t" << est[0].sampleSize << "\t"
 	      << est[0].sampleMean  << "\t" << est[0].sampleVariance
@@ -451,12 +456,11 @@ editDistanceOpMode() {
 	std::unique_ptr<EditDistanceInfo[]> samples =
 	  editDistSamplesInfoLinSpace(n,k);
 	
-	std::unique_ptr<double[]> subSamples
-	  = extractSubstitutionArray(samples.get(), k);
-	std::unique_ptr<double[]> delSamples
-	  = extractDeletionArray(samples.get(), k);
-	std::unique_ptr<double[]> insSamples
-	  = extractInsertionArray(samples.get(), k);
+	// auto -> std::unique_ptr<double[]>
+	auto subSamples = extractSubstitutionArray(samples.get(), k);
+	auto delSamples = extractDeletionArray(samples.get(), k);
+	auto insSamples = extractInsertionArray(samples.get(), k);
+	
 	SampleEstimates subEst
 	  = estimatesFromSamples<double>(subSamples.get(), k);
 	SampleEstimates delEst
@@ -478,10 +482,10 @@ editDistanceOpMode() {
       }
       else {
 	// MINIMAL INFO (mean + var) + Sample + Linear
-	std::unique_ptr<size_t[]> samples =
-	  editDistSamples(n,k);
-	SampleEstimates estimators
-	  = estimatesFromSamples<size_t>(samples.get(), k);
+	logInfo("Basic sampling");
+	AlgorithmBand alg(n, n, std::ceil(n/2.0));
+	auto samples = edit::edit_distance_samples(n,k, alg);
+	auto estimators = estimatesFromSamples<size_t>(samples.get(), k);
 	std::cout << estimators.sampleMean << std::endl;
 	std::cout << estimators.sampleVariance << std::endl;
       }

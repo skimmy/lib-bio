@@ -32,7 +32,10 @@ def parseArguments():
     parser.add_argument("--mat-col", dest="matrixColumn", help="Prints the content of the specified column of the frequency matrix")
     parser.add_argument("--stretch-stat", dest="stretchStat", default=None,
                         help="Name of the files (one per operation) where statistic of stretches will be saved")
+    parser.add_argument("--diagonal-stat", dest="diagonalStats", default=None,
+                        help="Name of the files the will contain passages through diagonal statistics of scripts")
     parser.add_argument("-a", "--archive-dir", dest="archive", help="Creates an 'archived' version in the directory given as parameter")
+    
     
     return parser.parse_args()
 
@@ -167,6 +170,41 @@ def calculateVerticalFlow(n, scripts, c):
         f[j] += 1
     return f
 
+'''Computes the statistics of scripts with respect to the main diagonal.
+More precisely computes the statistics of entering and exiting point (i.e.,
+which is the frequency of (i,i) being enter/exit point and the frequency of
+lengths of subpaths staying on the diagonal.
+'''
+def calculateDiagonalStats(n, scripts):
+    enterStats = np.zeros(n) 
+    exitStats = np.zeros(n)
+    onDiagStats = np.zeros(n)
+    for script in scripts:
+#        enterStats[0] += 1
+        i = 0
+        j = 0
+        inDiag = 0
+        for s in script:
+            i_next = i
+            j_next = j
+            if (s == 'M') or (s == 'S') or (s == 'D'):
+                i_next += 1
+            if (s == 'M') or (s == 'S') or (s == 'I'):
+                j_next += 1
+            # enter diagonal
+            if (i_next == j_next) and (i != j):
+                enterStats[i_next] += 1
+                inDiag += 1
+            # exit diagonal
+            if (i_next != j_next) and (i == j):
+                exitStats[i] += 1
+                onDiagStats[inDiag] += 1
+                inDiag = 0
+            i = i_next
+            j = j_next
+    return (enterStats, exitStats, onDiagStats)
+    
+
 if __name__ == "__main__":
     args = parseArguments()
     n = int(args.n)
@@ -206,6 +244,9 @@ if __name__ == "__main__":
 
     if (args.stretchStat is not None):
         mStretch, sStretch, dStretch, iStretch = computeStretchesDistribution(n+1, allScripts)
+
+    if(args.diagonalStats is not None):
+        diagEnter, diagExit, diagLength = calculateDiagonalStats(n+1, allScripts)
             
     # The archive options puts all files in binary numpy format into
     # the archiviation directory. This is useful to load afterwards
@@ -241,4 +282,7 @@ if __name__ == "__main__":
             np.save(os.path.join(archivePath, "D_" + args.stretchStat), dStretch)
             np.save(os.path.join(archivePath, "I_" + args.stretchStat), iStretch)
     
-    
+        if (args.diagonalStats is not None):
+            np.save(os.path.join(archivePath, "Enter_" + args.diagonalStats), diagEnter)
+            np.save(os.path.join(archivePath, "Exit_" + args.diagonalStats), diagExit)
+            np.save(os.path.join(archivePath, "Len_" + args.diagonalStats), diagLength)

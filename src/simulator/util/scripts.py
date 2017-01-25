@@ -175,12 +175,11 @@ More precisely computes the statistics of entering and exiting point (i.e.,
 which is the frequency of (i,i) being enter/exit point and the frequency of
 lengths of subpaths staying on the diagonal.
 '''
-def calculateDiagonalStats(n, scripts):
+def calculateDiagonalStats(n, scripts, diag=0):
     enterStats = np.zeros(n) 
     exitStats = np.zeros(n)
     onDiagStats = np.zeros(n)
     for script in scripts:
-#        enterStats[0] += 1
         i = 0
         j = 0
         inDiag = 0
@@ -192,17 +191,27 @@ def calculateDiagonalStats(n, scripts):
             if (s == 'M') or (s == 'S') or (s == 'I'):
                 j_next += 1
             # enter diagonal
-            if (i_next == j_next) and (i != j):
+            if ( (j_next - i_next) == diag ) and ((j - i) != diag):
                 enterStats[i_next] += 1
                 inDiag += 1
             # exit diagonal
-            if (i_next != j_next) and (i == j):
+            if ((j_next - i_next) != diag) and ((j - i) == diag):
                 exitStats[i] += 1
                 onDiagStats[inDiag] += 1
                 inDiag = 0
             i = i_next
             j = j_next
     return (enterStats, exitStats, onDiagStats)
+
+def diagonalStatAverageLengths(n, scripts, diagonals):
+    print("Hello!!")
+    for diag in diagonals:
+        ent, ex, lens = calculateDiagonalStats(n, scripts, diag)
+        normLengths = [t / sum(lens) for t in lens]
+        indexes = [t for t in range(1, len(lens)+1)]
+        avg = sum([(i+1) * lens[i] / sum(lens) for i in range(len(lens))])
+        print ("{0}\t{1}".format(diag, avg))
+                                 #np.average(normLengths, weights=indexes)))
     
 
 if __name__ == "__main__":
@@ -247,6 +256,7 @@ if __name__ == "__main__":
 
     if(args.diagonalStats is not None):
         diagEnter, diagExit, diagLength = calculateDiagonalStats(n+1, allScripts)
+        diagonalStatAverageLengths(n+1, allScripts, [-2,-1,0,1,2])
             
     # The archive options puts all files in binary numpy format into
     # the archiviation directory. This is useful to load afterwards
@@ -286,3 +296,4 @@ if __name__ == "__main__":
             np.save(os.path.join(archivePath, "Enter_" + args.diagonalStats), diagEnter)
             np.save(os.path.join(archivePath, "Exit_" + args.diagonalStats), diagExit)
             np.save(os.path.join(archivePath, "Len_" + args.diagonalStats), diagLength)
+

@@ -394,7 +394,7 @@ editDistanceOpMode() {
     lbio_size_t T = Options::opts.approxLevel;
 
 
-    AlgorithmBand alg(n, n, T);
+    AlgorithmBand alg(n, n, T, {1,1,1});
     
     std::vector<SampleEstimates> est =
       edit::difference_stimate(n, precision, z_confidence, k_max, alg);
@@ -483,7 +483,7 @@ editDistanceOpMode() {
       else {
 	// MINIMAL INFO (mean + var) + Sample + Linear
 	logInfo("Basic sampling");
-	AlgorithmBand alg(n, n, std::ceil(n/2.0));
+	AlgorithmBand alg(n, n, std::ceil(n/2.0), {1,1,1});
 	auto samples = edit::edit_distance_samples(n,k, alg);
 	auto estimators = estimatesFromSamples<size_t>(samples.get(), k);
 	std::cout << estimators.sampleMean << std::endl;

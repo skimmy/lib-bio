@@ -19,61 +19,59 @@
 #define EDIT_DISTANCE_SUBTASK_SCRIPT_DIST   8
 #define EDIT_DISTANCE_SUBTASK_COMPARE_ALGS  32
 
-
 /**
- * @brief This is a structure to store information about how edit
- * distance is divided into substitution,
+ * @brief This is a class to store information about how edit distance
+ * is divided into substitution, deletions and insertions.
+ *
+ * The members are kept public since they are often accessed and this
+ * used to be a struct.
  */
 class EditDistanceInfo
 {
 public:
-  size_t n_sub;
-  size_t n_del;
-  size_t n_ins;
-  std::string edit_script = "";
+  lbio_size_t n_sub;
+  lbio_size_t n_del;
+  lbio_size_t n_ins;
+  std::string edit_script;
 
-  EditDistanceInfo() : n_sub(0), n_del(0), n_ins(0)
-  { }
-  
-  EditDistanceInfo(const EditDistanceInfo& i) :
-    n_sub(i.n_sub), n_del(i.n_del), n_ins(i.n_ins),
-    edit_script(i.edit_script)
-  { }  
+  EditDistanceInfo();
+  EditDistanceInfo(lbio_size_t s, lbio_size_t d, lbio_size_t i);
+  EditDistanceInfo(lbio_size_t c);
 
-  size_t distance() const { return n_sub + n_ins + n_del; }
+  size_t
+  distance() const;
   
-  void reset() { n_sub = 0; n_del = 0; n_ins = 0; }
+  void
+  reset();
 
-  bool operator<(const EditDistanceInfo& i) {
-    return (this->distance() < i.distance());
-  }
+  bool
+  operator<(const EditDistanceInfo& i) const;
   
-  bool operator==(const EditDistanceInfo& i) {
-    return (n_sub == i.n_sub && n_del == i.n_del && n_ins == i.n_ins);
-  }
-  
-  bool operator!=(const EditDistanceInfo& i) {
-    return !(*this == i);
-  }
-  
-  EditDistanceInfo& operator+=(const EditDistanceInfo& rhs) {
-    n_sub += rhs.n_sub;
-    n_del += rhs.n_del;
-    n_ins += rhs.n_ins;
-    return *this;
-  }
+  bool
+  operator==(const EditDistanceInfo& i) const;
 
-  friend EditDistanceInfo operator+(EditDistanceInfo lhs, const EditDistanceInfo& rhs) {
-    lhs += rhs;
-    return lhs;
-  }
+  bool
+  operator!=(const EditDistanceInfo& i) const;
+  
+  EditDistanceInfo&
+  operator+=(const EditDistanceInfo& rhs);
 
+  friend EditDistanceInfo
+  operator+(EditDistanceInfo lhs, const EditDistanceInfo& rhs);
+
+  EditDistanceInfo&
+  operator*=(lbio_size_t scalar);
+
+  friend EditDistanceInfo
+  operator*(EditDistanceInfo lhs, lbio_size_t rhs);
  
-  friend std::ostream& operator<<(std::ostream& out, const EditDistanceInfo& info) {
-    out << info.n_sub << " " << info.n_del << " " << info.n_ins;
-    return out;
-  }  
+  friend std::ostream&
+  operator<<(std::ostream& out, const EditDistanceInfo& info);
 };
+
+const EditDistanceInfo InfoUnitSub {1,0,0};
+const EditDistanceInfo InfoUnitDel {0,1,0};
+const EditDistanceInfo InfoUnitIns {0,0,1};
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -155,13 +153,7 @@ private:
   // - a caller that is invoked when costs are needed (should be constexpr)
   CostVector costs_vector;
   
-public:
-  
-  EditDistanceWF(lbio_size_t n, lbio_size_t m)
-    : dp_struct {n, m}, costs_vector {1, 1, 1}
-  {
-    init();
-  }
+public:  
 
   EditDistanceWF(lbio_size_t n, lbio_size_t m, const CostVector& costs)
     : dp_struct{n, m}, costs_vector {costs}
@@ -216,8 +208,10 @@ private:
   const CostType Inf;
 
 public:
-  EditDistanceBandApproxLinSpace(lbio_size_t n_, lbio_size_t m_, lbio_size_t T)
-    : dp_struct {2, std::max(n_,m_)}, costs {1,1,1}, bandwidth {T}, n {n_}, m {m_},
+  EditDistanceBandApproxLinSpace(lbio_size_t n_, lbio_size_t m_,
+				 lbio_size_t T, const CostVector& costV)
+    : dp_struct {2, std::max(n_,m_)}, costs {costV}, bandwidth {T},
+      n {n_}, m {m_},
       Inf {(*std::max_element(costs.begin(), costs.end())) * 2*(n_+m_+1)}
   { }
 
@@ -438,3 +432,4 @@ struct EditDistanceSimOutput {
 };
 
 #endif
+

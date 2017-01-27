@@ -396,7 +396,7 @@ editDistanceTests() {
   n = 512;
   using Algorithm = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
 
-  Algorithm alg(n, n, std::sqrt(n));
+  Algorithm alg(n, n, std::sqrt(n), {1,1,1});
 
   std::vector<SampleEstimates> allEst = edit::difference_stimate(n, prec, z, Options::opts.k, alg);
   estimates = allEst[1];
@@ -456,7 +456,7 @@ editDistanceTests() {
     bandReverseTestV.push_back(editDistanceBandwiseApprox(s1Rev, s2Rev, t));
     bandShiftedTestV.push_back(editDistanceBandwiseApprox(s1Shift, s2Shift, t));
 
-    EditDistanceBandApproxLinSpace<lbio_size_t,std::string> edApprox(n,n, t);
+    EditDistanceBandApproxLinSpace<lbio_size_t,std::string> edApprox(n,n, t, {1,1,1});
 
     bandMonotoneTestVLin.push_back(edApprox.calculate(s1,s2));
     bandShiftedTestVLin.push_back(edApprox.calculate(s1Shift, s2Shift));
@@ -503,6 +503,6 @@ void testAll() {
   //testApproximatedExpectedScore();
 
  
-  //editDistanceTests();
+  editDistanceTests();
   test_edit_distance_class();
 }

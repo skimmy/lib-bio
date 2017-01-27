@@ -12,7 +12,7 @@
 
 
 //////////////////////////////////////////////////////////////////////
-//                         INFO CONVERSION
+//                    EDIT INFO IMPLE AND HELPERS
 //////////////////////////////////////////////////////////////////////
 
 std::unique_ptr<double[]> extractSubstitutionArray(const EditDistanceInfo* v, size_t k) {
@@ -41,6 +41,76 @@ std::unique_ptr<double[]> extractInsertionArray(const EditDistanceInfo* v, size_
   }
   return o;
 }
+
+EditDistanceInfo::EditDistanceInfo()
+    : n_sub {0}, n_del {0}, n_ins {0}, edit_script {""}
+{ }
+
+EditDistanceInfo::EditDistanceInfo(lbio_size_t s, lbio_size_t d, lbio_size_t i)
+  : n_sub {s}, n_del {d}, n_ins {i}, edit_script {""}
+{ }
+
+EditDistanceInfo::EditDistanceInfo(lbio_size_t c) : EditDistanceInfo(c,c,c) {} 
+
+size_t
+EditDistanceInfo::distance() const {
+  return n_sub + n_ins + n_del;
+}
+  
+void
+EditDistanceInfo::reset() {
+  n_sub = 0; n_del = 0; n_ins = 0;
+}
+
+bool
+EditDistanceInfo::operator<(const EditDistanceInfo& i) const {
+  return (this->distance() < i.distance());
+}
+  
+bool
+EditDistanceInfo::operator==(const EditDistanceInfo& i) const {
+  return (n_sub == i.n_sub && n_del == i.n_del && n_ins == i.n_ins);
+}
+  
+bool
+EditDistanceInfo::operator!=(const EditDistanceInfo& i) const {
+  return !(*this == i);
+}
+  
+EditDistanceInfo&
+EditDistanceInfo::operator+=(const EditDistanceInfo& rhs) {
+  n_sub += rhs.n_sub;
+  n_del += rhs.n_del;
+  n_ins += rhs.n_ins;
+  return *this;
+}
+
+EditDistanceInfo
+operator+(EditDistanceInfo lhs, const EditDistanceInfo& rhs) {
+  lhs += rhs;
+  return lhs;
+}
+
+EditDistanceInfo&
+EditDistanceInfo::operator*=(lbio_size_t scalar) {
+  n_sub *= scalar;
+  n_del *= scalar;
+  n_ins *= scalar;
+  return *this;
+}
+
+EditDistanceInfo
+operator*(EditDistanceInfo lhs, lbio_size_t rhs) {
+  lhs *= rhs;
+  return lhs;
+}
+
+ 
+std::ostream&
+operator<<(std::ostream& out, const EditDistanceInfo& info) {
+  out << info.n_sub << " " << info.n_del << " " << info.n_ins;
+  return out;
+}  
 
 //////////////////////////////////////////////////////////////////////
 //                      EDIT DISTANCE COMPUTATION
@@ -557,7 +627,7 @@ SampleEstimates
 editDistanceErrorBoundedEstimates(size_t n, double precision,
 				  double z_delta, size_t k_min) {
   using BandApprox = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
-  BandApprox alg(n, n, std::floor(n/2.0));
+  BandApprox alg(n, n, std::floor(n/2.0), {1,1,1});
   EditDistanceSample<BandApprox> gen(n, n);
   
   size_t k = 1;
@@ -595,7 +665,7 @@ editDistanceRelativeErrorEstimates(size_t n, double e_model,
 				   double precision, double z_delta) {
 
   using BandApprox = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
-  BandApprox alg(n, n, std::floor(n/2.0));
+  BandApprox alg(n, n, std::floor(n/2.0), {1,1,1});
   EditDistanceSample<BandApprox> gen(n, n);
 
   
@@ -651,7 +721,7 @@ scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix,
 
   std::string s1(n,'N');
   std::string s2(n,'N');
-  EditDistanceInfo info;
+  EditDistanceInfo info {};
 
   for (size_t l = 0; l < k; ++l) {
     generateIIDString(s1);
@@ -768,7 +838,7 @@ compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
     generateIIDString(s1);
     generateIIDString(s2);
 
-    EditDistanceInfo tmp;
+    EditDistanceInfo tmp {};
     editDistanceMat(s1, s2, dpMatrix);
     closestToDiagonalBacktrack(s1.size(), s2.size(), dpMatrix, tmp);
     res->addExact(tmp);
@@ -803,4 +873,17 @@ compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
 //          PROPTOTYPE TEST FUNCTION (RO REMOVE)
 //////////////////////////////////////////////////////////////////////
 void test_edit_distance_class() {
+  EditDistanceInfo inf1;
+  inf1.n_sub = 2;
+  EditDistanceInfo inf2(inf1);
+  inf1.n_del = 100;
+  EditDistanceInfo inf3(inf1);
+  inf3 *= 2;
+  EditDistanceInfo inf4 = inf1 * 10;
+  std::cout << "1\t" << inf1 << "\n2\t" << inf2 << "\n3\t" << inf3 << "\n4\t" << inf4 << "\n";
+
+  using EditInfoWF =   EditDistanceWF<EditDistanceInfo,std::string>  ;
+  EditInfoWF::CostVector costs = {InfoUnitSub, InfoUnitDel, InfoUnitIns};
+  EditInfoWF alg(10,10, costs);
+  std::cout << "ED: " << alg.calculate("AAA","AB") << "\n";
 }

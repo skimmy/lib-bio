@@ -416,6 +416,19 @@ public:
   
 };
 
+// These namespace will eventually contain all functions and classes
+namespace lbio { namespace sim { namespace edit {
+
+
+/**
+   \brief Computes the first value T such that the difference between 
+ */
+lbio_size_t
+optimal_bandwidth(lbio_size_t n, double precision, lbio_size_t Tmin = 1);
+
+
+} } } //namespaces
+
 /**
  * \brief Convience struct to manage vecotrs, this is a bad design and
  * should be changed.

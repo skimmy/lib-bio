@@ -105,6 +105,6 @@ difference_stimate(size_t n, double precision, double z_delta,
   return std::vector<SampleEstimates>
     ({ est_n_2.toSampleEstimates(), est_n.toSampleEstimates()}) ;
 }
-  
+      
 } } } // namespaces
 #endif

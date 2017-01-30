@@ -31,7 +31,6 @@ initRandomGenerator() {
 }
 
 int randomBaseIndex() {
-  //  return (rand() & 0x3);
   return randGen->nextBaseIdx();
 }
 

@@ -27,6 +27,7 @@
 // TODO Convert to use proper ns
 using namespace lbio::sim;
 using namespace lbio::sim::generator;
+using namespace lbio::sim::edit;
 
 // testing functions from test.cpp. This has not been inserted in
 // other includes (e.g., common.hpp) since this is the only place
@@ -346,6 +347,7 @@ void oracleSimulation() {
 
 void
 editDistanceOpMode() {
+    
 
   using AlgorithmBand = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
   // The default edit distance mode is
@@ -392,19 +394,23 @@ editDistanceOpMode() {
     size_t k_max = Options::opts.k;
     double precision = Options::opts.precision;
     double z_confidence = Options::opts.confidence;
-    lbio_size_t T = Options::opts.approxLevel;
-
-
+    lbio_size_t T = static_cast<lbio_size_t>(std::floor(n / 2.0));
+    lbio_size_t Tmin = static_cast<lbio_size_t>(std::sqrt(n));
+    // Approximation is required find 'optimal' T >= sqrt(n)
+    if (Options::opts.approxLevel > 0) {
+      T = optimal_bandwidth(n, precision / 2, Tmin);
+      
+    }
     AlgorithmBand alg(n, n, T, {1,1,1});
     
     std::vector<SampleEstimates> est =
       edit::difference_stimate(n, precision, z_confidence, k_max, alg);
+    
     std::cout << std::endl;
-    std::cout << (n>>1) << "\t" << est[0].sampleSize << "\t"
-	      << est[0].sampleMean  << "\t" << est[0].sampleVariance
-	      << "\n";    
-    std::cout << n << "\t" << est[1].sampleSize << "\t" << est[1].sampleMean
-	      << "\t" << est[1].sampleVariance << "\n";
+    std::cout << (n>>1) << "\t" << est[0] << "\n";    
+    std::cout << n << "\t" << est[1] << "\n";
+
+    
     return;
   }
 

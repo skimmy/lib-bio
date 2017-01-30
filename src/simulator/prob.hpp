@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <fstream>
+#include <iostream>
 
 // Class representing empirical distribution as histogram array
 class EmpiricalDistribution {  
@@ -53,6 +54,13 @@ public:
   double sampleVariance;
 
   SampleEstimates() : sampleSize(0), sampleMean(0), sampleVariance(0) {}
+
+  friend std::ostream& operator<<(std::ostream& os,
+				  const SampleEstimates& est) {
+    os << est.sampleSize << "\t" << est.sampleMean
+       << "\t" << est.sampleVariance;
+    return os;
+  }
 };
 
 /**

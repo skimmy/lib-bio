@@ -17,7 +17,8 @@ using namespace lbio::sim::generator;
 //                    EDIT INFO IMPLE AND HELPERS
 //////////////////////////////////////////////////////////////////////
 
-std::unique_ptr<double[]> extractSubstitutionArray(const EditDistanceInfo* v, size_t k) {
+std::unique_ptr<double[]>
+extractSubstitutionArray(const EditDistanceInfo* v, size_t k) {
   std::unique_ptr<double[]> o(new double[k]);
   for (size_t i = 0; i < k; ++i) {
     o[i] = v[i].n_sub;
@@ -26,7 +27,8 @@ std::unique_ptr<double[]> extractSubstitutionArray(const EditDistanceInfo* v, si
 }
 
 
-std::unique_ptr<double[]> extractDeletionArray(const EditDistanceInfo* v, size_t k) {
+std::unique_ptr<double[]>
+extractDeletionArray(const EditDistanceInfo* v, size_t k) {
   std::unique_ptr<double[]> o(new double[k]);
   
   for (size_t i = 0; i < k; ++i) {
@@ -36,7 +38,8 @@ std::unique_ptr<double[]> extractDeletionArray(const EditDistanceInfo* v, size_t
 }
 
 
-std::unique_ptr<double[]> extractInsertionArray(const EditDistanceInfo* v, size_t k)  {
+std::unique_ptr<double[]>
+extractInsertionArray(const EditDistanceInfo* v, size_t k)  {
   std::unique_ptr<double[]> o(new double[k]);
   for (size_t i = 0; i < k; ++i) {
     o[i] = v[i].n_ins;
@@ -45,14 +48,16 @@ std::unique_ptr<double[]> extractInsertionArray(const EditDistanceInfo* v, size_
 }
 
 EditDistanceInfo::EditDistanceInfo()
-    : n_sub {0}, n_del {0}, n_ins {0}, edit_script {""}
+  : n_sub {0}, n_del {0}, n_ins {0}, edit_script {""}
 { }
 
 EditDistanceInfo::EditDistanceInfo(lbio_size_t s, lbio_size_t d, lbio_size_t i)
   : n_sub {s}, n_del {d}, n_ins {i}, edit_script {""}
 { }
 
-EditDistanceInfo::EditDistanceInfo(lbio_size_t c) : EditDistanceInfo(c,c,c) {} 
+EditDistanceInfo::EditDistanceInfo(lbio_size_t c)
+  : EditDistanceInfo(c,c,c)
+{ } 
 
 size_t
 EditDistanceInfo::distance() const {
@@ -137,7 +142,7 @@ editDistanceLinSpace(const std::string& s1, const std::string& s2,
     v1[0] = i;
     for (size_t j = 1; j <= n2; ++j) {
       size_t delta = (s1[i-1] == s2[j-1]) ? 0 : 1;
-      v1[j] = std::min(std::min( v0[j] + 1, v1[j-1] + 1), v0[j-1] + delta );
+      v1[j] = std::min(std::min(v0[j]+1, v1[j-1]+1), v0[j-1]+delta);
     }
     size_t * tmp = v0;
     v0 = v1;
@@ -263,7 +268,8 @@ editDistanceMat(const std::string& s1, const std::string& s2,
       size_t delta = (s1[i-1] == s2[j-1]) ? 0 : 1;
       dpMatrix[i][j] =
 	std::min( std::min(dpMatrix[i-1][j]+1,
-			   dpMatrix[i][j-1]+1) , dpMatrix[i-1][j-1] + delta ) ;
+			   dpMatrix[i][j-1]+1),
+		  dpMatrix[i-1][j-1] + delta ) ;
     }
   }
 
@@ -322,13 +328,15 @@ editDistanceBandwiseApproxMat(const std::string& s1, const std::string& s2,
     for (size_t j = j_min; j <= j_max; ++j) {      
       size_t delta = (s1[i-1] == s2[j-1]) ? 0 : 1;
       dpMatrix[i][j] = std::min( dpMatrix[i-1][j-1] + delta,
-			    std::min(dpMatrix[i-1][j] + 1, dpMatrix[i][j-1] + 1));
+				 std::min(dpMatrix[i-1][j] + 1,
+					  dpMatrix[i][j-1] + 1));
     }
   }
 }
 
 size_t
-editDistanceBandwiseApprox(const std::string& s1, const std::string& s2, size_t T) {
+editDistanceBandwiseApprox(const std::string& s1, const std::string& s2,
+			   size_t T) {
   size_t n = s1.size();
   size_t m = s2.size();
   size_t** dpMatrix = allocMatrix<size_t>(n+1, m+1);
@@ -692,8 +700,8 @@ editDistanceRelativeErrorEstimates(size_t n, double e_model,
     var_k = ( cumulative_quad_sum - k*(mean_k*mean_k)  ) / ((double)(k-1));
     rho_k = std::sqrt( var_k / ((double)k));
   } while( k < k_min || (k < k_max
-	   && ( std::abs(mean_k - e_model)
-		< ( rho_k * z_delta / precision ) ) ) );
+			 && ( std::abs(mean_k - e_model)
+			      < ( rho_k * z_delta / precision ) ) ) );
    
 
   SampleEstimates est;
@@ -865,27 +873,53 @@ compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
       os << pRes->getBandApproxWithT(T) << "\t";
     }
     os << std::endl;
-    }
+  }
   
   freeMatrix<size_t>(n+1, m+1, dpMatrix);
 }
+
+namespace lbio { namespace sim { namespace edit {
+
+using BandApprAlg = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
+      
+lbio_size_t
+optimal_bandwidth(lbio_size_t n, double precision, lbio_size_t Tmin) {
+  lbio_size_t T = Tmin;
+  lbio_size_t T_2 = static_cast<lbio_size_t>(std::floor(n / 2));
+  BandApprAlg exactAlg {n, n, T_2 ,{1,1,1}};
+  IidPairGenerator gen(n, n);
+  lbio_size_t k_min = 5;
+  while (T < n / 2) {
+    double avg = 0;
+
+    BandApprAlg apprAlg { n, n, T, {1,1,1} };
+    for (lbio_size_t k = 0; k < k_min; ++k) {
+      auto strings = gen();
+
+      lbio_size_t exact = exactAlg.calculate(strings.first, strings.second);
+      lbio_size_t approx = apprAlg.calculate(strings.first, strings.second);
+      avg += (approx - exact) / static_cast<double>(exact);
+      std::cout << T << " " << exact << " " << approx << "\n";	  
+    }
+    std::cout << avg / k_min << "\n";
+    if ( avg < k_min * precision) {
+      return T;
+    }
+    T *= 2;
+  }
+  return T;
+}
+      
+      
+} } } // namespaces
 
 
 //////////////////////////////////////////////////////////////////////
 //          PROPTOTYPE TEST FUNCTION (RO REMOVE)
 //////////////////////////////////////////////////////////////////////
 void test_edit_distance_class() {
-  EditDistanceInfo inf1;
-  inf1.n_sub = 2;
-  EditDistanceInfo inf2(inf1);
-  inf1.n_del = 100;
-  EditDistanceInfo inf3(inf1);
-  inf3 *= 2;
-  EditDistanceInfo inf4 = inf1 * 10;
-  std::cout << "1\t" << inf1 << "\n2\t" << inf2 << "\n3\t" << inf3 << "\n4\t" << inf4 << "\n";
-
-  using EditInfoWF =   EditDistanceWF<EditDistanceInfo,std::string>  ;
-  EditInfoWF::CostVector costs = {InfoUnitSub, InfoUnitDel, InfoUnitIns};
-  EditInfoWF alg(10,10, costs);
-  std::cout << "ED: " << alg.calculate("AAA","AB") << "\n";
+  lbio_size_t n = 512;
+  double epsilon = 0.01;
+  std::cout << "Opt(T): "
+	    << lbio::sim::edit::optimal_bandwidth(n, epsilon) << "\n";
 }

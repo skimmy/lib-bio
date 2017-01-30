@@ -1,3 +1,5 @@
+/*! \file edit_estimates.hpp 
+ */
 #ifndef SIM_EDIT_ESTIMATES_H
 #define SIM_EDIT_ESTIMATES_H
 
@@ -12,16 +14,17 @@
 namespace lbio { namespace sim { namespace edit {
 
 
-/*
- * @brief Computes k_the edit distance for k_samples pairs of random
- * strings with length n. The distances are stored in an array whose
- * pointer is returned.
- *
- * @tparam Algorithm  Algorithm used to compute edit distance
- * @param  n          The length of the strings
- * @param  k_samples  The number of pairs to compute
- *
- * @return a  Pointer to an array containing all the distances
+/*!
+   \brief Computes the edit distance for \c k_samples pairs of random
+   strings with length n. The distances are stored in an array whose
+   pointer is returned.
+  
+   \tparam Algorithm  Algorithm used to compute edit distance
+
+   \param  n          The length of the strings
+   \param  k_samples  The number of pairs to compute
+  
+   \return a  Pointer to an array containing all the distances
  */
 template<class Algorithm>
 std::unique_ptr<size_t[]>
@@ -38,24 +41,28 @@ edit_distance_samples(size_t n, size_t k_samples, Algorithm& alg) {
 }
 
 
-/**
- * @brief Computes 2 e(n/2) - e(n) with error < (precison) * (value)
- *
- * @tparam Algorithm Class for edit distance algorithm.
- *
- * @param n          The size of strings to be generated.
- * @param precision  The desired _relative precision_.
- * @param z_delta    The number of standard deviation for confidence.
- * @param k_max      The maximum number of iterations
- * @param alg        An instance of `Algorithm` used to calculate the distance
- *
- * @return A `vector v` containing `SampleEstimates` for e(n/2)
- *         (`v[0]`)and e(n) (`v[1]`)
+/*!
+  \brief Computes \f$2e(n/2) - e(n)\f$ with error < (precison) * (value)
+  
+  \tparam Algorithm   Class for edit distance algorithm.
+  \tparam Func        Callback function invoked with two \c SampleEstimates
+  one for n and one for n/2 estimations.
+   
+  
+  \param n          The size of strings to be generated.
+  \param precision  The desired _relative precision_.
+  \param z_delta    The number of standard deviation for confidence.
+  \param k_max      The maximum number of iterations
+  \param alg        An instance of `Algorithm` used to calculate the distance
+  \param callback   A callable function accepting two \c SampleEstimates
+  
+  \return A vector \c v containing \c SampleEstimates for e(n/2)
+  (\c v[0] )and e(n) (\c v[1] )
  */
-template<class Algorithm>
+template<class Algorithm, typename Func>
 std::vector<SampleEstimates> 
-difference_stimate(size_t n, double precision, double z_delta,
-		   size_t k_max, Algorithm& alg) {
+difference_estimate(size_t n, double precision, double z_delta,
+		   size_t k_max, Algorithm& alg, Func callback) {
   
   // Generators
   EditDistanceSample<Algorithm> generator_n(n, n);
@@ -96,15 +103,34 @@ difference_stimate(size_t n, double precision, double z_delta,
     var_n = est_n.sampleVariance();
     var_n_2 = est_n_2.sampleVariance();
     rho = std::sqrt( (4*var_n_2 + var_n) / ((double)k) );
-
+    callback(est_n.toSampleEstimates(), est_n_2.toSampleEstimates());
     // stopping condition
     // - max iteration number reached or
     // - rho < epsilon * |2e(n/2) - e(n)
+    
   } while(k < k_max && ( rho >= precision * diff_n / z_delta ));
 
   return std::vector<SampleEstimates>
     ({ est_n_2.toSampleEstimates(), est_n.toSampleEstimates()}) ;
 }
+
+
+/**
+   \overload
+
+   \brief This a convenience proxy function that invokes its
+   counterpart with a dummy callback.
+ */
+template<class Algorithm>
+std::vector<SampleEstimates> 
+difference_estimate(size_t n, double precision, double z_delta,
+		   size_t k_max, Algorithm& alg) {
+  
+  auto dummy_cb = [](const SampleEstimates& est_n,
+		     const SampleEstimates& est_n_2) {};
+  return difference_estimate(n, precision, z_delta, k_max, alg, dummy_cb);
+}
+
       
 } } } // namespaces
 #endif

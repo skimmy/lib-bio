@@ -391,6 +391,7 @@ editDistanceOpMode() {
 
   // Task - Default (0)
   if (flags & EDIT_DISTANCE_DIFF_BOUNDED_ERROR) {
+    logInfo("g(n) Esitmation");
     size_t k_max = Options::opts.k;
     double precision = Options::opts.precision;
     double z_confidence = Options::opts.confidence;
@@ -398,18 +399,20 @@ editDistanceOpMode() {
     lbio_size_t Tmin = static_cast<lbio_size_t>(std::sqrt(n));
     // Approximation is required find 'optimal' T >= sqrt(n)
     if (Options::opts.approxLevel > 0) {
-      T = optimal_bandwidth(n, precision / 2, Tmin);
-      
+      logInfo("Estimation of optimal bandwidth...");
+      T = optimal_bandwidth(n, precision / 2, Tmin);      
     }
     AlgorithmBand alg(n, n, T, {1,1,1});
+    // lambda for output
+    auto print_cb =
+      [n](const SampleEstimates& est_n, const SampleEstimates& est_n_2) {
+      std::cout << (n>>1) << "\t" << est_n_2 << "\n"
+	<< n << "\t" << est_n  << "\n"; };
     
+    logInfo("Estimation...");
     std::vector<SampleEstimates> est =
-      edit::difference_stimate(n, precision, z_confidence, k_max, alg);
-    
-    std::cout << std::endl;
-    std::cout << (n>>1) << "\t" << est[0] << "\n";    
-    std::cout << n << "\t" << est[1] << "\n";
-
+      edit::difference_estimate(n, precision, z_confidence,
+				k_max, alg, print_cb );
     
     return;
   }

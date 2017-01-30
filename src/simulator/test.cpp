@@ -399,7 +399,7 @@ editDistanceTests() {
 
   Algorithm alg(n, n, std::sqrt(n), {1,1,1});
 
-  std::vector<SampleEstimates> allEst = edit::difference_stimate(n, prec, z, Options::opts.k, alg);
+  std::vector<SampleEstimates> allEst = edit::difference_estimate(n, prec, z, Options::opts.k, alg);
   estimates = allEst[1];
 
   std::cout << allEst[0].sampleSize << "\t" << allEst[0].sampleMean << "\t" << allEst[0].sampleVariance << "\n"

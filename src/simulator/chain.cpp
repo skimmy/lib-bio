@@ -9,6 +9,8 @@
 #include <iostream>
 #include <map>
 
+using namespace lbio::sim::generator;
+
 // matrix of false positive
 double ** fpMatrix;
 // half of this mxm matrix is not used in case we need some optimizations

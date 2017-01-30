@@ -399,21 +399,19 @@ editDistSamplesInfoLinSpace(size_t n, size_t k_samples, EditDistanceInfo** sampl
 template<typename EDAlg_>
 class EditDistanceSample {
 private:
-  std::string A_;
-  std::string B_;
+  lbio::sim::generator::IidPairGenerator gen;
   
 public:
   EditDistanceSample(lbio_size_t n, lbio_size_t m)
-    : A_(n, 'N'), B_(m, 'N') {  }
+    : gen(n,m) {  }
   
   lbio_size_t operator()(EDAlg_& algorithm) {
-    generateIIDString(A_);
-    generateIIDString(B_);
-    return algorithm.calculate(A_, B_);
+    auto next = gen();
+    return algorithm.calculate(next.first, next.second);
   }
 
   std::pair<std::string, std::string> latest_strings() {
-    return std::pair<std::string, std::string>(A_, B_);
+    return gen.last_pair();
   }
   
 };

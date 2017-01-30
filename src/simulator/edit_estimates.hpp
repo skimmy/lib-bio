@@ -9,12 +9,7 @@
 
 #include <cmath>
 
-namespace lbio
-{
-namespace sim
-{
-namespace edit
-{
+namespace lbio { namespace sim { namespace edit {
 
 
 /*
@@ -35,8 +30,8 @@ edit_distance_samples(size_t n, size_t k_samples, Algorithm& alg) {
   std::string s1(n,'N');
   std::string s2(n,'N');
   for (size_t k = 0; k < k_samples; ++k) {
-    generateIIDString(s1);
-    generateIIDString(s2);
+    generator::generateIIDString(s1);
+    generator::generateIIDString(s2);
     v[k] = alg.calculate(s1, s2);
   }
   return v;
@@ -110,40 +105,6 @@ difference_stimate(size_t n, double precision, double z_delta,
   return std::vector<SampleEstimates>
     ({ est_n_2.toSampleEstimates(), est_n.toSampleEstimates()}) ;
 }
-
-
-
-// Old and note used functions
-/**
- * Use a Monte-Carlo sampling technique to estimate the edit distance between
- * random strings of same length.
- *
- * \param n_min The minimum length to be tested
- * \param n_max The maximum lengths to be tested
- * \param n_step The incremente on length 
- * \param k_max The number of samples for each length
- * 
- */
-/*void
-editDistanc eEstimations(size_t n_min, size_t n_max, size_t n_step, size_t k_max) {  
-  std::cout << std::endl;
-  for (size_t n = n_min; n <= n_max; n += n_step) {
-    std::string s1(n,'N');
-    std::string s2(n,'N');
-    double AED = 0;
-    for (size_t k = 1; k <= k_max; ++k) {
-      generateIIDString(s1);
-      generateIIDString(s2);
-      AED += editDistance(s1,s2);
-    }
-    std::cout << n << "\t" << ( AED / k_max) << std::endl;
-  }
-  std::cout << std::endl;
-  }      */
-
   
-} // ::edit
-} // ::sim
-} // ::lbio
-
+} } } // namespaces
 #endif

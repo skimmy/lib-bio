@@ -10,6 +10,8 @@
 #include <map>
 #include <cmath>
 
+using namespace lbio::sim::generator;
+
 
 //////////////////////////////////////////////////////////////////////
 //                    EDIT INFO IMPLE AND HELPERS

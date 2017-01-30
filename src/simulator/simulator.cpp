@@ -26,6 +26,7 @@
 
 // TODO Convert to use proper ns
 using namespace lbio::sim;
+using namespace lbio::sim::generator;
 
 // testing functions from test.cpp. This has not been inserted in
 // other includes (e.g., common.hpp) since this is the only place

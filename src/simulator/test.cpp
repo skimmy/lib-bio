@@ -16,6 +16,7 @@
 #include <cmath>
 
 using namespace lbio::sim;
+using namespace lbio::sim::generator;
 
 #define TEST_GENOME_LENGTH 65536
 #define TEST_READ_LENGTH 100

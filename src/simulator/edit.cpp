@@ -714,61 +714,6 @@ editDistanceRelativeErrorEstimates(size_t n, double e_model,
 
 
 
-
-//////////////////////////////////////////////////////////////////////
-//                    SCRIPT DISTRIBUTION FUNCTIONS
-//////////////////////////////////////////////////////////////////////
-
-void
-scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix,
-			 std::vector<std::string>* scripts) {
-  size_t ** dpMatrix = allocMatrix<size_t>(n+1,m+1);
-  for (size_t i = 0; i <= n; ++i) {
-    for (size_t j = 0; j <= m; ++j) {
-      distMatrix[i][j] = 0;
-    }
-  }
-
-  std::string s1(n,'N');
-  std::string s2(n,'N');
-  EditDistanceInfo info {};
-
-  for (size_t l = 0; l < k; ++l) {
-    generateIIDString(s1);
-    generateIIDString(s2);
-    editDistanceMat(s1, s2, dpMatrix);
-    closestToDiagonalBacktrack(n, m, dpMatrix, info);
-    // refresh the distribution matrix
-    size_t i = 0, j = 0;
-    distMatrix[i][j]++;
-    for (size_t t = 0; t < info.edit_script.size(); ++t) {
-      char c = info.edit_script[t];
-      switch(c) {
-      case 'M':
-	i++; j++;
-	break;
-      case 'S':
-	i++; j++;
-	break;
-      case 'I':
-	j++;
-	break;
-      case 'D':
-	i++;
-	break;
-      }
-      distMatrix[i][j]++;
-    }
-
-    if (scripts != nullptr) {
-      scripts->push_back(info.edit_script);
-    }
-
-  }
-  printMatrix<size_t>(n+1,m+1, distMatrix);
-  freeMatrix<size_t>(n+1, m+1, dpMatrix);
-}
-
 // ----------------------------------------------------------------------
 //                        ALGORITHMS COMPARISON
 // ----------------------------------------------------------------------
@@ -899,15 +844,39 @@ optimal_bandwidth(lbio_size_t n, double precision, lbio_size_t Tmin) {
       lbio_size_t exact = exactAlg.calculate(strings.first, strings.second);
       lbio_size_t approx = apprAlg.calculate(strings.first, strings.second);
       avg += (approx - exact) / static_cast<double>(exact);
-      std::cout << T << " " << exact << " " << approx << "\n";	  
     }
-    std::cout << avg / k_min << "\n";
     if ( avg < k_min * precision) {
       return T;
     }
     T *= 2;
   }
   return T;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+//                    SCRIPT DISTRIBUTION FUNCTIONS
+//////////////////////////////////////////////////////////////////////
+
+void
+generate_scripts(size_t n, size_t m, size_t k,
+		 std::vector<std::string>& scripts) {
+  
+  size_t ** dpMatrix = allocMatrix<size_t>(n+1,m+1);
+
+  std::string s1(n,'N');
+  std::string s2(n,'N');
+  EditDistanceInfo info {};
+
+  for (size_t l = 0; l < k; ++l) {
+    generateIIDString(s1);
+    generateIIDString(s2);
+    editDistanceMat(s1, s2, dpMatrix);
+    closestToDiagonalBacktrack(n, m, dpMatrix, info);
+    scripts.push_back(info.edit_script);   
+
+  }
+  freeMatrix<size_t>(n+1, m+1, dpMatrix);
 }
       
       

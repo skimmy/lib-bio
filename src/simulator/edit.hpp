@@ -14,13 +14,16 @@
 #define EDIT_DISTANCE_BOUNDED_ERROR       0x20 // 32
 #define EDIT_DISTANCE_DIFF_BOUNDED_ERROR  0x40 // 64
 
+#define EDIT_DISTANCE_BANDWIDTH_ESTIMATE  0x80 // 128
+// Approx ~g(n) --> 64+128 = 192 --> -f 192
+
 // edit distance subtasks
 #define EDIT_DISTANCE_SUBTASK_DEFUALT       0
 #define EDIT_DISTANCE_SUBTASK_SCRIPT_DIST   8
 #define EDIT_DISTANCE_SUBTASK_COMPARE_ALGS  32
 
 /**
- * @brief This is a class to store information about how edit distance
+ * \brief This is a class to store information about how edit distance
  * is divided into substitution, deletions and insertions.
  *
  * The members are kept public since they are often accessed and this
@@ -371,8 +374,8 @@ editDistanceRelativeErrorEstimates(size_t n, double e_model, double precision, d
  *  If set to <code>nullptr</code> no script will be stored
  */
 void
-scriptDistributionMatrix(size_t n, size_t m, size_t k, size_t** distMatrix,
-			 std::vector<std::string>* scripts = nullptr);
+scriptDistributionMatrix(size_t n, size_t m, size_t k,
+			 std::vector<std::string>& scripts);
 
 std::unique_ptr<EditDistanceInfo[]>
 editDistSamplesInfo(size_t n, size_t k_samples);
@@ -425,6 +428,19 @@ namespace lbio { namespace sim { namespace edit {
  */
 lbio_size_t
 optimal_bandwidth(lbio_size_t n, double precision, lbio_size_t Tmin = 1);
+
+/**
+ * \brief Computes a matrix containing in (i,j) the number of times a
+ * 'closest diagonal' path traverses the cell (i,j)
+ *
+ * \param n number of rows of the matrix
+ * \param m number of columns of the matrix
+ * \param k number of samples to be used
+ * \param a \c std::vector where scritps will be inserted
+ */
+void
+generate_scripts(size_t n, size_t m, size_t k,
+		 std::vector<std::string>& scripts);
 
 
 } } } //namespaces

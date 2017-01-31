@@ -364,43 +364,53 @@ editDistanceOpMode() {
 
   // TASK - Scripts Generation (8)
   if (task == EDIT_DISTANCE_SUBTASK_SCRIPT_DIST) {
-    size_t** freqMat = allocMatrix<size_t>(n+1, n+1);
-    std::vector<std::string>* allScripts = nullptr;
+    logInfo("Task 'Script Distribution'");
+
+    std::vector<std::string> allScripts {};
+    generate_scripts(n, n, Options::opts.k, allScripts);
+
+    // if file is given save there otherwise use std out
     if (!Options::opts.outputDistribution.empty()) {
-      allScripts = new std::vector<std::string>();
-    }
-    scriptDistributionMatrix(n, n, Options::opts.k, freqMat, allScripts);
-    freeMatrix<size_t>(n+1, n+1, freqMat);
-    if (allScripts != nullptr) {
       std::ofstream ofs(Options::opts.outputDistribution, std::ofstream::out);
-      for (std::string script : *allScripts) {
+      for (std::string script : allScripts) {
 	ofs << script << "\n";
       }
       ofs.close();
-      delete allScripts;
-      allScripts = nullptr;
     }
+    else {
+      for (std::string script : allScripts) {
+	std::cout << script << "\n";
+      }
+    }
+    
     return;
   }
 
   // TASK - Algorithms comparison (32)
   if (task == EDIT_DISTANCE_SUBTASK_COMPARE_ALGS) {
+    logInfo("Task 'Algorithms comparison'");
     compareEditDistanceAlgorithms(n, n, Options::opts.k);
     return;
   }
 
   // Task - Default (0)
   if (flags & EDIT_DISTANCE_DIFF_BOUNDED_ERROR) {
-    logInfo("g(n) Esitmation");
+    logInfo("Task 'g(n) Esitmation'");
     size_t k_max = Options::opts.k;
     double precision = Options::opts.precision;
     double z_confidence = Options::opts.confidence;
     lbio_size_t T = static_cast<lbio_size_t>(std::floor(n / 2.0));
     lbio_size_t Tmin = static_cast<lbio_size_t>(std::sqrt(n));
     // Approximation is required find 'optimal' T >= sqrt(n)
-    if (Options::opts.approxLevel > 0) {
-      logInfo("Estimation of optimal bandwidth...");
-      T = optimal_bandwidth(n, precision / 2, Tmin);      
+    if (Options::opts.approxLevel >= 0) {      
+      if (flags & EDIT_DISTANCE_BANDWIDTH_ESTIMATE) {	
+	logInfo("Estimation of optimal bandwidth...");
+	Tmin = std::max(1, Options::opts.approxLevel);
+	T = optimal_bandwidth(n, precision / 2, Tmin);
+	std::cout << "~T*: " << T << "\n";
+      } else {
+	T = Options::opts.approxLevel;
+      }
     }
     AlgorithmBand alg(n, n, T, {1,1,1});
     // lambda for output
@@ -444,6 +454,7 @@ editDistanceOpMode() {
       if (flags & EDIT_DISTANCE_INFO_PARTIAL) {
 	// Sample + Quadratic + Partial Info
 	if (flags & EDIT_DISTANCE_INFO_SCRIPT) {
+	  logInfo("Quadratic algorithms info");
 	  std::unique_ptr<EditDistanceInfo[]> infos =
 	    editDistSamplesInfo(n,k);
 	  for (size_t i = 0; i < k; ++i) {

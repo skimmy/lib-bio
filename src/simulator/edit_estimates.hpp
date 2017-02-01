@@ -13,6 +13,38 @@
 
 namespace lbio { namespace sim { namespace edit {
 
+/**
+   \brief Computes a matrix containing in (i,j) the number of times a
+   'closest diagonal' path traverses the cell (i,j)
+
+   \tparam Algorithm The algorithm used for edit distance (must supply
+                     \c backtrack() method returning \c EditDistanceInfo).
+  
+   \param n     Number of rows of the matrix
+   \param m     Number of columns of the matrix
+   \param k     Number of samples to be used
+   \param a     \c std::vector where scritps will be inserted
+   \param alg   The instance of \c Algorithm used for calculation and
+                backtrack
+
+   \note The \c Algorithm type is used to instantiate a \c
+   EditDistanceSample object first and to calculate the backtrack
+   afterward. It is therefore required that \c Algorithm type
+   implements \c calculate(...) and \c backtrack()
+
+ */
+template <class Algorithm>
+void
+generate_scripts(lbio_size_t n, lbio_size_t m, lbio_size_t k,
+		 std::vector<std::string>& scripts, Algorithm& alg) {
+  EditDistanceSample<Algorithm> generator {n, m};
+  for (; k>0; --k) {
+    generator(alg);
+    scripts.push_back(alg.backtrack().edit_script);
+  }
+}
+
+
 
 /*!
    \brief Computes the edit distance for \c k_samples pairs of random
@@ -133,4 +165,5 @@ difference_estimate(size_t n, double precision, double z_delta,
 
       
 } } } // namespaces
+
 #endif

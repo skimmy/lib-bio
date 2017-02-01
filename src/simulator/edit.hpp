@@ -22,6 +22,47 @@
 #define EDIT_DISTANCE_SUBTASK_SCRIPT_DIST   8
 #define EDIT_DISTANCE_SUBTASK_COMPARE_ALGS  32
 
+// !!! Forward declaration to be removed after namespace enclosing is done !!!!
+class EditDistanceInfo;
+
+
+// These namespace will eventually contain all functions and classes
+namespace lbio { namespace sim { namespace edit {
+
+
+/**
+   \brief Performs backtrack and fills the \c EditDistanceInfo
+   passed. When ties are possible the backtrack goes through the
+   diagonal closest to the main one.
+
+   \param n         Number of rows of matrix minus one
+   \param m         Number of columns of matrix minus one
+   \param dpMatrix  The dynamic programming matrix
+   \param info      The object used to put output
+ */
+void
+closest_to_diagonal_backtrack(size_t n, size_t m, size_t** dpMatrix,
+			      EditDistanceInfo& info);
+
+
+
+//////////////////////////////////////////////////////////////////////
+//           COMPARISON OF ALGORITHMS FOR EDIT DISTANCE
+//////////////////////////////////////////////////////////////////////
+
+void
+compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os = std::cout);
+
+
+/**
+   \brief Computes the first value T such that the difference between 
+ */
+lbio_size_t
+optimal_bandwidth(lbio_size_t n, double precision, lbio_size_t Tmin = 1);
+
+
+} } } //namespaces
+
 /**
  * \brief This is a class to store information about how edit distance
  * is divided into substitution, deletions and insertions.
@@ -165,7 +206,8 @@ public:
   }
 
   
-  void init() {
+  void
+  init() {
     dp_struct(0, 0) = 0;
     for (lbio_size_t i = 1; i <= dp_struct.n; ++i) {
       dp_struct(i, 0)
@@ -177,7 +219,8 @@ public:
     }
   }
 
-  CostType calculate(const IndexedType& s1, const IndexedType& s2) {
+  CostType
+  calculate(const IndexedType& s1, const IndexedType& s2) {
     lbio_size_t n = s1.size();
     lbio_size_t m = s2.size();
     for (lbio_size_t i = 1; i <= n; ++i) {
@@ -192,7 +235,18 @@ public:
     return dp_struct(n, m);
   }
 
-  void print_dp_matrix() {
+  EditDistanceInfo
+  backtrack() {
+    EditDistanceInfo info;
+    // following uses an 'old' functions that accepts size_t** as DP matrix
+    // it should be changed to accept a dp_struct
+    lbio::sim::edit::closest_to_diagonal_backtrack(dp_struct.n, dp_struct.m,
+						   dp_struct.dp_matrix, info);
+    return info;
+  }
+
+  void
+  print_dp_matrix() {
     dp_struct.print_matrix();
   }
 }; // EditDistanceWF
@@ -322,30 +376,19 @@ editDistanceBandwiseApprox(const std::string& s1, const std::string& s2, size_t 
 //////////////////////////////////////////////////////////////////////
 
 /**
- * \breif Reconstruct the edit script from the dynamic programming matrix.
- * The script and other informations are stored in the passed EditDistanceInfo 
- * structure.
- *
- * \param dpMatrix the dynamic programming matrix
- * \param n number of rows of the matrix minus one 
- * \param m number of columns of the matrix minus one
- * \param info the structure that will be filled with the information
- * 
+   \brief Reconstruct the edit script from the dynamic programming matrix.
+   The script and other informations are stored in the passed EditDistanceInfo 
+   structure.
+  
+   \param dpMatrix the dynamic programming matrix
+   \param n number of rows of the matrix minus one 
+   \param m number of columns of the matrix minus one
+   \param info the structure that will be filled with the information
+   
  */
 void
-editDistanceBacktrack(size_t** dpMatrix, const std::string& s1, const std::string& s2,
-		      EditDistanceInfo& info);
-
-void
-closestToDiagonalBacktrack(size_t n, size_t m, size_t** dpMatrix, EditDistanceInfo& info);
-
-//////////////////////////////////////////////////////////////////////
-//           COMPARISON OF ALGORITHMS FOR EDIT DISTANCE
-//////////////////////////////////////////////////////////////////////
-
-void
-compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os = std::cout);
-
+editDistanceBacktrack(size_t** dpMatrix, const std::string& s1,
+		      const std::string& s2, EditDistanceInfo& info);
 
 //////////////////////////////////////////////////////////////////////
 //            EDIT DISTANCE ESTIMATION AND SAMPLING
@@ -419,31 +462,6 @@ public:
   
 };
 
-// These namespace will eventually contain all functions and classes
-namespace lbio { namespace sim { namespace edit {
-
-
-/**
-   \brief Computes the first value T such that the difference between 
- */
-lbio_size_t
-optimal_bandwidth(lbio_size_t n, double precision, lbio_size_t Tmin = 1);
-
-/**
- * \brief Computes a matrix containing in (i,j) the number of times a
- * 'closest diagonal' path traverses the cell (i,j)
- *
- * \param n number of rows of the matrix
- * \param m number of columns of the matrix
- * \param k number of samples to be used
- * \param a \c std::vector where scritps will be inserted
- */
-void
-generate_scripts(size_t n, size_t m, size_t k,
-		 std::vector<std::string>& scripts);
-
-
-} } } //namespaces
 
 /**
  * \brief Convience struct to manage vecotrs, this is a bad design and

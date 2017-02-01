@@ -480,136 +480,6 @@ editDistanceBacktrack(size_t** dpMatrix,const std::string& s1,
   }
 }
 
-void
-closestToDiagonalBacktrack(size_t n, size_t m, size_t** dpMatrix,
-			   EditDistanceInfo& info) {
-  info.n_sub = 0;
-  info.n_del = 0;
-  info.n_ins = 0;
-  info.edit_script = "";
-
-  size_t i = n;
-  size_t j = m;
-  size_t a = 0, b = 0, c = 0, d = 0;
-  // backtrack until one edge is reached
-  while(i > 0 && j > 0) {
-    a = dpMatrix[i-1][j-1];
-    b = dpMatrix[i-1][j];
-    c = dpMatrix[i][j-1];
-    d = dpMatrix[i][j];
-    
-    // Match
-    if ( (a == d) && ( a <= b) && (a <= c)) {
-      info.edit_script = "M" + info.edit_script;
-      i--; j--;
-      continue;
-    }
-    
-    // Substitution
-    if ( (a < b) && (a < c) ) {
-      info.n_sub++;
-      info.edit_script = "S" + info.edit_script;
-      i--; j--;
-      continue;
-    }
-    // Deletion
-    if ( (b < a) && (b < c) ) {
-      info.n_del++;
-      info.edit_script = "D" + info.edit_script;
-      i--;
-      continue;
-    }
-    // Insertion
-    if ( (c < a) && (c < b) ) {
-      info.n_ins++;
-      info.edit_script = "I" + info.edit_script;
-      j--;
-      continue;
-    }
-    // Tie between all operations
-    if ( (a == b) && (b == c) ) {
-      if (i < j) {
-	info.n_ins++;
-	info.edit_script = "I" + info.edit_script;
-	j--;
-	continue;
-      }
-      if (i == j) {
-	info.n_sub++;
-	info.edit_script = "S" + info.edit_script;
-	i--; j--;
-	continue;
-      }
-      if (i > j) {
-	info.n_del++;
-	info.edit_script = "D" + info.edit_script;
-	i--;
-	continue;
-      }
-    }
-
-    // Tie between sub and del
-    if (a == b) {
-
-      if (i > j) {
-	info.n_del++;
-	info.edit_script = "D" + info.edit_script;
-	i--;
-      } else {
-	info.n_sub++;
-	info.edit_script = "S" + info.edit_script;
-	i--; j--;
-      }
-      continue;	
-    }
-    // Tie between sub and ins
-    if (a == c) {
-      if (i < j) {
-	info.n_ins++;
-	info.edit_script = "I" + info.edit_script;
-	j--;
-      } else {
-	info.n_sub++;
-	info.edit_script = "S" + info.edit_script;
-	i--; j--;
-      }
-      continue;
-    }
-
-    // Tie between del and ins
-    if (b == c) {
-      if (j <= i) {
-	info.n_del++;
-	info.edit_script = "D" + info.edit_script;
-	i--;
-      } else {
-	info.n_ins++;
-	info.edit_script = "I" + info.edit_script;	
-	j--;
-      }
-      continue;
-
-    }
-  }
-
-  // backtrack the left edge (if needed)
-  while(i > 0) {
-    info.n_del++;
-    info.edit_script = "D" + info.edit_script;
-    i--;
-  }
-
-  // bacltrack the top edge (if needed)
-  while(j > 0) {
-    info.n_ins++;
-    info.edit_script  = "I" + info.edit_script;
-    j--;
-  }
-  
-
-}
-
-
 void editDistanceWithInfo(const std::string& s1, const std::string& s2,
 			  EditDistanceInfo& info) {
   size_t n = s1.size();
@@ -772,6 +642,15 @@ private:
 
 };
 
+
+// NAMESPACES BEGIN
+namespace lbio { namespace sim { namespace edit {
+
+// Useful alias used throughout the code
+using ExactAlg    = EditDistanceWF<lbio_size_t, std::string>;
+using BandApprAlg = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
+
+
 void
 compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
   size_t T_max = n / 2;
@@ -795,13 +674,14 @@ compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
 
     EditDistanceInfo tmp {};
     editDistanceMat(s1, s2, dpMatrix);
-    closestToDiagonalBacktrack(s1.size(), s2.size(), dpMatrix, tmp);
+
+    closest_to_diagonal_backtrack(s1.size(), s2.size(), dpMatrix, tmp);
     res->addExact(tmp);
 
     // Approximation for all values of T
     for (size_t T : Ts) {
       editDistanceBandwiseApproxMat(s1, s2, T, dpMatrix);
-      closestToDiagonalBacktrack(s1.size(), s2.size(), dpMatrix, tmp);
+      closest_to_diagonal_backtrack(s1.size(), s2.size(), dpMatrix, tmp);
       res->addBandApprox(tmp, T);
     }
     results.push_back(res);
@@ -823,9 +703,137 @@ compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
   freeMatrix<size_t>(n+1, m+1, dpMatrix);
 }
 
-namespace lbio { namespace sim { namespace edit {
 
-using BandApprAlg = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
+void
+closest_to_diagonal_backtrack(size_t n, size_t m, size_t** dpMatrix,
+			   EditDistanceInfo& info) {
+  info.n_sub = 0;
+  info.n_del = 0;
+  info.n_ins = 0;
+  info.edit_script = "";
+
+  size_t i = n;
+  size_t j = m;
+  size_t a = 0, b = 0, c = 0, d = 0;
+  // backtrack until one edge is reached
+  while(i > 0 && j > 0) {
+    a = dpMatrix[i-1][j-1];
+    b = dpMatrix[i-1][j];
+    c = dpMatrix[i][j-1];
+    d = dpMatrix[i][j];
+    
+    // Match
+    if ( (a == d) && ( a <= b) && (a <= c)) {
+      info.edit_script = "M" + info.edit_script;
+      i--; j--;
+      continue;
+    }
+    
+    // Substitution
+    if ( (a < b) && (a < c) ) {
+      info.n_sub++;
+      info.edit_script = "S" + info.edit_script;
+      i--; j--;
+      continue;
+    }
+    // Deletion
+    if ( (b < a) && (b < c) ) {
+      info.n_del++;
+      info.edit_script = "D" + info.edit_script;
+      i--;
+      continue;
+    }
+    // Insertion
+    if ( (c < a) && (c < b) ) {
+      info.n_ins++;
+      info.edit_script = "I" + info.edit_script;
+      j--;
+      continue;
+    }
+    // Tie between all operations
+    if ( (a == b) && (b == c) ) {
+      if (i < j) {
+	info.n_ins++;
+	info.edit_script = "I" + info.edit_script;
+	j--;
+	continue;
+      }
+      if (i == j) {
+	info.n_sub++;
+	info.edit_script = "S" + info.edit_script;
+	i--; j--;
+	continue;
+      }
+      if (i > j) {
+	info.n_del++;
+	info.edit_script = "D" + info.edit_script;
+	i--;
+	continue;
+      }
+    }
+
+    // Tie between sub and del
+    if (a == b) {
+
+      if (i > j) {
+	info.n_del++;
+	info.edit_script = "D" + info.edit_script;
+	i--;
+      } else {
+	info.n_sub++;
+	info.edit_script = "S" + info.edit_script;
+	i--; j--;
+      }
+      continue;	
+    }
+    // Tie between sub and ins
+    if (a == c) {
+      if (i < j) {
+	info.n_ins++;
+	info.edit_script = "I" + info.edit_script;
+	j--;
+      } else {
+	info.n_sub++;
+	info.edit_script = "S" + info.edit_script;
+	i--; j--;
+      }
+      continue;
+    }
+
+    // Tie between del and ins
+    if (b == c) {
+      if (j <= i) {
+	info.n_del++;
+	info.edit_script = "D" + info.edit_script;
+	i--;
+      } else {
+	info.n_ins++;
+	info.edit_script = "I" + info.edit_script;	
+	j--;
+      }
+      continue;
+
+    }
+  }
+
+  // backtrack the left edge (if needed)
+  while(i > 0) {
+    info.n_del++;
+    info.edit_script = "D" + info.edit_script;
+    i--;
+  }
+
+  // bacltrack the top edge (if needed)
+  while(j > 0) {
+    info.n_ins++;
+    info.edit_script  = "I" + info.edit_script;
+    j--;
+  }
+  
+
+}
+
+
       
 lbio_size_t
 optimal_bandwidth(lbio_size_t n, double precision, lbio_size_t Tmin) {
@@ -853,32 +861,7 @@ optimal_bandwidth(lbio_size_t n, double precision, lbio_size_t Tmin) {
   return T;
 }
 
-
-//////////////////////////////////////////////////////////////////////
-//                    SCRIPT DISTRIBUTION FUNCTIONS
-//////////////////////////////////////////////////////////////////////
-
-void
-generate_scripts(size_t n, size_t m, size_t k,
-		 std::vector<std::string>& scripts) {
-  
-  size_t ** dpMatrix = allocMatrix<size_t>(n+1,m+1);
-
-  std::string s1(n,'N');
-  std::string s2(n,'N');
-  EditDistanceInfo info {};
-
-  for (size_t l = 0; l < k; ++l) {
-    generateIIDString(s1);
-    generateIIDString(s2);
-    editDistanceMat(s1, s2, dpMatrix);
-    closestToDiagonalBacktrack(n, m, dpMatrix, info);
-    scripts.push_back(info.edit_script);   
-
-  }
-  freeMatrix<size_t>(n+1, m+1, dpMatrix);
-}
-      
+     
       
 } } } // namespaces
 
@@ -887,8 +870,4 @@ generate_scripts(size_t n, size_t m, size_t k,
 //          PROPTOTYPE TEST FUNCTION (RO REMOVE)
 //////////////////////////////////////////////////////////////////////
 void test_edit_distance_class() {
-  lbio_size_t n = 512;
-  double epsilon = 0.01;
-  std::cout << "Opt(T): "
-	    << lbio::sim::edit::optimal_bandwidth(n, epsilon) << "\n";
 }

@@ -349,7 +349,8 @@ void
 editDistanceOpMode() {
     
 
-  using AlgorithmBand = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
+  using AlgorithmBand  = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
+  using AlgorithmExact = EditDistanceWF<lbio_size_t, std::string>; 
   // The default edit distance mode is
   // Sample
   // Linear Alg
@@ -366,8 +367,9 @@ editDistanceOpMode() {
   if (task == EDIT_DISTANCE_SUBTASK_SCRIPT_DIST) {
     logInfo("Task 'Script Distribution'");
 
-    std::vector<std::string> allScripts {};
-    generate_scripts(n, n, Options::opts.k, allScripts);
+    AlgorithmExact alg {n, n, {1,1,1}};
+    std::vector<std::string> allScripts {};    
+    generate_scripts(n, n, Options::opts.k, allScripts, alg);
 
     // if file is given save there otherwise use std out
     if (!Options::opts.outputDistribution.empty()) {

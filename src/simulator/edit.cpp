@@ -652,17 +652,18 @@ using BandApprAlg = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
 
 
 void
-compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
-  size_t T_max = n / 2;
-  size_t T_min = 1;
+compare_edit_distance_algorithms(lbio_size_t n, lbio_size_t m,
+				 lbio_size_t k, std::ostream& os) {
+  lbio_size_t T_max = n / 2;
+  lbio_size_t T_min = 1;
 
-  GeometricProgression<size_t> geom(2, T_min);
-  std::vector<size_t> Ts = geom.valuesLeq(T_max);
+  GeometricProgression<lbio_size_t> geom(2, T_min);
+  std::vector<lbio_size_t> Ts = geom.valuesLeq(T_max);
   Ts.push_back(0);
   
 
   
-  size_t** dpMatrix = allocMatrix<size_t>(n+1, m+1);
+  lbio_size_t** dpMatrix = allocMatrix<lbio_size_t>(n+1, m+1);
   std::vector< std::shared_ptr<AlgorithmComparisonResult> > results;
   std::string s1(n, 'N');
   std::string s2(m, 'N');
@@ -679,7 +680,7 @@ compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
     res->addExact(tmp);
 
     // Approximation for all values of T
-    for (size_t T : Ts) {
+    for (auto T : Ts) {
       editDistanceBandwiseApproxMat(s1, s2, T, dpMatrix);
       closest_to_diagonal_backtrack(s1.size(), s2.size(), dpMatrix, tmp);
       res->addBandApprox(tmp, T);
@@ -688,19 +689,19 @@ compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os) {
   }
 
   os << n << "\t";
-  for (size_t T : Ts) {
+  for (auto T : Ts) {
     os << T << "\t";
   }
   os << std::endl;
   for (auto pRes : results) {
     os << pRes->getExact() << "\t";
-    for (size_t T : Ts) {
+    for (auto T : Ts) {
       os << pRes->getBandApproxWithT(T) << "\t";
     }
     os << std::endl;
   }
   
-  freeMatrix<size_t>(n+1, m+1, dpMatrix);
+  freeMatrix<lbio_size_t>(n+1, m+1, dpMatrix);
 }
 
 

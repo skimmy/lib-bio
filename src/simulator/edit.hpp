@@ -51,7 +51,7 @@ closest_to_diagonal_backtrack(size_t n, size_t m, size_t** dpMatrix,
 //////////////////////////////////////////////////////////////////////
 
 void
-compareEditDistanceAlgorithms(size_t n, size_t m, size_t k, std::ostream& os = std::cout);
+compare_edit_distance_algorithms(size_t n, size_t m, size_t k, std::ostream& os = std::cout);
 
 
 /**
@@ -350,7 +350,7 @@ std::unique_ptr<double[]> extractInsertionArray(const EditDistanceInfo* v, size_
 /**
  * \brief computes the edit distance between strings s1 and s2
  */
-size_t editDistance(const std::string& s1, const std::string& s2);
+//size_t editDistance(const std::string& s1, const std::string& s2);
 
 size_t editDistanceEncoded(uint64_t s1, size_t n1, uint64_t s2, size_t n2, size_t** dpMatrix);
 

@@ -218,7 +218,7 @@ void testScoreFunction() {
 }
 
 void 
-editDistanceTest() {
+editDistanceTests() {
   
 }
 

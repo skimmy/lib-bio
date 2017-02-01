@@ -391,7 +391,7 @@ editDistanceOpMode() {
   // TASK - Algorithms comparison (32)
   if (task == EDIT_DISTANCE_SUBTASK_COMPARE_ALGS) {
     logInfo("Task 'Algorithms comparison'");
-    compareEditDistanceAlgorithms(n, n, Options::opts.k);
+    compare_edit_distance_algorithms(n, n, Options::opts.k);
     return;
   }
 

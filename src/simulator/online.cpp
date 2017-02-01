@@ -4,6 +4,8 @@
 
 #include <cstring>
 
+using namespace lbio::sim::generator;
+
 GenomeSegment::GenomeSegment(size_t N, size_t m, size_t l) {
   this->length = l;
   this->total_length = N;

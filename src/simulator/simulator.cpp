@@ -1,7 +1,8 @@
 /**
- * This is a simulator developed ad-hoc to allow future optimization regardless
- * the changes to other components of the library (which are designed ti be part
- * of a library rather then efficient stand alon tools.
+ * This is a simulator developed ad-hoc to allow future optimization
+ * regardless the changes to other components of the library (which
+ * are designed ti be part of a library rather then efficient stand
+ * alon tools.
  */
 
 #include "common.hpp"
@@ -13,6 +14,7 @@
 #include "util.hpp"
 #include "align.hpp"
 #include "edit.hpp"
+#include "edit_estimates.hpp"
 #include "log.hpp"
 
 #include <cstdlib>
@@ -21,6 +23,11 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+
+// TODO Convert to use proper ns
+using namespace lbio::sim;
+using namespace lbio::sim::generator;
+using namespace lbio::sim::edit;
 
 // testing functions from test.cpp. This has not been inserted in
 // other includes (e.g., common.hpp) since this is the only place
@@ -67,7 +74,8 @@ void initSimulator() {
   initProbabilities();
   initChainMatrix();
     
-  scoreDist = EmpiricalDistribution(0,1,Options::opts.empiricalDistributionStep);
+  scoreDist
+    = EmpiricalDistribution(0,1,Options::opts.empiricalDistributionStep);
   oraclePoints = new EstimationPoint[Options::opts.m + 1];
   
   for (size_t i = 0; i < Options::opts.m; ++i) {
@@ -99,8 +107,9 @@ void outputResults() {
 	Options::opts.subTask != EDIT_DISTANCE_SUBTASK_SCRIPT_DIST) {
       if (edOut->distPDF) {
 	size_t n = Options::opts.N;	
-	std::ofstream ofs(Options::opts.outputDistribution, std::ofstream::out);      
-	logInfo("Writing Edit Distance distribution on " + Options::opts.outputDistribution);
+	std::ofstream ofs(Options::opts.outputDistribution, std::ofstream::out);
+	logInfo("Writing Edit Distance distribution on "
+		+ Options::opts.outputDistribution);
 	for (size_t i = 0; i <= n; ++i) {
 	  ofs << edOut->distPDF[i] << std::endl;
 	}
@@ -114,10 +123,11 @@ void outputResults() {
       double appNumDen[2];
       for (size_t i = 0; i < Options::opts.m+1; ++i) {
 	approximatedScore(i, appNumDen);
-	std::cout << i << "\t" <<
-	  oraclePoints[i].sumScore << "\t" << oraclePoints[i].count << "\t" <<
-	  oraclePoints[i].sumNum << "\t" << oraclePoints[i].sumDen << "\t" <<
-	  appNumDen[0] << "\t" << appNumDen[1] << "\t" << oraclePoints[i].hammDist << "\n";
+	std::cout << i << "\t" << oraclePoints[i].sumScore << "\t"
+		  << oraclePoints[i].count << "\t" << oraclePoints[i].sumNum
+		  << "\t" << oraclePoints[i].sumDen << "\t" <<appNumDen[0]
+		  << "\t" << appNumDen[1] << "\t" << oraclePoints[i].hammDist
+		  << "\n";
       }
       return;
     }
@@ -168,14 +178,15 @@ void offlineSimulation() {
   generateIIDGenome(N,ref);
   std::string s(ref);
 
-  // priority queue is used with position as key so that while extractin reads at
-  // once (i.e., emptying the queue) reads will be presented in ordered by
-  // position on the reference sequence
+  // priority queue is used with position as key so that while
+  // extractin reads at once (i.e., emptying the queue) reads will be
+  // presented in ordered by position on the reference sequence
   std::priority_queue<Read> reads;
   generateOfflineReads(s, reads, m, Options::opts.M, Options::opts.pe);
 
-  // Temporary variables to count the number of holes, in the future a more
-  // sophisticated way (e.g., finite state machine) should be used.
+  // Temporary variables to count the number of holes, in the future a
+  // more sophisticated way (e.g., finite state machine) should be
+  // used.
   bool onHole = false;
   
   Read r1 = reads.top();
@@ -232,14 +243,15 @@ void onlineSimulation() {
     size_t d = generateInterReadDistance();
     real_position += d;
 
-    // this is artificial however for reasonable values of parameters it should
-    // never happen otherwise we woul need a different way of online generating
-    // the genome.
-    // More specifically if that happens it means that 'd' is higher then a whole
-    // genome segment (which should be no less than 10000 in practical cases) for
-    // reasonable values of N and M this event will have probability zero for
-    // all practical situations and artifically skipping over such 'extreme' values
-    // of d will not appreciably change final results
+    // this is artificial however for reasonable values of parameters
+    // it should never happen otherwise we woul need a different way
+    // of online generating the genome.  More specifically if that
+    // happens it means that 'd' is higher then a whole genome segment
+    // (which should be no less than 10000 in practical cases) for
+    // reasonable values of N and M this event will have probability
+    // zero for all practical situations and artifically skipping over
+    // such 'extreme' values of d will not appreciably change final
+    // results
     if (d > (g.length - m - 1)) {
       continue;
     }
@@ -335,6 +347,10 @@ void oracleSimulation() {
 
 void
 editDistanceOpMode() {
+    
+
+  using AlgorithmBand  = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
+  using AlgorithmExact = EditDistanceWF<lbio_size_t, std::string>; 
   // The default edit distance mode is
   // Sample
   // Linear Alg
@@ -349,56 +365,84 @@ editDistanceOpMode() {
 
   // TASK - Scripts Generation (8)
   if (task == EDIT_DISTANCE_SUBTASK_SCRIPT_DIST) {
-    size_t** freqMat = allocMatrix<size_t>(n+1, n+1);
-    std::vector<std::string>* allScripts = nullptr;
+    logInfo("Task 'Script Distribution'");
+
+    AlgorithmExact alg {n, n, {1,1,1}};
+    std::vector<std::string> allScripts {};    
+    generate_scripts(n, n, Options::opts.k, allScripts, alg);
+
+    // if file is given save there otherwise use std out
     if (!Options::opts.outputDistribution.empty()) {
-      allScripts = new std::vector<std::string>();
-    }
-    scriptDistributionMatrix(n, n, Options::opts.k, freqMat, allScripts);
-    freeMatrix<size_t>(n+1, n+1, freqMat);
-    if (allScripts != nullptr) {
       std::ofstream ofs(Options::opts.outputDistribution, std::ofstream::out);
-      for (std::string script : *allScripts) {
+      for (std::string script : allScripts) {
 	ofs << script << "\n";
       }
       ofs.close();
-      delete allScripts;
-      allScripts = nullptr;
     }
+    else {
+      for (std::string script : allScripts) {
+	std::cout << script << "\n";
+      }
+    }
+    
     return;
   }
 
   // TASK - Algorithms comparison (32)
   if (task == EDIT_DISTANCE_SUBTASK_COMPARE_ALGS) {
-    compareEditDistanceAlgorithms(n, n, Options::opts.k);
+    logInfo("Task 'Algorithms comparison'");
+    compare_edit_distance_algorithms(n, n, Options::opts.k);
     return;
   }
 
   // Task - Default (0)
   if (flags & EDIT_DISTANCE_DIFF_BOUNDED_ERROR) {
+    logInfo("Task 'g(n) Esitmation'");
     size_t k_max = Options::opts.k;
     double precision = Options::opts.precision;
     double z_confidence = Options::opts.confidence;
-    std::vector<SampleEstimates> est = differenceBoundedRelativeErrorEstimate(n, precision, z_confidence, k_max);
-    std::cout << std::endl;
-    std::cout << (n>>1) << "\t" << est[0].sampleSize << "\t"
-	      << est[0].sampleMean  << "\t" << est[0].sampleVariance << "\n";    
-    std::cout << n << "\t" << est[1].sampleSize
-	      << "\t" << est[1].sampleMean  << "\t" << est[1].sampleVariance << "\n";
+    lbio_size_t T = static_cast<lbio_size_t>(std::floor(n / 2.0));
+    lbio_size_t Tmin = static_cast<lbio_size_t>(std::sqrt(n));
+    // Approximation is required find 'optimal' T >= sqrt(n)
+    if (Options::opts.approxLevel >= 0) {      
+      if (flags & EDIT_DISTANCE_BANDWIDTH_ESTIMATE) {	
+	logInfo("Estimation of optimal bandwidth...");
+	Tmin = std::max(1, Options::opts.approxLevel);
+	T = optimal_bandwidth(n, precision / 2, Tmin);
+	std::cout << "~T*: " << T << "\n";
+      } else {
+	T = Options::opts.approxLevel;
+      }
+    }
+    AlgorithmBand alg(n, n, T, {1,1,1});
+    // lambda for output
+    auto print_cb =
+      [n](const SampleEstimates& est_n, const SampleEstimates& est_n_2) {
+      std::cout << (n>>1) << "\t" << est_n_2 << "\n"
+	<< n << "\t" << est_n  << "\n"; };
+    
+    logInfo("Estimation...");
+    std::vector<SampleEstimates> est =
+      edit::difference_estimate(n, precision, z_confidence,
+				k_max, alg, print_cb );
+    
     return;
   }
 
   if (flags & EDIT_DISTANCE_BOUNDED_ERROR) {
     double precision = Options::opts.precision;
     double z_confidence = Options::opts.confidence;
-    SampleEstimates beEst = editDistanceErrorBoundedEstimates(n, precision, z_confidence);
-    std::cout << beEst.sampleSize << "\t" << beEst.sampleMean << "\t" << beEst.sampleVariance << "\n";
+    SampleEstimates beEst =
+      editDistanceErrorBoundedEstimates(n, precision, z_confidence);
+    std::cout << beEst.sampleSize << "\t" << beEst.sampleMean << "\t"
+	      << beEst.sampleVariance << "\n";
     return;
   }
   
   if (flags & EDIT_DISTANCE_ESTIMATE_EXHAUSTIVE) {
     // Exhasutve (only quadratic)
-    logWarning("only \033[1;37mqudratic algorithm\033[0m available with exhaustive option");
+    logWarning("only \033[1;37mqudratic algorithm\033[0m" 
+	       "available with exhaustive option");
     double avgDist = testExhaustiveEditDistanceEncoded(n, edOut->distPDF);
     std::cout << avgDist << std::endl;    
   }
@@ -412,10 +456,12 @@ editDistanceOpMode() {
       if (flags & EDIT_DISTANCE_INFO_PARTIAL) {
 	// Sample + Quadratic + Partial Info
 	if (flags & EDIT_DISTANCE_INFO_SCRIPT) {
+	  logInfo("Quadratic algorithms info");
 	  std::unique_ptr<EditDistanceInfo[]> infos =
 	    editDistSamplesInfo(n,k);
 	  for (size_t i = 0; i < k; ++i) {
-	    std::cout << infos[i].n_sub << "\t" << infos[i].n_ins << "\t" << infos[i].n_del << "\n";
+	    std::cout << infos[i].n_sub << "\t" << infos[i].n_ins
+		      << "\t" << infos[i].n_del << "\n";
 	  }
 	}
 	else {
@@ -433,12 +479,17 @@ editDistanceOpMode() {
 	std::unique_ptr<EditDistanceInfo[]> samples =
 	  editDistSamplesInfoLinSpace(n,k);
 	
-	std::unique_ptr<double[]> subSamples = extractSubstitutionArray(samples.get(), k);
-	std::unique_ptr<double[]> delSamples = extractDeletionArray(samples.get(), k);
-	std::unique_ptr<double[]> insSamples = extractInsertionArray(samples.get(), k);
-	SampleEstimates subEst = estimatesFromSamples<double>(subSamples.get(), k);
-	SampleEstimates delEst = estimatesFromSamples<double>(delSamples.get(), k);
-	SampleEstimates insEst = estimatesFromSamples<double>(insSamples.get(), k);
+	// auto -> std::unique_ptr<double[]>
+	auto subSamples = extractSubstitutionArray(samples.get(), k);
+	auto delSamples = extractDeletionArray(samples.get(), k);
+	auto insSamples = extractInsertionArray(samples.get(), k);
+	
+	SampleEstimates subEst
+	  = estimatesFromSamples<double>(subSamples.get(), k);
+	SampleEstimates delEst
+	  = estimatesFromSamples<double>(delSamples.get(), k);
+	SampleEstimates insEst
+	  = estimatesFromSamples<double>(insSamples.get(), k);
 
 	// If 'verbose' is set  all samples are printed
 	if (Options::opts.verbose) {
@@ -454,9 +505,10 @@ editDistanceOpMode() {
       }
       else {
 	// MINIMAL INFO (mean + var) + Sample + Linear
-	std::unique_ptr<size_t[]> samples =
-	  editDistSamples(n,k);
-	SampleEstimates estimators = estimatesFromSamples<size_t>(samples.get(), k);
+	logInfo("Basic sampling");
+	AlgorithmBand alg(n, n, std::ceil(n/2.0), {1,1,1});
+	auto samples = edit::edit_distance_samples(n,k, alg);
+	auto estimators = estimatesFromSamples<size_t>(samples.get(), k);
 	std::cout << estimators.sampleMean << std::endl;
 	std::cout << estimators.sampleVariance << std::endl;
       }

@@ -4,6 +4,8 @@
 #include <iostream>
 #include <random>
 
+namespace lbio { namespace sim { namespace  generator {
+
 struct RandGen
 {
   std::mt19937 gen;
@@ -29,7 +31,6 @@ initRandomGenerator() {
 }
 
 int randomBaseIndex() {
-  //  return (rand() & 0x3);
   return randGen->nextBaseIdx();
 }
 
@@ -135,3 +136,5 @@ void complementBases(char* S, size_t n) {
     S[i] = baseComplement(S[i]);
   }
 }
+
+} } } // namespaces

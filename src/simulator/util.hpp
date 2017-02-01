@@ -1,11 +1,9 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <vector>
 #include <iostream>
 
-// general variables
-// extern char bases[];
-// extern char revBases[128];
 extern double* power4_lookup;
 
 

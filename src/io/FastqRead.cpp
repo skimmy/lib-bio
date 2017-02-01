@@ -1,7 +1,3 @@
-/*#include "../io.h"
-#include "../core.h"
-*/
-
 #include "FastqRead.hpp"
 
 #include <fstream>
@@ -61,28 +57,27 @@ FastqRead::FastqRead(const FastqRead& other) {
 }
 
 FastqRead::~FastqRead() {
-  if (this->quality != NULL) {
-    delete this->quality;
-    this->quality = NULL;
-  }
+  delete this->quality;
+  this->quality = NULL;
 }
 
-/********************* STREAM OPERATORS *********************/
+//////////////////////////////////////////////////////////////////////
+//                      STREAM OPERATORS
+//////////////////////////////////////////////////////////////////////
 
 std::istream& operator>>(std::istream& is, FastqRead& read) {
-  char buffer[MAX_BUFFER_SIZE];
-  // header (starts with '@')
-  is.getline(buffer,MAX_BUFFER_SIZE);
-  read.header = string(buffer);
 
-  // bases
-  is.getline(buffer,MAX_BUFFER_SIZE);
-  read.bases = string(buffer);
-  //  '+' for qualities
-  is.getline(buffer,MAX_BUFFER_SIZE);
-  // qualtiies
-  is.getline(buffer,MAX_BUFFER_SIZE);
-  read.qualities = string(buffer);
+  // This works as long as the fastq is well formed. More robust code
+  // should be implemented in the future. For example aborting current
+  // read when malformed file is encountered.
+
+  std::getline(is, read.header);
+  std::getline(is, read.bases);
+  // The '+' divider between sequence and qualities is ignored
+  std::string trash_string;
+  std::getline(is, trash_string);
+  std::getline(is, read.qualities);
+
   return is;
 }
 

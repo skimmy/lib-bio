@@ -1,51 +1,30 @@
-#include "BamFormat.hpp"
-#include <string>
 #include <iostream>
-#include <memory>
+#include <iterator>
 
-typedef std::unique_ptr<UIntList> pUIntList;
+#include "../io.h"
+
+void logInfo(const std::string& msg) {
+  std::cerr << "[Info] " << msg  << std::endl;
+}
+
+void testFastqRead(const std::string& fastqPath) {
+  logInfo("Fastq test on file " + fastqPath);
+
+  std::cerr << "Istream iterator test...\n";
+  std::ifstream ifs("/tmp/in.fastq", std::ifstream::in);
+
+  for (std::istream_iterator<FastqRead> it(ifs);
+       it != std::istream_iterator<FastqRead>(); ++it) {
+    std::cout << *it;
+  }
+
+  ifs.close();
+}
 
 int main(int argc, char** argv) {
-  /*  std::string dnaPath("/storage/bio/ecoli/ecoli.fasta");
-  FastFormat ecoli(dnaPath);
-  Reference r = ecoli.toReference();
-  std::cout << std::endl;
-  for (int i = 0; i < 102; ++i) {
-    //    std::cout << r.getBaseAt(i);
-  }
-  std::cout << std::endl;
-  std::string readsPath("/storage/bio/ecoli/ecoli_sample.fastq");
-  FastqFormat reads;
-  reads.openFile(readsPath);
-  std::cout << reads.getNextRead() << std::endl;
-  std::cout << reads.getNextRead() << std::endl;
-  std::cout << reads.getNextRead() << std::endl;
-  std::cout << reads.getNextRead() << std::endl;*/
 
-  lbiobam::BamFormat bam;
-  bam.open("/tmp/sample.bam");
-  IdPos idPos = bam.getNext();
-  while (idPos.first != "EOF") {
-    std::cout << idPos.first << " " << idPos.second << "\n";
-    idPos = bam.getNext();
-  }
-  /*  pUIntList pList = bam.getAlignmentPositions();
-  std::cout << "Found " << pList->size() << " alignments\n";
-  for (uint64_t align : *pList) {
-    std::cout << align << "\n";
-    }*/
-
-  // BAM write tests
-  lbiobam::BamFormat oBam;
-  oBam.open("/tmp/out.sam", lbiobam::BamOpenWrite);
-  // ... DO STUFF ...
-  oBam.copyHeader(bam);
-  oBam.writeBamHeader();
-
-  oBam.close();
-
-  std::cout << std::endl;
-  bam.close();
-  
+  testFastqRead(argc > 1 ? std::string {argv[1]} :
+		std::string {"/tmp/in.fastq"} );
+    
   return 0;
 }

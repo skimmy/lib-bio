@@ -458,16 +458,18 @@ editDistanceOpMode() {
       if (flags & EDIT_DISTANCE_INFO_PARTIAL) {
 	// Sample + Quadratic + Partial Info
 	if (flags & EDIT_DISTANCE_INFO_SCRIPT) {
-	  logInfo("Quadratic algorithms info");
-	  std::unique_ptr<EditDistanceInfo[]> infos =
-	    editDistSamplesInfo(n,k);
+	  logInfo("Sample quadratic algorithms info");
+	  AlgorithmExact algExact {n, n, {1,1,1}};
+	  EditDistanceSample<AlgorithmExact> generator {n, n};
 	  for (size_t i = 0; i < k; ++i) {
-	    std::cout << infos[i].n_sub << "\t" << infos[i].n_ins
-		      << "\t" << infos[i].n_del << "\n";
+	    generator(algExact);
+	    auto info = algExact.backtrack();
+	    std::cout << info.n_sub << "\t" << info.n_ins
+		      << "\t" << info.n_del << "\n";
 	  }
 	}
 	else {
-	  logWarning("Quadratic info without script not yet implemented");
+	  logWarning("Sample quadratic info without script not available");
 	}
       }
     }

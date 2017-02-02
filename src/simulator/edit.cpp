@@ -229,51 +229,6 @@ editInfoCompute(EditDistanceInfo& info) {
   }
 }
 
-void
-editDistanceMat(const std::string& s1, const std::string& s2,
-		size_t** dpMatrix) {
-  size_t n = s1.size();
-  size_t m = s2.size();
-
-  // initialization of first row and column
-  for (size_t i = 0; i < n+1; ++i) {
-    dpMatrix[i][0] = i;
-  }
-  for (size_t j = 0; j < m+1; ++j) {
-    dpMatrix[0][j] = j;
-  }
-  
-  for (size_t i = 1; i < n+1; ++i) {
-    for(size_t j = 1; j < m+1; ++j) {
-      size_t delta = (s1[i-1] == s2[j-1]) ? 0 : 1;
-      dpMatrix[i][j] =
-	std::min( std::min(dpMatrix[i-1][j]+1,
-			   dpMatrix[i][j-1]+1),
-		  dpMatrix[i-1][j-1] + delta ) ;
-    }
-  }
-
-}
-
-// size_t
-// editDistance(const std::string& s1, const std::string& s2) {
-//   size_t n = s1.size();
-//   size_t m = s2.size();
-//   size_t** dpMatrix = new size_t*[n+1];
-//   for (size_t i = 0; i < n+1; ++i) {
-//     dpMatrix[i] = new size_t[m+1];
-//   }
-
-//   editDistanceMat(s1, s2, dpMatrix);
- 
-//   size_t dist = dpMatrix[n][m];
-//   for (size_t i = 0; i < n+1; ++i) {
-//     delete[] dpMatrix[i];   
-//   }
-//   delete[] dpMatrix;
-//   return dist;
-// }
-
 //////////////////////////////////////////////////////////////////////
 //                    EDIT DISTANCE APPROXIMATIONS
 //////////////////////////////////////////////////////////////////////
@@ -333,27 +288,6 @@ editDistanceBandwiseApprox(const std::string& s1, const std::string& s2,
 
 
 std::unique_ptr<EditDistanceInfo[]>
-editDistSamplesInfo(size_t n, size_t k_samples) {
-  std::unique_ptr<EditDistanceInfo[]> infos(new EditDistanceInfo[k_samples]);
-  std::string s1(n,'N');
-  std::string s2(n,'N');
-
-  size_t** dpMatrix = allocMatrix<size_t>(n,n);
-
-  for (size_t k = 0; k < k_samples; ++k) {
-    generateIIDString(s1);
-    generateIIDString(s2);
-    editDistanceMat(s1, s2, dpMatrix);
-    editDistanceBacktrack(dpMatrix, s1, s2, infos[k]);
-    editInfoCompute(infos[k]);
-  }
-  
-  freeMatrix<size_t>(n, n, dpMatrix);
-  
-  return infos;
-}
-
-std::unique_ptr<EditDistanceInfo[]>
 editDistSamplesInfoLinSpace(size_t n, size_t k_samples,
 			    EditDistanceInfo** sampleMat) {
   std::unique_ptr<EditDistanceInfo[]> samples(new EditDistanceInfo[k_samples]);
@@ -373,75 +307,6 @@ editDistSamplesInfoLinSpace(size_t n, size_t k_samples,
   delete[] v0;
   
   return samples;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-//                      EXHASUTIVE AND BACKTRACK
-//////////////////////////////////////////////////////////////////////
-
-
-void
-editDistanceBacktrack(size_t** dpMatrix,const std::string& s1,
-		      const std::string& s2, EditDistanceInfo& info) {
-  info.edit_script = "";
-  size_t i = s1.size();
-  size_t j = s2.size();  
-  while( i > 0 && j > 0) {
-    size_t a = dpMatrix[i-1][j-1];
-    size_t b = dpMatrix[i-1][j];
-    size_t c = dpMatrix[i][j-1];
-    // Match case
-    if (s1[i-1] == s2[j-1]) {
-      info.edit_script = "M" + info.edit_script;
-      i--; j--;
-      continue;
-    }
-    // Substitution case
-    if (a <= b && a <=c) {
-      info.edit_script = "S" + info.edit_script;
-      i--; j--;
-      continue;
-    }
-    // In case of a tie prefer deletion
-    if (b <= c) {
-      info.edit_script = "D" + info.edit_script;
-      i--;
-    } else {
-      info.edit_script = "I" + info.edit_script;
-      j--;
-    }      
-    
-  }
-
-  while (i > 0) {
-    info.edit_script = "D" + info.edit_script;
-    i--;
-  }
-
-  while(j > 0) {
-    info.edit_script = "I" + info.edit_script;
-    j--;
-  }
-}
-
-void editDistanceWithInfo(const std::string& s1, const std::string& s2,
-			  EditDistanceInfo& info) {
-  size_t n = s1.size();
-  size_t m = s2.size();
-  size_t** dpMatrix = new size_t*[n+1];
-  for (size_t i = 0; i < n+1; ++i) {
-    dpMatrix[i] = new size_t[m+1];
-  }
-
-  editDistanceMat(s1, s2, dpMatrix);
-  editDistanceBacktrack(dpMatrix, s1, s2, info);
-  editInfoCompute(info);
-
-  for (size_t i = 0; i < n+1; ++i) {
-    delete[] dpMatrix[i];
-  }
-  delete[] dpMatrix;
 }
 
 // ----------------------------------------------------------------------
@@ -588,7 +453,9 @@ private:
 };
 
 
+// --------------------------------------------------------------------
 // NAMESPACES BEGIN
+
 namespace lbio { namespace sim { namespace edit {
 
 
@@ -660,13 +527,17 @@ compare_edit_distance_algorithms(lbio_size_t n, lbio_size_t m,
   lbio_size_t T_max = n / 2;
   lbio_size_t T_min = 1;
 
+  ExactAlg exactAlg { n, m, {1,1,1} };
+
   GeometricProgression<lbio_size_t> geom(2, T_min);
   std::vector<lbio_size_t> Ts = geom.valuesLeq(T_max);
   Ts.push_back(0);
   
 
   
-  lbio_size_t** dpMatrix = allocMatrix<lbio_size_t>(n+1, m+1);
+  lbio_size_t** dpMatrix = allocMatrix<lbio_size_t>(n+1, m+1); // !!!
+
+  
   std::vector< std::shared_ptr<AlgorithmComparisonResult> > results;
   std::string s1(n, 'N');
   std::string s2(m, 'N');
@@ -677,10 +548,9 @@ compare_edit_distance_algorithms(lbio_size_t n, lbio_size_t m,
     generateIIDString(s2);
 
     EditDistanceInfo tmp {};
-    editDistanceMat(s1, s2, dpMatrix);
-
-    closest_to_diagonal_backtrack(s1.size(), s2.size(), dpMatrix, tmp);
-    res->addExact(tmp);
+    
+    exactAlg.calculate(s1, s2);
+    res->addExact(exactAlg.backtrack());
 
     // Approximation for all values of T
     for (auto T : Ts) {

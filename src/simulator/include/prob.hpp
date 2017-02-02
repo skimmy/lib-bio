@@ -1,7 +1,7 @@
 #ifndef SIM_PROB_H
 #define SIM_PROB_H
 
-#include "util.hpp"
+#include <include/util.hpp>
 
 #include <vector>
 #include <fstream>

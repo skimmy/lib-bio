@@ -1,9 +1,10 @@
-#include "common.hpp"
+#include <include/common.hpp>
 
-#include "options.hpp"
-#include "align.hpp"
-#include "io.hpp"
-#include "log.hpp"
+#include <include/options.hpp>
+
+#include <include/align.hpp>
+#include <include/io.hpp>
+#include <include/log.hpp>
 
 #include <list>
 #include <iostream>

@@ -3,11 +3,12 @@
 #ifndef SIM_EDIT_ESTIMATES_H
 #define SIM_EDIT_ESTIMATES_H
 
-#include "common.hpp"
+#include <include/common.hpp>
 
-#include "prob.hpp"
 #include "options.hpp"
 #include "edit.hpp"
+
+#include <include/prob.hpp>
 
 #include <cmath>
 

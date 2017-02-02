@@ -5,18 +5,24 @@
  * alon tools.
  */
 
-#include "common.hpp"
-#include "generator.hpp"
-#include "online.hpp"
-#include "options.hpp"
-#include "chain.hpp"
-#include "prob.hpp"
-#include "util.hpp"
-#include "align.hpp"
-#include "edit.hpp"
-#include "edit_estimates.hpp"
-#include "log.hpp"
+#include <include/common.hpp>
+#include <include/options.hpp>
 
+// Basic includes
+#include <include/generator.hpp>
+#include <include/log.hpp>
+#include <include/prob.hpp>
+#include <include/util.hpp>
+
+
+// Task includes
+#include <include/align.hpp>
+#include <include/chain.hpp>
+#include <include/edit.hpp>
+#include <include/edit_estimates.hpp>
+#include <include/online.hpp>
+
+// standard includes
 #include <cstdlib>
 #include <ctime>
 
@@ -28,14 +34,7 @@
 using namespace lbio::sim;
 using namespace lbio::sim::generator;
 using namespace lbio::sim::edit;
-
-// testing functions from test.cpp. This has not been inserted in
-// other includes (e.g., common.hpp) since this is the only place
-// where it used. Moreover in case of unit testing code development
-// this tests will become deprecated.
-void testAll();
-
-Options Options::opts;
+using namespace lbio::sim::log;
 
 // output quantities (common to online and offline)
 double p_fail = 0.0;
@@ -442,8 +441,8 @@ editDistanceOpMode() {
   if (flags & EDIT_DISTANCE_ESTIMATE_EXHAUSTIVE) {
     // Exhasutve (only quadratic)
     logWarning("only \033[1;37mqudratic algorithm\033[0m" 
-	       "available with exhaustive option");
-    double avgDist = testExhaustiveEditDistanceEncoded(n, edOut->distPDF);
+	       " available with exhaustive option");
+    double avgDist = test_exhaustive_edit_distance_encoded(n, edOut->distPDF);
     std::cout << avgDist << std::endl;    
   }
   
@@ -456,16 +455,18 @@ editDistanceOpMode() {
       if (flags & EDIT_DISTANCE_INFO_PARTIAL) {
 	// Sample + Quadratic + Partial Info
 	if (flags & EDIT_DISTANCE_INFO_SCRIPT) {
-	  logInfo("Quadratic algorithms info");
-	  std::unique_ptr<EditDistanceInfo[]> infos =
-	    editDistSamplesInfo(n,k);
+	  logInfo("Sample quadratic algorithms info");
+	  AlgorithmExact algExact {n, n, {1,1,1}};
+	  EditDistanceSample<AlgorithmExact> generator {n, n};
 	  for (size_t i = 0; i < k; ++i) {
-	    std::cout << infos[i].n_sub << "\t" << infos[i].n_ins
-		      << "\t" << infos[i].n_del << "\n";
+	    generator(algExact);
+	    auto info = algExact.backtrack();
+	    std::cout << info.n_sub << "\t" << info.n_ins
+		      << "\t" << info.n_del << "\n";
 	  }
 	}
 	else {
-	  logWarning("Quadratic info without script not yet implemented");
+	  logWarning("Sample quadratic info without script not available");
 	}
       }
     }
@@ -516,16 +517,31 @@ editDistanceOpMode() {
   }
 }
 
+void
+prototyping() {
+  std::string proto_task_msg = make_bold("Edit Distance");
+  logInfo("Working on " + proto_task_msg + " prototyping");
+}
+
 int main(int argc, char** argv) {   
   // Important NOT invert (init requires argument to be parsed)
-  //  parseArguments(argc,argv);
+
+
+#ifdef HAVE_BOOST_PROGRAM_OPTIONS
   parseArgumentsBoost(argc,argv);
-  //  return -1;
+  logInfo("Boost args");
+#else
+  parseArguments(argc,argv);
+  logInfo("Std args");
+#endif
+
+  
   initSimulator();
 
   switch (Options::opts.mode) {
   case (OpMode::Test):
-    testAll();
+    logWarning("Prototyping, for tests run proper binary");
+    prototyping();
     exit(0);
   case (OpMode::Offline):
     offlineSimulation();

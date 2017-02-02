@@ -1,8 +1,12 @@
-#include "common.hpp"
-#include "generator.hpp"
-#include "options.hpp"
-#include "chain.hpp"
-#include "util.hpp"
+#include <include/common.hpp>
+#include <include/chain.hpp>
+
+
+#include <include/options.hpp>
+
+#include <include/generator.hpp>
+#include <include/util.hpp>
+
 
 #include <cstdint>
 #include <cmath>

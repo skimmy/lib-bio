@@ -1,4 +1,7 @@
-#include "options.hpp"
+#include <include/common.hpp>
+#include <include/options.hpp>
+
+#include <include/log.hpp>
 
 #include <getopt.h>
 #include <iostream>
@@ -10,6 +13,9 @@
 namespace po = boost::program_options;
 
 #endif
+
+Options Options::opts;
+
 
 
 void printUsage() {

@@ -1,4 +1,4 @@
-#include "log.hpp"
+#include <include/log.hpp>
 
 #include <iostream>
 
@@ -31,6 +31,16 @@ fatal_error(const std::string &msg, int exit_code)
   exit(exit_code);
 }
 
-std::string colorifyString(const std::string& plain, const std::string& color) {
+std::string
+colorifyString(const std::string& plain, const std::string& color) {
   return (color + plain + TermColEndColor);
 }
+
+namespace lbio { namespace sim { namespace log {
+
+std::string
+make_bold(const std::string& plain) {
+  return (TermColBold + plain + TermColEndColor);
+}
+
+} } } // namespaces

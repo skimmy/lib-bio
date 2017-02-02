@@ -1,5 +1,5 @@
-#include "generator.hpp"
-#include "common.hpp"
+#include <include/common.hpp>
+#include <include/generator.hpp>
 
 #include <iostream>
 #include <random>

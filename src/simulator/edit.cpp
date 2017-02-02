@@ -209,28 +209,6 @@ editDistanceLinSpaceInfo(const std::string& s1, const std::string& s2,
   }
   return v0[n2];
 }
-
-// returns the edit distance between strings encoded in two bits form
-// on the 64 for bits input integers (strings can't be longer than 32
-// characters). The actual lengths of the strings are given as
-// parameters
-size_t
-editDistanceEncoded(uint64_t s1, size_t n1, uint64_t s2,
-		    size_t n2, size_t** dpMatrix) {
-  for (size_t i = 1; i < n1+1; ++i) {
-    for(size_t j = 1; j < n2+1; ++j) {
-      // pre compute matrix {A,C,G,T} x [1...n]
-      uint64_t x = ( s1 >> 2*(i-1) ) & 0x3; 
-      uint64_t y = ( s2 >> 2*(j-1) ) & 0x3;
-      size_t delta = (x == y) ? 0 : 1;       
-      dpMatrix[i][j] =
-	std::min( std::min(dpMatrix[i-1][j]+1, dpMatrix[i][j-1]+1),
-		  dpMatrix[i-1][j-1] + delta ) ;
-    }
-  }
-  return dpMatrix[n1][n2];
-}
-
 void
 editInfoCompute(EditDistanceInfo& info) {
   info.n_sub = 0;
@@ -275,24 +253,24 @@ editDistanceMat(const std::string& s1, const std::string& s2,
 
 }
 
-size_t
-editDistance(const std::string& s1, const std::string& s2) {
-  size_t n = s1.size();
-  size_t m = s2.size();
-  size_t** dpMatrix = new size_t*[n+1];
-  for (size_t i = 0; i < n+1; ++i) {
-    dpMatrix[i] = new size_t[m+1];
-  }
+// size_t
+// editDistance(const std::string& s1, const std::string& s2) {
+//   size_t n = s1.size();
+//   size_t m = s2.size();
+//   size_t** dpMatrix = new size_t*[n+1];
+//   for (size_t i = 0; i < n+1; ++i) {
+//     dpMatrix[i] = new size_t[m+1];
+//   }
 
-  editDistanceMat(s1, s2, dpMatrix);
+//   editDistanceMat(s1, s2, dpMatrix);
  
-  size_t dist = dpMatrix[n][m];
-  for (size_t i = 0; i < n+1; ++i) {
-    delete[] dpMatrix[i];   
-  }
-  delete[] dpMatrix;
-  return dist;
-}
+//   size_t dist = dpMatrix[n][m];
+//   for (size_t i = 0; i < n+1; ++i) {
+//     delete[] dpMatrix[i];   
+//   }
+//   delete[] dpMatrix;
+//   return dist;
+// }
 
 //////////////////////////////////////////////////////////////////////
 //                    EDIT DISTANCE APPROXIMATIONS
@@ -399,41 +377,6 @@ editDistSamplesInfoLinSpace(size_t n, size_t k_samples,
 //////////////////////////////////////////////////////////////////////
 //                      EXHASUTIVE AND BACKTRACK
 //////////////////////////////////////////////////////////////////////
-
-
-double
-testExhaustiveEditDistanceEncoded(size_t n, double* freq) {
-  size_t** dpMatrix = new size_t*[n+1];
-  for (size_t i = 0; i < n+1; ++i) {
-    dpMatrix[i] = new size_t[n+1];
-  }
-
-
-  // initialization of first row and column
-  for (size_t i = 0; i < n+1; ++i) {
-    dpMatrix[i][0] = i;
-  }
-  for (size_t j = 0; j < n+1; ++j) {
-    dpMatrix[0][j] = j;
-  }
-
-  uint64_t N = pow(4,n);
-  double ed = 0;
-  size_t dist = 0;
-  for (uint64_t i = 0; i < N; ++i) {
-    freq[0]++;
-    for (uint64_t j = i+1; j <N; ++j) {
-      dist = editDistanceEncoded(i, n, j, n, dpMatrix);
-      freq[dist] += 2.0;
-      ed += 2*dist;
-    }
-  }
-  for (size_t i = 0; i < n+1; ++i) {
-    delete[] dpMatrix[i];
-  }
-  delete[] dpMatrix;
-  return ((double)ed) / ((double) (N*N));
-}
 
 
 void
@@ -645,6 +588,64 @@ private:
 
 // NAMESPACES BEGIN
 namespace lbio { namespace sim { namespace edit {
+
+
+// returns the edit distance between strings encoded in two bits form
+// on the 64 for bits input integers (strings can't be longer than 32
+// characters). The actual lengths of the strings are given as
+// parameters
+size_t
+edit_distance_encoded(uint64_t s1, size_t n1, uint64_t s2,
+		    size_t n2, size_t** dpMatrix) {
+  for (size_t i = 1; i < n1+1; ++i) {
+    for(size_t j = 1; j < n2+1; ++j) {
+      // pre compute matrix {A,C,G,T} x [1...n]
+      uint64_t x = ( s1 >> 2*(i-1) ) & 0x3; 
+      uint64_t y = ( s2 >> 2*(j-1) ) & 0x3;
+      size_t delta = (x == y) ? 0 : 1;       
+      dpMatrix[i][j] =
+	std::min( std::min(dpMatrix[i-1][j]+1, dpMatrix[i][j-1]+1),
+		  dpMatrix[i-1][j-1] + delta ) ;
+    }
+  }
+  return dpMatrix[n1][n2];
+}
+
+double
+test_exhaustive_edit_distance_encoded(lbio_size_t n, double* freq) {
+  size_t** dpMatrix = new size_t*[n+1];
+  for (size_t i = 0; i < n+1; ++i) {
+    dpMatrix[i] = new size_t[n+1];
+  }
+
+
+  // initialization of first row and column
+  for (size_t i = 0; i < n+1; ++i) {
+    dpMatrix[i][0] = i;
+  }
+  for (size_t j = 0; j < n+1; ++j) {
+    dpMatrix[0][j] = j;
+  }
+
+  uint64_t N = pow(4,n);
+  double ed = 0;
+  size_t dist = 0;
+  for (uint64_t i = 0; i < N; ++i) {
+    freq[0]++;
+    for (uint64_t j = i+1; j <N; ++j) {
+      dist = edit_distance_encoded(i, n, j, n, dpMatrix);
+      freq[dist] += 2.0;
+      ed += 2*dist;
+    }
+  }
+  for (size_t i = 0; i < n+1; ++i) {
+    delete[] dpMatrix[i];
+  }
+  delete[] dpMatrix;
+  return ((double)ed) / ((double) (N*N));
+}
+
+
 
 // Useful alias used throughout the code
 using ExactAlg    = EditDistanceWF<lbio_size_t, std::string>;
@@ -865,10 +866,3 @@ optimal_bandwidth(lbio_size_t n, double precision, lbio_size_t Tmin) {
      
       
 } } } // namespaces
-
-
-//////////////////////////////////////////////////////////////////////
-//          PROPTOTYPE TEST FUNCTION (RO REMOVE)
-//////////////////////////////////////////////////////////////////////
-void test_edit_distance_class() {
-}

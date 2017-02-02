@@ -36,4 +36,11 @@ void _logInfo(const std::string& msg);
 
 void fatal_error(const std::string &msg, int exit_code = 1);
 
+namespace lbio { namespace sim { namespace log {
+
+std::string make_bold(const std::string& plain);
+
+} } } // namespaces
+
+
 #endif

@@ -60,6 +60,23 @@ compare_edit_distance_algorithms(size_t n, size_t m, size_t k, std::ostream& os 
 lbio_size_t
 optimal_bandwidth(lbio_size_t n, double precision, lbio_size_t Tmin = 1);
 
+//////////////////////////////////////////////////////////////////////
+
+
+/**
+   \brief computes the edit distance between strings s1 and s2
+ */
+size_t edit_distance_encoded(uint64_t s1, lbio_size_t n1, uint64_t s2,
+			     lbio_size_t n2, size_t** dpMatrix);
+
+/**
+   \brief Computes the exact average edit distance and corresponding
+   distribution by enumeratin all possible pairs.
+ */
+double
+test_exhaustive_edit_distance_encoded(lbio_size_t n, double* freq);
+
+
 
 } } } //namespaces
 
@@ -347,13 +364,6 @@ std::unique_ptr<double[]> extractInsertionArray(const EditDistanceInfo* v, size_
 //              EDIT DISTANCE CALCULATION FUNCTION
 //////////////////////////////////////////////////////////////////////
 
-/**
- * \brief computes the edit distance between strings s1 and s2
- */
-//size_t editDistance(const std::string& s1, const std::string& s2);
-
-size_t editDistanceEncoded(uint64_t s1, size_t n1, uint64_t s2, size_t n2, size_t** dpMatrix);
-
 size_t editDistanceLinSpace(const std::string& s1, const std::string& s2, size_t* v0, size_t* v1);
 
 EditDistanceInfo editDistanceLinSpaceInfo(const std::string& s1, const std::string& s2, EditDistanceInfo* v0, EditDistanceInfo* v1, EditDistanceInfo** sampleMat = NULL);
@@ -395,9 +405,6 @@ editDistanceBacktrack(size_t** dpMatrix, const std::string& s1,
 //                 (TO BE MOVED TO EDIT_EST.HPP)
 //////////////////////////////////////////////////////////////////////
 
-
-double
-testExhaustiveEditDistanceEncoded(size_t n, double* freq);
 
 SampleEstimates
 editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta, size_t k_min = 16);

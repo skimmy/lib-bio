@@ -28,14 +28,7 @@
 using namespace lbio::sim;
 using namespace lbio::sim::generator;
 using namespace lbio::sim::edit;
-
-// testing functions from test.cpp. This has not been inserted in
-// other includes (e.g., common.hpp) since this is the only place
-// where it used. Moreover in case of unit testing code development
-// this tests will become deprecated.
-void testAll();
-
-Options Options::opts;
+using namespace lbio::sim::log;
 
 // output quantities (common to online and offline)
 double p_fail = 0.0;
@@ -442,8 +435,8 @@ editDistanceOpMode() {
   if (flags & EDIT_DISTANCE_ESTIMATE_EXHAUSTIVE) {
     // Exhasutve (only quadratic)
     logWarning("only \033[1;37mqudratic algorithm\033[0m" 
-	       "available with exhaustive option");
-    double avgDist = testExhaustiveEditDistanceEncoded(n, edOut->distPDF);
+	       " available with exhaustive option");
+    double avgDist = test_exhaustive_edit_distance_encoded(n, edOut->distPDF);
     std::cout << avgDist << std::endl;    
   }
   
@@ -516,6 +509,12 @@ editDistanceOpMode() {
   }
 }
 
+void
+prototyping() {
+  std::string proto_task_msg = make_bold("Edit Distance");
+  logInfo("Working on " + proto_task_msg + " prototyping");
+}
+
 int main(int argc, char** argv) {   
   // Important NOT invert (init requires argument to be parsed)
   parseArguments(argc,argv);
@@ -523,7 +522,8 @@ int main(int argc, char** argv) {
 
   switch (Options::opts.mode) {
   case (OpMode::Test):
-    testAll();
+    logWarning("Prototyping, for tests run proper binary");
+    prototyping();
     exit(0);
   case (OpMode::Offline):
     offlineSimulation();

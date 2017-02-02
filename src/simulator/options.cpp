@@ -4,6 +4,9 @@
 #include <iostream>
 #include <limits>
 
+Options Options::opts;
+
+
 void printUsage() {
   std::cout << std::endl;
   std::cout << "USAGE\n";

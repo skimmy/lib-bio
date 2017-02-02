@@ -1,8 +1,9 @@
-#include "common.hpp"
+#include <include/common.hpp>
 
-#include "options.hpp"
-#include "prob.hpp"
-#include "util.hpp"
+#include <include/options.hpp>
+
+#include <include/prob.hpp>
+#include <include/util.hpp>
 
 #include <vector>
 #include <iostream>

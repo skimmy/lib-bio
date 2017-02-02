@@ -5,18 +5,27 @@
  * alon tools.
  */
 
-#include "common.hpp"
-#include "generator.hpp"
-#include "online.hpp"
-#include "options.hpp"
-#include "chain.hpp"
-#include "prob.hpp"
-#include "util.hpp"
-#include "align.hpp"
-#include "edit.hpp"
-#include "edit_estimates.hpp"
-#include "log.hpp"
+#include <include/common.hpp>
 
+
+#include <include/options.hpp>
+
+
+// Basic includes
+#include <include/generator.hpp>
+#include <include/log.hpp>
+#include <include/prob.hpp>
+#include <include/util.hpp>
+
+
+// Task includes
+#include <include/align.hpp>
+#include <include/chain.hpp>
+#include <include/edit.hpp>
+#include <include/edit_estimates.hpp>
+#include <include/online.hpp>
+
+// standard includes
 #include <cstdlib>
 #include <ctime>
 

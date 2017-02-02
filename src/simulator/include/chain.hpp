@@ -1,6 +1,8 @@
 #ifndef CHAIN_H
 #define CHAIN_H
 
+#include <include/generator.hpp>
+
 void
 computeExpectedFalsePositiveMatrix(double** m);
 

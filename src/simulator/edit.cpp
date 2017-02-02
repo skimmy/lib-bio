@@ -1,10 +1,12 @@
-#include "common.hpp"
+#include <include/common.hpp>
+#include <include/edit.hpp>
 
-#include "generator.hpp"
-#include "options.hpp"
-#include "prob.hpp"
-#include "util.hpp"
-#include "edit.hpp"
+#include <include/options.hpp>
+
+#include <include/prob.hpp>
+#include <include/generator.hpp>
+#include <include/util.hpp>
+
 
 #include <fstream>
 #include <map>

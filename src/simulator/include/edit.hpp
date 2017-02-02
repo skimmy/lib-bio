@@ -1,6 +1,11 @@
 #ifndef SIM_EDIT_H
 #define SIM_EDIT_H
 
+#include <include/prob.hpp>
+#include <include/generator.hpp>
+#include <include/util.hpp>
+
+
 #include <memory>
 #include <iostream>
 #include <algorithm>

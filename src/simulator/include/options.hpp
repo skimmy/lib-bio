@@ -6,8 +6,6 @@ enum class Task { Test, Offline, Online, Oracle, ScoreEst, AlignScore, EditDist,
 #include <string>
 
 
-enum OpMode { Test, Offline, Online, Oracle, ScoreEst, AlignScore, EditDist };
-
 // options parsing
 struct Options {
   size_t N; // -M
@@ -30,7 +28,6 @@ struct Options {
   size_t floatPrecision; // TODO
 
   Task task; // --task (will substituted mode in -O)
-  OpMode mode;  // -O
   int subTask;  // -B
   int optFlags; // -f
 

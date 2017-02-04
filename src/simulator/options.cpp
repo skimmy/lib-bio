@@ -6,6 +6,7 @@
 #include <getopt.h>
 #include <iostream>
 #include <limits>
+#include <map>
 
 #ifdef HAVE_BOOST_PROGRAM_OPTIONS
 
@@ -16,7 +17,16 @@ namespace po = boost::program_options;
 
 Options Options::opts;
 
-
+std::map<std::string, Task> text_to_op =
+  {
+    {"test", Task::Test} ,
+    {"offline", Task::Offline},
+    {"online",  Task::Online},
+    {"oracle", Task::Oracle},
+    {"score", Task::ScoreEst},
+    {"align", Task::AlignScore},
+    {"edit", Task::EditDist}
+  };
 
 void printUsage() {
   std::cout << std::endl;
@@ -44,13 +54,15 @@ void printUsage() {
   std::cout << std::endl;
 }
 
-void printArguments() {
+void
+printArguments() {
   std::cout << "\t\t    +++++  ARGUMENTS +++++\n\n";
   std::cout << "Reference length (N)         " << Options::opts.N << std::endl;
   std::cout << "Reads length (m)             " << Options::opts.m << std::endl;
   std::cout << "Reads count (M)              " << Options::opts.M << std::endl;
   std::cout << "Base error probability (pe)  " << Options::opts.pe << std::endl;
-  std::cout << "Operation mode (O)           " << Options::opts.mode << std::endl;
+  std::cout << "Operation mode (O)           "
+	    << static_cast<int>(Options::opts.task) << std::endl;
 }
 
 void printOperationModeDescription() {
@@ -86,7 +98,7 @@ setDefualtParams() {
   Options::opts.floatPrecision = std::numeric_limits< double >::max_digits10;
   
 
-  Options::opts.mode = OpMode::Test;
+  Options::opts.task = Task::Test;
   Options::opts.subTask = 0;
   Options::opts.optFlags = 0;
   Options::opts.online = false;
@@ -144,6 +156,16 @@ std::string taskToString(Task task) {
   }
 }
 
+Task parse_opmode_string(std::string param) {
+  for (size_t i = 0; i < param.size(); ++i) {
+    param[i] = std::tolower(param[i]);
+  }
+  if (text_to_op.count(param)) {
+    return text_to_op[param];
+  }
+  return Task::Undefined;
+}
+
 // ----------------------------------------------------------------------
 //                        ARG PARSING FUNCTIONS
 // ----------------------------------------------------------------------
@@ -196,7 +218,7 @@ void parseArguments(int argc, char** argv) {
       Options::opts.approxLevel = atoi(optarg);
       break;
     case 'O':
-      Options::opts.mode = static_cast<OpMode>(atoi(optarg));
+      Options::opts.task = static_cast<Task>(atoi(optarg));
       break;
     case 'B':
       Options::opts.subTask = atoi(optarg);
@@ -276,9 +298,8 @@ parseArgumentsBoost(int argc, char** argv) {
     ("approx-level,A", po::value<int>(&Options::opts.approxLevel), // -A, --approx-level
      "Set the approximation level")
 
-    ("task", po::value<std::string>(), "Selects the task to be performed")    
-    ("operation-mode,O", po::value<int>(), "Sets the operation mode") // -O, --operation-mode
-
+    ("task,O", po::value<std::string>(), "Selects the task to be performed")
+    
     ("sub-task,B", po::value<int>(&Options::opts.subTask), // -B, --sub-tast
      "Defines the subtask for the operation mode selected") 
 
@@ -311,16 +332,14 @@ parseArgumentsBoost(int argc, char** argv) {
   }
 
   if (vm.count("task")) {
+    std::string arg = vm["task"].as<std::string>();
     try {
-      Options::opts.task = intToTask(std::stoi(vm["task"].as<std::string>()));
+      Options::opts.task= static_cast<Task>(std::stoi(arg));
     } catch(std::invalid_argument) {
-      //Options::opts.task = string2Task(vm["count"]);
-      Options::opts.task = Task::Undefined;
+      logInfo("OpMode String");
+      Options::opts.task =
+	parse_opmode_string(vm["task"].as<std::string>());
     }
-  }
-  
-  if (vm.count("operation-mode")) {
-    Options::opts.mode = static_cast<OpMode>(vm["operation-mode"].as<int>());
   }
 
   if (vm.count("pipeline")) {

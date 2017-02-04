@@ -100,7 +100,7 @@ void clearSimulator() {
 }
 
 void outputResults() {
-  if (Options::opts.mode == OpMode::EditDist) {
+  if (Options::opts.task == Task::EditDist) {
     // CDF ouput requested (-D <distfile> option)
     if (!Options::opts.outputDistribution.empty() &&
 	Options::opts.subTask != EDIT_DISTANCE_SUBTASK_SCRIPT_DIST) {
@@ -118,7 +118,7 @@ void outputResults() {
     return;
   }
   if (Options::opts.pipeline) {
-    if (Options::opts.mode == OpMode::Oracle) {
+    if (Options::opts.task == Task::Oracle) {
       double appNumDen[2];
       for (size_t i = 0; i < Options::opts.m+1; ++i) {
 	approximatedScore(i, appNumDen);
@@ -538,29 +538,29 @@ int main(int argc, char** argv) {
   
   initSimulator();
 
-  switch (Options::opts.mode) {
-  case (OpMode::Test):
+  switch (Options::opts.task) {
+  case (Task::Test):
     logWarning("Prototyping, for tests run proper binary");
     prototyping();
     exit(0);
-  case (OpMode::Offline):
+  case (Task::Offline):
     offlineSimulation();
     break;
-  case (OpMode::Online):
+  case (Task::Online):
     onlineSimulation();
     break;
-  case (OpMode::Oracle):
+  case (Task::Oracle):
     oracleSimulation();
     break;
-  case (OpMode::AlignScore):
+  case (Task::AlignScore):
     evaluateAlignmentScore(Options::opts);
     break;
-  case (OpMode::EditDist):
+  case (Task::EditDist):
     editDistanceOpMode();
     break;
   default:
     std::cout << "Unrecognized operation mode " <<
-      Options::opts.mode << "\nAborting..\n";
+      static_cast<int>(Options::opts.task) << "\nAborting..\n";
     exit(1);
   }
   outputResults();

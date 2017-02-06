@@ -60,10 +60,20 @@ compare_edit_distance_algorithms(size_t n, size_t m, size_t k, std::ostream& os 
 
 
 /**
-   \brief Computes the first value T such that the difference between 
+   \brief Computes the first value T such that the difference between
+   two approximation for T and T/2 (averaged over \c k samples) is
+   below the given precision.
  */
 lbio_size_t
-optimal_bandwidth(lbio_size_t n, double precision, lbio_size_t Tmin = 1);
+optimal_bandwidth(lbio_size_t n, double precision,
+		  lbio_size_t k, lbio_size_t Tmin = 1);
+
+/**
+   \brief Computes the first value T such that the difference between
+   band T approximation and exact is below the given precision.
+ */
+lbio_size_t
+optimal_bandwidth_exact(lbio_size_t n, double precision, lbio_size_t Tmin = 1);
 
 //////////////////////////////////////////////////////////////////////
 

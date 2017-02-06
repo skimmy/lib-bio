@@ -407,8 +407,8 @@ editDistanceOpMode() {
       if (flags & EDIT_DISTANCE_BANDWIDTH_ESTIMATE) {	
 	logInfo("Estimation of optimal bandwidth...");
 	Tmin = std::max(1, Options::opts.approxLevel);
-	T = optimal_bandwidth(n, precision / 2, Tmin);
-	std::cout << "~T*: " << T << "\n";
+	T = optimal_bandwidth(n, precision / 2, 16, Tmin);
+	logDebug(debug_string("[Band Estimate]\t",  "~T*: " + std::to_string(T)));
       } else {
 	T = Options::opts.approxLevel;
       }

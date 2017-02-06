@@ -707,10 +707,9 @@ closest_to_diagonal_backtrack(size_t n, size_t m, size_t** dpMatrix,
 
 }
 
-
       
 lbio_size_t
-optimal_bandwidth(lbio_size_t n, double precision, lbio_size_t Tmin) {
+optimal_bandwidth_exact(lbio_size_t n, double precision, lbio_size_t Tmin) {
   lbio_size_t T = Tmin;
   lbio_size_t T_2 = static_cast<lbio_size_t>(std::floor(n / 2));
   BandApprAlg exactAlg {n, n, T_2 ,{1,1,1}};
@@ -735,6 +734,38 @@ optimal_bandwidth(lbio_size_t n, double precision, lbio_size_t Tmin) {
   return T;
 }
 
-     
+lbio_size_t
+optimal_bandwidth(lbio_size_t n, double precision, lbio_size_t k, lbio_size_t Tmin) {
+  lbio_size_t T_2 = Tmin;
+  lbio_size_t T = 2 * T_2;
+  
+  BandApprAlg alg_T_2(n, n, T_2, {1,1,1});
+  BandApprAlg alg_T(n, n, T, {1,1,1});
+  IidPairGenerator gen(n,n);
+
+  while (T < static_cast<lbio_size_t>(std::floor(n/2))) {
+    double avg = 0;
+    for (lbio_size_t i = 0; i < k; ++i) {
+      auto strings = gen();
+      lbio_size_t ed_T = alg_T.calculate(strings.first, strings.second);
+      lbio_size_t ed_T_2 = alg_T_2.calculate(strings.first, strings.second);
+      //     std::cout << (ed_T_2 - ed_T) << " ";
+      avg += static_cast<double>(ed_T_2 - ed_T) / static_cast<double>(ed_T_2);
+    }
+    // std::cout << "\nT:    " << T
+    // 	      << "\nAvg:  " << avg << "\n";
+
+    avg /= static_cast<double>(k);
+    if (avg < precision) {
+      return T_2;
+    }
+    T_2 = T;
+    T *= 2;
+    
+  }
+    
+  
+  return T_2;
+}
       
 } } } // namespaces

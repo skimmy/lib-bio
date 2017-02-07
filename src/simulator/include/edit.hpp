@@ -347,6 +347,28 @@ public:
     return dp_struct(0, m);
   }
 
+  /**
+     \brief Changes the bandwidth \e without reallocating the internal
+     structure. It the new bandwidth cannot be accomodated the old
+     value is kept and \c false is returned.
+
+     \param new_band The new bandwidth
+     \return \c true if value is changed \c false otherwise
+
+     \note This is supplied for performance reasons, that is it can be
+     used to perform the algorithm for any fitting value of the
+     bandwidth without the necessity of more instances or without
+     resizing.
+   */
+  bool
+  change_bandwidth(lbio_size_t new_band) {
+    if (new_band > std::min(dp_struct.n, dp_struct.m)) {      
+      return false;
+    }
+    bandwidth = new_band;
+    return true;
+  }
+
   
   void print_dp_matrix() const {
     dp_struct.print_matrix();

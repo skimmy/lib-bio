@@ -105,8 +105,8 @@ double score(const std::string& r1, const std::string& r2, size_t s);
 double scoreExt(const std::string& r1, const std::string& r2, size_t s, double* num_den);
 
 /*
- * Returns the index of the FIRST elements x such that 
- *     P[X < x] >= 0.5
+   \brief Returns the index of the FIRST elements x such that 
+       P[X < x] >= 0.5
  */
 template<typename T>
 size_t medianFromFrequency(T f[], size_t n) {
@@ -135,54 +135,32 @@ size_t medianFromFrequency(T f[], size_t n) {
  */
 class SamplingEstimationProcess {
 public:
-  SamplingEstimationProcess(size_t n_)
-    :  n {n_}, cumulativeSum {0}, cumulativeSumSquare {0}, k {0}
-  {
-    this->frequency = new size_t[n+1];
-    std::fill_n(this->frequency, n+1, 0);
-  }
-  ~SamplingEstimationProcess() {
-    delete[] frequency;
-  }
+  SamplingEstimationProcess(size_t n_);
+  ~SamplingEstimationProcess();
 
-  void newSample(size_t sample) {
-    this->frequency[sample]++;
-    this->cumulativeSum += sample;
-    this->cumulativeSumSquare += (sample * sample);
-    this->k++;
-  }
+  void
+  newSample(size_t sample);
 
-  double sampleMean() const {
-    return ( (double)cumulativeSum ) / ( (double)k);
-  }
+  double
+  sampleMean() const;
 
-  double sampleVariance() const {
-    double sMean = sampleMean();
-    double meanTerm = ((double)k) * sMean * sMean;
-    return ( ( this->cumulativeSumSquare - meanTerm ) / ((double)k-1));
-  }
+  double
+  sampleVariance() const;
 
-  size_t medianForSampleDistribution() const {
-    return medianFromFrequency<size_t>(frequency, n+1);
-  }
+  double
+  standardError() const;
 
-  size_t sampleSize() const {
-    return k;
-  }
+  size_t
+  medianForSampleDistribution() const;
 
-  void writeFrequencyOnFile(const std::string& path) {
-    std::ofstream os(path, std::ofstream::out);
-    writeVectorOnStream<size_t>(frequency, n+1, os);
-    os.close();
-  }
+  size_t
+  sampleSize() const;
 
-  SampleEstimates toSampleEstimates() const {
-    SampleEstimates est;
-    est.sampleSize = k;
-    est.sampleMean = sampleMean();
-    est.sampleVariance = sampleVariance();
-    return est;
-  }
+  void
+  writeFrequencyOnFile(const std::string& path);
+
+  SampleEstimates
+  toSampleEstimates() const;
 
 private:
   size_t n;

@@ -248,3 +248,72 @@ double scoreExt(const std::string& r1, const std::string& r2, size_t s, double* 
 
   return num_den[1] / num_den[0];
 }
+
+//////////////////////////////////////////////////////////////////////
+//               SamplingEstimationProcess CLASS
+//////////////////////////////////////////////////////////////////////
+
+SamplingEstimationProcess::SamplingEstimationProcess(size_t n_)
+    :  n {n_}, cumulativeSum {0}, cumulativeSumSquare {0}, k {0}
+  {
+    this->frequency = new size_t[n+1];
+    std::fill_n(this->frequency, n+1, 0);
+  }
+SamplingEstimationProcess::~SamplingEstimationProcess() {
+  delete[] frequency;
+}
+
+void
+SamplingEstimationProcess::newSample(size_t sample) {
+  this->frequency[sample]++;
+  this->cumulativeSum += sample;
+  this->cumulativeSumSquare += (sample * sample);
+  this->k++;
+}
+
+double
+SamplingEstimationProcess::sampleMean() const {
+  return ( (double)cumulativeSum ) / ( (double)k);
+}
+
+double
+SamplingEstimationProcess::sampleVariance() const {
+  double sMean = sampleMean();
+  double meanTerm = ((double)k) * sMean * sMean;
+  return ( ( this->cumulativeSumSquare - meanTerm ) / ((double)k-1));
+}
+
+double
+SamplingEstimationProcess::standardError() const {
+  return std::sqrt(sampleMean() / sampleVariance());
+}
+
+
+size_t
+SamplingEstimationProcess::medianForSampleDistribution() const {
+  return medianFromFrequency<size_t>(frequency, n+1);
+}
+
+size_t
+SamplingEstimationProcess::sampleSize() const {
+  return k;
+}
+
+void
+SamplingEstimationProcess::writeFrequencyOnFile(const std::string& path) {
+  std::ofstream os(path, std::ofstream::out);
+  writeVectorOnStream<size_t>(frequency, n+1, os);
+  os.close();
+}
+
+SampleEstimates
+SamplingEstimationProcess::toSampleEstimates() const {
+  SampleEstimates est;
+  est.sampleSize = k;
+  est.sampleMean = sampleMean();
+  est.sampleVariance = sampleVariance();
+  return est;
+}
+
+
+

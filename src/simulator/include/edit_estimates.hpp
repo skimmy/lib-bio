@@ -5,10 +5,12 @@
 
 #include <include/common.hpp>
 
-#include "options.hpp"
-#include "edit.hpp"
+#include <include/options.hpp>
 
+#include <include/generator.hpp>
 #include <include/prob.hpp>
+
+#include <include/edit.hpp>
 
 #include <cmath>
 
@@ -162,6 +164,48 @@ difference_estimate(size_t n, double precision, double z_delta,
   auto dummy_cb = [](const SampleEstimates& est_n,
 		     const SampleEstimates& est_n_2) {};
   return difference_estimate(n, precision, z_delta, k_max, alg, dummy_cb);
+}
+
+template <typename _Func>
+std::vector<SampleEstimates>
+difference_estimate_adaptive(lbio_size_t n, double precision, double z_delta,
+			   lbio_size_t kmax, _Func callback) {
+  using BandApprAlg = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
+   std::vector<SampleEstimates> out;
+  // lbio_size_t n_2 = static_cast<lbio_size_t>(std::floor(n/2.0));
+  // lbio_size_t T = 1;static_cast<lbio_size_t>(std::floor(std::sqrt(n)));
+  // lbio::sim::generator::IidPairGenerator gen_n {n, n};
+  // lbio::sim::generator::IidPairGenerator gen_n_2 {n_2, n_2};
+  // // these will be used for all calculations, only bandwidth value will change
+  // BandApprAlg alg_n {n, n, n_2, {1,1,1}};
+  // SamplingEstimationProcess est_n {n};
+  // SamplingEstimationProcess est_n_2 {n_2};
+  // SamplingEstimationProcess appr_est_n {n};
+  // SamplingEstimationProcess appr_est_n_2 {n_2};
+  // double avg_approximation_error = 1.0;  
+  // while(avg_approximation_error > precision / 2.0) {
+  //   for (lbio_size_t k = 0; k < k_step; ++k, --kmax) {
+  //     auto pair_n = gen_n();      
+  //     auto pair_n_2 = gen_n_2();
+  //     alg_n.change_bandwidth(n_2);
+  //     est_n.newSample(alg_n.calculate(pair_n.first, pair_n.second));
+  //     est_n_2.newSample(alg_n.calculate(pair_n_2.first, pair_n_2.second));
+  //     alg_n.change_bandwidth(T);
+  //     appr_est_n.newSample(alg_n.calculate(pair_n.first, pair_n.second));
+  //     appr_est_n_2.newSample(alg_n.calculate(pair_n_2.first, pair_n_2.second));
+  //     std::cout << "  " << appr_est_n.sampleMean() - est_n.sampleMean() << "\n";
+  //   }
+
+  //   double appr_rho_n = (appr_est_n.sampleMean() / est_n.sampleMean()) - 1;
+  //   double appr_rho_n_2 = (appr_est_n_2.sampleMean() / est_n_2.sampleMean()) - 1;
+  //   std::cout << avg_approximation_error << "\n";
+  //   avg_approximation_error= std::max(appr_rho_n, appr_rho_n_2);
+ 
+  // }  
+  // while (kmax > 0) {        
+  //   --kmax;
+  // }    
+   return out;
 }
 
       

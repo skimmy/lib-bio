@@ -421,9 +421,15 @@ editDistanceOpMode() {
 	<< n << "\t" << est_n  << "\n"; };
     
     logInfo("Estimation...");
+    // std::vector<SampleEstimates> est =
+    //   edit::difference_estimate(n, precision, z_confidence,
+    // 				k_max, alg, print_cb );
+
+    logWarning("Developing new approach for ~g(n)");
     std::vector<SampleEstimates> est =
-      edit::difference_estimate(n, precision, z_confidence,
-				k_max, alg, print_cb );
+      edit::difference_estimate_adaptive(n, precision, z_confidence,
+				k_max, print_cb );
+
     
     return;
   }

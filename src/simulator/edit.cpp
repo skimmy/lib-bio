@@ -743,7 +743,7 @@ optimal_bandwidth(lbio_size_t n, double precision, lbio_size_t k, lbio_size_t Tm
   BandApprAlg alg_T(n, n, T, {1,1,1});
   IidPairGenerator gen(n,n);
 
-  while (T < static_cast<lbio_size_t>(std::floor(n/2))) {
+  while (T < static_cast<lbio_size_t>(std::floor(n/2.0))) {
     double avg = 0;
     for (lbio_size_t i = 0; i < k; ++i) {
       auto strings = gen();
@@ -767,5 +767,6 @@ optimal_bandwidth(lbio_size_t n, double precision, lbio_size_t k, lbio_size_t Tm
   
   return T_2;
 }
-      
+
+     
 } } } // namespaces

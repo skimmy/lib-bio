@@ -527,6 +527,11 @@ void
 prototyping() {
   std::string proto_task_msg = make_bold("Edit Distance");
   logInfo("Working on " + proto_task_msg + " prototyping");
+  std::string s_A = "ACATTTAT";
+  std::string s_B = "AGTTTCAC";
+  EditDistanceWF<lbio_size_t, std::string> alg(s_A.size(),s_B.size(), {1,1,1});
+  alg.calculate(s_A, s_B);
+  alg.print_dp_matrix();
 }
 
 int main(int argc, char** argv) {   
@@ -535,10 +540,8 @@ int main(int argc, char** argv) {
 
 #ifdef HAVE_BOOST_PROGRAM_OPTIONS
   parseArgumentsBoost(argc,argv);
-  logInfo("Boost args");
 #else
   parseArguments(argc,argv);
-  logInfo("Std args");
 #endif
 
   

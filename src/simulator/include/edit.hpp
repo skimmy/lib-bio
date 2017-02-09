@@ -205,7 +205,7 @@ struct DynamicProgramming {
   }
 
   void print_matrix() {
-    printMatrix<T>(2, m + 1, dp_matrix);
+    printMatrix<T>(n+1, m+1, dp_matrix);
   }
 }; // DynamicProgramming D
 

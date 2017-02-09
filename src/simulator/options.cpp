@@ -249,8 +249,6 @@ void parseArguments(int argc, char** argv) {
 
 void
 parseArgumentsBoost(int argc, char** argv) {
-  logWarning("Boost program_options test in progress");
-
   std::string infoArg = "";
 
   setDefualtParams();

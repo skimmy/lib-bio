@@ -1,3 +1,25 @@
+// matrix.hpp
+// Matrix classes and utilities
+
+// Copyright 2017 Michele Schimd
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+   \file strctures/matrix.hpp
+   Contains classes, structures and utilities to manipulate matrices.
+ */
+
 #ifndef LBIO_MATRIX_HPP
 #define LBIO_MATRIX_HPP
 
@@ -5,7 +27,18 @@
 
 DEFAULT_NAMESPACE_BEGIN
 
-template <typename _ContentT>
+/**
+   \brief A \c struct representing two dimensional matrix of generic type.
+
+   \tparam _ContentT  The type of the elements stored in the matrix
+   \tparam _Alloc     An allocator type
+
+   This implementation uses one single array to store the two
+   dimensional matrix. This means that accesses all happen in constant
+   time, but moving rows and columns always requires to move the
+   actual elements.
+ */
+template <typename _ContentT, typename _Alloc = std::allocator<_ContentT> >
 struct _2D_matrix
 {
 
@@ -19,6 +52,7 @@ struct _2D_matrix
   size_type _rows;
   size_type _cols;
 
+  
   _2D_matrix(size_type _r, size_type _c)
     : _rows {_r}, _cols {_c}
   {

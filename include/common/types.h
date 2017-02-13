@@ -1,4 +1,4 @@
-// Public library include lbio.h
+// Common types definitions include/common/types.h
 
 // Copyright 2017 Michele Schimd
 
@@ -15,12 +15,19 @@
 // limitations under the License.
 
 
-#ifndef _LBIO_H
-#define _LBIO_H
+#ifndef LBIO_COMMON_TYPES_H
+#define LBIO_COMMON_TYPES_H
 
-// Common preprocess directives
-#include <common/preprocs.h>
-// definition of types
-#include <common/types.h>
+#include <cstdint>
+
+// This file contains definition of types used throughout the
+// library. These types are used to ease possible transitions from on
+// base type to another.
+
+// WARNING Most of the code has not yet been ported to adopt hopefully
+// this will be corrected soon.
+
+// size type for lib-bio
+typedef size_t lbio_size_t;
 
 #endif

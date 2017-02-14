@@ -19,6 +19,7 @@
 
 #include <lbio.h>
 #include <algorithms/dynamic_programming.hpp>
+#include <algorithms/edit_distance.hpp>
 
 #include <iostream>
 #include <vector>
@@ -55,5 +56,25 @@ int main(int argc, char** argv) {
     }
     std::cout << "\n";
   }
+
+  lbio::edit_transformation<char> transform_1;
+  lbio::edit_transformation<char> transform_2;
+  transform_1.assign('A','C');
+  try {
+    transform_2.checked_assign(0,0);
+  } catch(domain_error e) {
+    std::cerr << e.what() << std::endl;
+  }
+
+  using script_type = std::vector<lbio::edit_transformation<char>>;
+
+  script_type script(n);
+  script[0].assign('C','C');
+
+  for (auto t : script) {
+    std::cout << t._from << " --> " << t._to << std::endl;
+  }
+  
+  
   return 0;
 }

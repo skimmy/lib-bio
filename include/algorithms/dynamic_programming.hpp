@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef DYNAMIC_PROGRAMMING_HPP_
-#define DYNAMIC_PROGRAMMING_HPP_
+#ifndef LBIO_DYNAMIC_PROGRAMMING_HPP
+#define LBIO_DYNAMIC_PROGRAMMING_HPP
 
 #include <lbio.h>
 #include <structures/matrix.hpp>

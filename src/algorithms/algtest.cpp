@@ -74,7 +74,9 @@ int main(int argc, char** argv) {
   for (auto t : script) {
     std::cout << t._from << " --> " << t._to << std::endl;
   }
-  
+
+  lbio::edit_distance_wf<std::string> ed_alg(n,n);
+  std::cout << "ED: " << ed_alg.compute("ACCGAAAA", "ACTGAACA") << "\n";
   
   return 0;
 }

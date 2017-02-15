@@ -17,7 +17,70 @@
 #ifndef LBIO_EDIT_DISTANCE_HPP
 #define LBIO_EDIT_DISTANCE_HPP
 
+#include <lbio.h>
+#include <algorithms/dynamic_programming.hpp>
+
+#include <iterator>
+
 DEFAULT_NAMESPACE_BEGIN
+
+/**
+   \brief Implements the Wagner Fischer algorithm for the edit distance.
+
+   \tparam _SeqT  The sequence type on which find the edit distnace
+   \tparam _CostT The cost type 
+ */
+template<typename _SeqT, typename _CostT = lbio_size_t>
+class edit_distance_wf
+{
+public:
+  typedef _SeqT                  sequence_type;
+  typedef _CostT                 cost_type;
+  typedef dp_matrix<cost_type>   matrix;
+  typedef lbio_size_t            size_type;
+  typedef lbio_size_t            index_type;
+
+  edit_distance_wf(size_type _n, size_type _m)
+    : _mat {_n+1, _m+1} {
+    init();
+  }
+  
+  cost_type
+  compute(const sequence_type& _seq1, size_type _n1,
+	  const sequence_type& _seq2, size_type _n2) {
+    auto _iter1 = _seq1.begin();
+    for (index_type _i=1; _i<=_n1; ++_i, ++_iter1) {
+      auto _iter2 = _seq2.begin();
+      for (index_type _j=1; _j<=_n2; ++_j, ++_iter2)  {
+	cost_type delta = (*_iter1 == *_iter2) ? 0 : 1;
+	_mat(_i, _j) = std::min(_mat(_i-1,_j-1) + delta,
+				std::min(_mat(_i-1,_j) + 1, _mat(_i,_j-1) + 1));
+      }
+    }
+    
+    return _mat(_n1, _n2);
+  }
+
+  cost_type
+  compute(const sequence_type& _seq1, const sequence_type& _seq2) {
+    size_type n = std::distance(_seq1.begin(), _seq1.end());
+    size_type m = std::distance(_seq2.begin(), _seq2.end());
+    return compute(_seq1, n, _seq2, m);
+  }
+
+private:
+  matrix _mat;
+
+  void
+  init() {
+    for (index_type _i=0; _i<_mat._rows; ++_i) {
+      _mat(_i,0) = _i;
+    }
+    for (index_type _j=0; _j<_mat._cols; ++_j) {
+      _mat(0,_j) = _j;
+    }
+  }
+};
 
 /**
    \brief This struct represents an edit transformation as a pair x ->

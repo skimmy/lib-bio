@@ -111,13 +111,15 @@ PhredQuality(const std::string& quals, size_t n);
   static int toPhred(double p);
 
   static void fromSangerQualities(const std::string& q, double* p);
+  static void fromIlluminaQualities(const std::string& q, double* p);
+  static void fromSolexaQualities(const std::string& q, double* p);
 
 private:
   // ---------------------------------------------------------
   //                      UTILITY METHODS
   // ---------------------------------------------------------
   void init(const int* v, size_t n);
-  void parseQualityString(const string& s);
+  void parseQualityString(const std::string& s);
 };
 
 #endif

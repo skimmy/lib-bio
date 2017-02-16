@@ -3,6 +3,8 @@
 #include "../util.h"
 #include "../quality.h"
 
+using namespace std;
+
 /*************** CONSTRUCTORS AND DESTRUCTOR ****************/
 
 ProbabilisticQuality::ProbabilisticQuality(const double* prob, size_t n) {
@@ -83,13 +85,15 @@ ProbabilisticQuality ProbabilisticQuality::fromEncodedQuality(const string& v, q
     PhredQuality::fromSangerQualities(v,p);
     break;
   case qual::QualityEncodingType::ILLUMINA:
+    PhredQuality::fromIlluminaQualities(v,p);
     break;    
   case qual::QualityEncodingType::SOLEXA:
+    PhredQuality::fromSolexaQualities(v,p);
     break;    
   case qual::QualityEncodingType::UNKNOWN:
     break;    
   }
-  ProbabilisticQuality pq(p,m);
+//  ProbabilisticQuality pq(p,m);
   delete[] p;
   return pq;
 }

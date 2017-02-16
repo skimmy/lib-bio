@@ -115,6 +115,7 @@ void FastqRead::autoDecodeQualities() {
   }
   // try to 'guess' the encoding used
   qual::QualityEncodingType encoding = qual::parseQuality(this->qualities);
+  std::cout << static_cast<int>(encoding) << "\n";
   this->quality = new ProbabilisticQuality(ProbabilisticQuality::fromEncodedQuality(this->qualities, encoding));
   
 }

@@ -15,7 +15,9 @@ void testFastqRead(const std::string& fastqPath) {
 
   for (std::istream_iterator<FastqRead> it(ifs);
        it != std::istream_iterator<FastqRead>(); ++it) {
-    std::cout << *it;
+    FastqRead read {*it};
+    read.autoDecodeQualities();
+//    std::cout << *it;
   }
 
   ifs.close();

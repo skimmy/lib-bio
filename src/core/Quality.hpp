@@ -1,9 +1,7 @@
 #ifndef QUALITY_CLASS_H
 #define QUALITY_CLASS_H
 
-#include <cstring>
-using namespace std;
-
+#include <string>
 
 /**
  * \brief This is a virtual class (interface) defining the

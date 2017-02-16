@@ -27,7 +27,7 @@ extern const double PHRED[];
 
 const int SANGER_ASCII_OFFSET = 33;
 const int SOLEXA_ASCII_OFFSET = 64;
-const int ILLUMINA_ASCCI_OFFSET = 64;
+const int ILLUMINA_ASCII_OFFSET = 64;
 
 enum class QualityEncodingType { SANGER, ILLUMINA, SOLEXA, UNKNOWN };
 

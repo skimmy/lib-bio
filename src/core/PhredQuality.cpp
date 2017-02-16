@@ -314,15 +314,6 @@ const double qual::PHRED[300] = {
 1.25892541179417137e-30, // 299.0
 };
 
-
-/*
-public:
-  
-private:
-
-*/
-
-
 /**************** CONSTRUCTORS AND DESTRUCTOR ***************/
 
 PhredQuality::PhredQuality(const int* quals, size_t n) {
@@ -385,11 +376,27 @@ size_t PhredQuality::length() const {
 
 /********************** STATIC METHODS **********************/
 
-void PhredQuality::fromSangerQualities(const std::string& q, double* p) {
+void
+from_phred_with_offset(const std::string& q, double* p, size_t o) {
   size_t n = q.size();
   for (size_t i = 0; i < n; ++i) {
-    p[i] = qual::PHRED[q[i] - qual::SANGER_ASCII_OFFSET];
+    p[i] = qual::PHRED[q[i] - o];
   }
+}
+
+void
+PhredQuality::fromSangerQualities(const std::string& q, double* p) {
+  from_phred_with_offset(q, p, qual::SANGER_ASCII_OFFSET);
+}
+
+void
+PhredQuality::fromIlluminaQualities(const std::string& q, double* p) {
+  from_phred_with_offset(q, p, qual::ILLUMINA_ASCII_OFFSET);
+}
+
+void
+PhredQuality::fromSolexaQualities(const std::string& q, double* p) {
+  from_phred_with_offset(q, p, qual::SOLEXA_ASCII_OFFSET);
 }
 
 int* PhredQuality::toPhred(const double* probs, size_t n) {

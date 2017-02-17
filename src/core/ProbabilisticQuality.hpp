@@ -3,7 +3,7 @@
 
 #include "../quality.h"
 
-#include <string>
+#include <vector>
 
 
 /**
@@ -25,9 +25,13 @@
  */
 class ProbabilisticQuality : public Quality {
 private:
-  double* probVector;
-  size_t n;
+  
+  size_t n;  
+  std::vector<double> probabilities;
+
   double* iidProb;
+  
+
 public:
   // ---------------------------------------------------------
   //                CONSTRUCTORS AND DESTRUCTOR

@@ -380,7 +380,7 @@ void
 from_phred_with_offset(const std::string& q, double* p, size_t o) {
   size_t n = q.size();
   for (size_t i = 0; i < n; ++i) {
-    p[i] = qual::PHRED[q[i] - o];
+    p[i] = qual::PHRED[static_cast<int>(q[i]) - o];
   }
 }
 

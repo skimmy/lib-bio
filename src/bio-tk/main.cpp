@@ -73,6 +73,16 @@ int runTask(int argc, char** argv) {
       taskKmerScoreReads(ref, reads, k, out, nThreads);
       break;
     }
+  case 5:
+    {
+      // statistics of reads
+      taskSelectedMsg = "Reads statistics";
+      string reads = opts.readsFile;
+      string w_dir = opts.outputDir;
+      string prefix = opts.prefixFile;
+      task_read_statistics(reads, w_dir, prefix);
+      break;
+    }
   default:
     std::cout << "Unrecognized operation" << std::endl;
     return 1;
@@ -95,7 +105,7 @@ void test() {
 #include "../core/DNAAlphabet2Bits.hpp"
 
 int main(int argc, char** argv) {
-  //runTask(argc, argv);
+  runTask(argc, argv);
   test();   
   return 0;
 }

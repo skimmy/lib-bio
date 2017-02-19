@@ -3,29 +3,25 @@
 #include <getopt.h>
 #include <cstdlib>
 
-#include <string>
+#include <algorithm>
+#include <vector>
 #include <map>
 
-const std::string tVec[] = 
+const std::vector<std::string> tVec = 
   {
     std::string("nop"),
     std::string("align"),
     std::string("kspectrum"),
     std::string("kmapping"),
-    std::string("kscore")
+    std::string("kscore"),
+    std::string("readstats")
   };
-const int TASK_COUNT = 5;
 
 
 int parseTask(const string& taskName) {
-  int task = -1;
-  for (int i = 0; i < TASK_COUNT; i++) {
-    if (taskName == tVec[i]) {
-      task = i;
-      break;
-    }
-  }
-  return task;
+  auto pos = std::find(tVec.begin(), tVec.end(), taskName);
+  return (pos != tVec.end()) ?
+    std::distance(tVec.begin(),pos) : -1;
 }
 
 GenomeFormat parseGenomeFormat(const char* optval) {
@@ -66,7 +62,11 @@ AlignAlgorithm parseAlgorithmType(const char* optval) {
   }
 }
 
-const char* shortOptions = "hvntg:G:f:r:R:F:o:p:c:A:k:T:";
+string timestamp_string() {
+  return "";
+}
+
+const char* shortOptions = "hvntg:G:f:r:R:F:o:d:X:p:c:A:k:T:";
 const struct option longOptions[] = 
   {
     { "help", 0, NULL, 'h' },
@@ -80,6 +80,8 @@ const struct option longOptions[] =
     { "output-reads", 1, NULL, 'R' },
     { "reads-format", 1, NULL, 'F' },
     { "output-align", 1, NULL, 'o' },
+    { "output-dir", 1, NULL, 'd' },
+    { "file-name-prefix", 1, NULL, 'X' },
     { "padding", 1, NULL, 'p' },
     { "genome-copies", 1, NULL, 'c' },
     { "algorithm-type", 1, NULL, 'A' },
@@ -101,6 +103,9 @@ options::options() {
   readsOutputFile = "reads.dat";
   alignOutputFile = "";
 
+  outputDir = "/tmp/";
+  prefixFile = timestamp_string() + "_";
+
   padding = 0;
   genomeCopies = 1;
 
@@ -111,6 +116,8 @@ options::options() {
   kmerSize = 15;
 
   threadsNumber = 1;
+
+  
 }
 
 void options::printUsage(ostream& os, const char* name, int exitCode) {
@@ -158,6 +165,12 @@ void options::parseInputArgs(int argc, char** argv) {
       this->readsFormat = parseReadsFormat(optarg);
     case 'o':
       this->alignOutputFile = optarg;
+      break;
+    case 'd':
+      this->outputDir = optarg;
+      break;
+    case 'X':
+      this->prefixFile = optarg;
       break;
     case 'p':
       this->padding = atoi(optarg);

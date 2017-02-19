@@ -1,9 +1,11 @@
 #include <cmath>
 #include <vector>
 #include <fstream>
+#include <iterator>
 #include <thread>
 #include <unordered_map>
 #include <ctime>
+
 
 #include "tasks.hpp"
 #include "../core.h"
@@ -241,4 +243,14 @@ void taskKmerScoreReads(const string& reference, const string& reads, size_t k, 
   double elapsed = difftime(endTime, beginTime);
   double rate = M / elapsed;
   std::cout << " Done (" << M << " reads in " << elapsed  << " sec, " << rate << " reads/sec)"  << std::endl;
+}
+
+void task_read_statistics(const std::string& reads, const string& w_dir, const string& prefix) {
+  std::ifstream ifs(reads, std::ifstream::in);
+  for (std::istream_iterator<FastqRead> it(ifs);
+       it != std::istream_iterator<FastqRead>(); ++it) {
+    FastqRead read {*it};
+    std::cout << read;
+  }
+  ifs.close();
 }

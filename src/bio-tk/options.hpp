@@ -57,6 +57,16 @@ struct options {
    */
   string alignOutputFile;
 
+  /**
+   * \brief When multiple files are outputted this is the destination
+   * directory.
+   */
+  string outputDir;
+  /**
+   * \brief Prefix used on each output file
+   */
+  string prefixFile;
+
   // ---------------------------------------------------------
   //                 PREPROCESSING INFORMATION
   // ---------------------------------------------------------

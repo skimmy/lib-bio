@@ -60,4 +60,6 @@ void taskMapReadsKmers(const string& reference, const string& reads, size_t k, c
 
 void taskKmerScoreReads(const string& reference, const string& reads, size_t k, const string& out = "", size_t nThreads = 1);
 
+void task_read_statistics(const std::string& reads, const string& w_dir, const string& prefix);
+
 #endif

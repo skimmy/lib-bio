@@ -1,3 +1,5 @@
+include_dirs=$(top_srcdir)/include
+
 noinst_LIBRARIES = libbioio.a
 libbioio_a_SOURCES = Format.cpp FastFormat.cpp FastqRead.cpp FastqFormat.cpp FastqLazyLoader.cpp \
 	BamFormat.cpp CSFastFormat.cpp CSFastRead.cpp
@@ -8,4 +10,4 @@ iotest_out_SOURCES = iotest.cpp
 iotest_out_LDADD =  ./libbioio.a ../core/libbiocore.a -lhts
 
 
-AM_CXXFLAGS = -std=c++11
+AM_CXXFLAGS = -std=c++11 -I$(include_dirs)

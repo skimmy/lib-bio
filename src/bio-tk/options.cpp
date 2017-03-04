@@ -7,6 +7,9 @@
 #include <vector>
 #include <map>
 
+#include <chrono>
+using Clock = std::chrono::system_clock;
+
 const std::vector<std::string> tVec = 
   {
     std::string("nop"),
@@ -62,8 +65,44 @@ AlignAlgorithm parseAlgorithmType(const char* optval) {
   }
 }
 
+template <typename Num, int Digits>
+std::string fixed_len_digit_string(Num n) {
+  int d = Digits;
+  std::string str(d, '0');
+  auto back_str = str.rbegin();
+  while(d>0) {
+    *back_str = '0' + (n % 10);
+    n /= 10;
+    ++back_str;
+    --d;
+  }
+  return str;
+}
+
+std::string day_from_tm(const std::tm& t) {
+  return std::to_string(1900 + t.tm_year) + "-"
+    + fixed_len_digit_string<int,2>(1 + t.tm_mon) + "-"
+    + fixed_len_digit_string<int,2>(t.tm_mday);
+}
+
+std::string time_from_tm(const std::tm& t) {
+  return fixed_len_digit_string<int,2>(t.tm_hour) + ":"
+    + fixed_len_digit_string<int,2>(t.tm_min)  + ":"
+    + fixed_len_digit_string<int,2>(t.tm_sec);
+}
+
 string timestamp_string() {
-  return "";
+  auto now = Clock::now();
+  auto seconds = std::chrono::time_point_cast<std::chrono::seconds>(now);
+  auto fraction = now - seconds;
+  std::time_t now_time_t = Clock::to_time_t(now);
+  std::tm tm = *std::localtime(&now_time_t);
+  auto milliseconds =
+    std::chrono::duration_cast<std::chrono::milliseconds>(fraction);
+  auto msecs = milliseconds.count();
+  return day_from_tm(tm) + " " + time_from_tm(tm) + "." + 
+    fixed_len_digit_string<decltype(msecs),3>(msecs);
+
 }
 
 const char* shortOptions = "hvntg:G:f:r:R:F:o:d:X:p:c:A:k:T:";
@@ -126,6 +165,7 @@ void options::printUsage(ostream& os, const char* name, int exitCode) {
 }
 
 void options::parseInputArgs(int argc, char** argv) {
+  std::cout << "Time -> " << timestamp_string() << "\n";
   if ( argc < 4 ) {
     this->printUsage(cerr, argv[0], 1);
   }
@@ -189,6 +229,8 @@ void options::parseInputArgs(int argc, char** argv) {
       //      this->printUsage(cerr, argv[0], 1);
     }
   } while( nextOption != -1);
+
+  // DEBUG
 }
 
 void options::printOptions(ostream& os) {

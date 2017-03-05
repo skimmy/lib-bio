@@ -65,6 +65,8 @@ AlignAlgorithm parseAlgorithmType(const char* optval) {
   }
 }
 
+// TO BE MOVED IN A PROPER TIME/STRING UTIL PLACE
+
 template <typename Num, int Digits>
 std::string fixed_len_digit_string(Num n) {
   int d = Digits;
@@ -102,8 +104,34 @@ string timestamp_string() {
   auto msecs = milliseconds.count();
   return day_from_tm(tm) + " " + time_from_tm(tm) + "." + 
     fixed_len_digit_string<decltype(msecs),3>(msecs);
-
 }
+
+size_t
+str_position_of(char c, const std::string& text) {
+  size_t pos = std::string::npos;
+  for(size_t i = 0; i < text.size(); ++i) {
+    if (text[i] == c) {
+      return i;
+    }
+  }
+  return pos;
+}
+
+std::string
+remove_punctuation_and_spaces(const std::string& in) {
+  std::string banned_chars = ".,;:!? \t-";
+  std::string out {};
+  auto iBegin = in.cbegin();
+  while(iBegin != in.cend()) {
+    if (str_position_of(*iBegin, banned_chars) == std::string::npos) {
+        out.insert(out.end(), *iBegin);
+    }
+    ++iBegin;
+  }
+  return out;
+}
+
+// END UTIL FUNCTIONS
 
 const char* shortOptions = "hvntg:G:f:r:R:F:o:d:X:p:c:A:k:T:";
 const struct option longOptions[] = 
@@ -143,7 +171,7 @@ options::options() {
   alignOutputFile = "";
 
   outputDir = "/tmp/";
-  prefixFile = timestamp_string() + "_";
+  prefixFile = remove_punctuation_and_spaces(timestamp_string()) + "_";
 
   padding = 0;
   genomeCopies = 1;
@@ -165,8 +193,7 @@ void options::printUsage(ostream& os, const char* name, int exitCode) {
 }
 
 void options::parseInputArgs(int argc, char** argv) {
-  std::cout << "Time -> " << timestamp_string() << "\n";
-  if ( argc < 4 ) {
+  if ( argc < 2 ) {
     this->printUsage(cerr, argv[0], 1);
   }
   task = parseTask(argv[1]);

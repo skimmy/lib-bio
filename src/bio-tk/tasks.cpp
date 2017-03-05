@@ -252,15 +252,34 @@ void
 task_read_statistics(const std::string& reads, const string& w_dir,
 		     const string& prefix) {
 
-  std::map<int,int> lengths;
+  using IntIntMap = std::map<int,int>;
+  using CharIntMap = std::map<char,int>;
+  IntIntMap lengths;
+  IntIntMap qualities;
+  CharIntMap bases;
   
   // for each read in the stream
   std::ifstream ifs(reads, std::ifstream::in);
   for (std::istream_iterator<FastqRead> it(ifs);
        it != std::istream_iterator<FastqRead>(); ++it) {
     FastqRead read {*it};
-    lengths[read.length() ]++;
-    std::cout << read;
+    lengths[read.length()]++;
+    lbio_size_t read_len = read.length();
+    std::string bs = read.getBases();
+    std::string qs = read.getQualities();
+    for (lbio_size_t i = 0; i < read_len; ++i) {
+      bases[bs[i]]++;
+      //      qualities[
+    }
   }
   ifs.close();
+
+  // save length stat file
+  // [len]\t[count]
+  std::string filePath{ w_dir + prefix + "len.btk" };
+  std::ofstream lenFile(filePath, std::ofstream::out);
+  for (auto key : lengths) {
+    lenFile << key.first << "\t" << key.second << "\n";
+  }
+  lenFile.close();
 }

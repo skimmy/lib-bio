@@ -255,7 +255,7 @@ task_read_statistics(const std::string& reads, const string& w_dir,
   using IntIntMap = std::map<int,int>;
   using CharIntMap = std::map<char,int>;
   IntIntMap lengths;
-  IntIntMap qualities;
+  //IntIntMap qualities;
   CharIntMap bases;
   
   // for each read in the stream
@@ -269,7 +269,6 @@ task_read_statistics(const std::string& reads, const string& w_dir,
     std::string qs = read.getQualities();
     for (lbio_size_t i = 0; i < read_len; ++i) {
       bases[bs[i]]++;
-      //      qualities[
     }
   }
   ifs.close();

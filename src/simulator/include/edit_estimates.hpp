@@ -105,8 +105,8 @@ difference_estimate(size_t n, double precision, double z_delta,
   
   lbio_size_t k = 1;
   // create sampling process structures (one for 'n' and one for 'n/2' )
-  SamplingEstimationProcess est_n(n);
-  SamplingEstimationProcess est_n_2(n / 2);
+  lbio::prob::SamplingEstimationProcess est_n(n);
+  lbio::prob::SamplingEstimationProcess est_n_2(n / 2);
 
   // generate new sample and refresh sampling processes
   lbio_size_t sample_n = generator_n(alg);
@@ -169,24 +169,45 @@ difference_estimate(size_t n, double precision, double z_delta,
 template <typename _Func>
 std::vector<SampleEstimates>
 difference_estimate_adaptive(lbio_size_t n, double precision, double z_delta,
-			   lbio_size_t kmax, _Func callback) {
+			     lbio_size_t kmax, _Func callback) {
   using BandApprAlg = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
-   std::vector<SampleEstimates> out;
-  // lbio_size_t n_2 = static_cast<lbio_size_t>(std::floor(n/2.0));
-  // lbio_size_t T = 1;static_cast<lbio_size_t>(std::floor(std::sqrt(n)));
-  // lbio::sim::generator::IidPairGenerator gen_n {n, n};
-  // lbio::sim::generator::IidPairGenerator gen_n_2 {n_2, n_2};
-  // // these will be used for all calculations, only bandwidth value will change
-  // BandApprAlg alg_n {n, n, n_2, {1,1,1}};
-  // SamplingEstimationProcess est_n {n};
-  // SamplingEstimationProcess est_n_2 {n_2};
+  std::vector<SampleEstimates> out;    
+  lbio_size_t n_2 = static_cast<lbio_size_t>(std::floor(n/2.0));
+
+  lbio_size_t T_min = 1;
+  lbio_size_t ed_diff_threshold = 0;
+
+  // these will be used for all calculations, only bandwidth value will change
+  BandApprAlg ed_alg {n, n, n_2, {1,1,1}};
+
+  lbio::sim::generator::IidPairGenerator gen_n {n, n};
+  lbio::sim::generator::IidPairGenerator gen_n_2 {n_2, n_2};
+  
+  // lbio_size_t T = 1;static_cast<lbio_size_t>(std::floor(std::sqrt(n)));   
+  lbio::prob::SamplingEstimationProcess est_n {n};
+  lbio::prob::SamplingEstimationProcess est_n_2 {n_2};
+  double approximation_error = 1.0;
+
+  lbio_size_t k = 0;
+  do {
+    auto pair_n = gen_n();      
+    auto pair_n_2 = gen_n_2();
+    // Adaptive estimation
+    lbio_size_t T = T_min;
+      
+
+    callback(est_n.toSampleEstimates(), est_n_2.toSampleEstimates());
+    ++k;
+  } while(k < kmax);
+  
+
+  
   // SamplingEstimationProcess appr_est_n {n};
   // SamplingEstimationProcess appr_est_n_2 {n_2};
   // double avg_approximation_error = 1.0;  
   // while(avg_approximation_error > precision / 2.0) {
   //   for (lbio_size_t k = 0; k < k_step; ++k, --kmax) {
-  //     auto pair_n = gen_n();      
-  //     auto pair_n_2 = gen_n_2();
+
   //     alg_n.change_bandwidth(n_2);
   //     est_n.newSample(alg_n.calculate(pair_n.first, pair_n.second));
   //     est_n_2.newSample(alg_n.calculate(pair_n_2.first, pair_n_2.second));

@@ -127,6 +127,8 @@ size_t medianFromFrequency(T f[], size_t n) {
   return n-1;
 }
 
+namespace lbio { namespace prob {
+
 /**
  * \brief This class is used to represent sampling processes.
  * 
@@ -138,28 +140,28 @@ public:
   SamplingEstimationProcess(size_t n_);
   ~SamplingEstimationProcess();
 
-  void
+  void inline
   newSample(size_t sample);
 
-  double
+  double inline
   sampleMean() const;
 
-  double
+  double inline
   sampleVariance() const;
 
-  double
+  double inline
   standardError() const;
+  
+  size_t inline
+  sampleSize() const;
 
   size_t
   medianForSampleDistribution() const;
 
-  size_t
-  sampleSize() const;
-
   void
   writeFrequencyOnFile(const std::string& path);
 
-  SampleEstimates
+  SampleEstimates 
   toSampleEstimates() const;
 
 private:
@@ -171,5 +173,6 @@ private:
   size_t* frequency;
 };
 
+} } // namespaces
 
 #endif

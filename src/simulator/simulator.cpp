@@ -395,7 +395,7 @@ editDistanceOpMode() {
   }
 
   // Task - Default (0)
-  if (flags & EDIT_DISTANCE_DIFF_BOUNDED_ERROR) {
+  if (flags & EDIT_DISTANCE_DIFF_BOUNDED_ERROR) { // -f 64
     logInfo("Task 'g(n) Esitmation'");
     size_t k_max = Options::opts.k;
     double precision = Options::opts.precision;
@@ -403,7 +403,7 @@ editDistanceOpMode() {
     lbio_size_t T = static_cast<lbio_size_t>(std::floor(n / 2.0));
     lbio_size_t Tmin = static_cast<lbio_size_t>(std::sqrt(n));
     // Approximation is required find 'optimal' T >= sqrt(n)
-    if (Options::opts.approxLevel >= 0) {      
+    if (Options::opts.approxLevel >= 0) { // -A 1+
       if (flags & EDIT_DISTANCE_BANDWIDTH_ESTIMATE) {	
 	logInfo("Estimation of optimal bandwidth...");
 	Tmin = std::max(1, Options::opts.approxLevel);
@@ -429,7 +429,6 @@ editDistanceOpMode() {
     std::vector<SampleEstimates> est =
       edit::difference_estimate_adaptive(n, precision, z_confidence,
 				k_max, print_cb );
-
     
     return;
   }
@@ -564,7 +563,7 @@ int main(int argc, char** argv) {
   case (Task::AlignScore):
     evaluateAlignmentScore(Options::opts);
     break;
-  case (Task::EditDist):
+  case (Task::EditDist): // -O 6
     editDistanceOpMode();
     break;
   default:

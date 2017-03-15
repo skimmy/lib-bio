@@ -249,6 +249,8 @@ double scoreExt(const std::string& r1, const std::string& r2, size_t s, double* 
   return num_den[1] / num_den[0];
 }
 
+namespace lbio { namespace prob {
+
 //////////////////////////////////////////////////////////////////////
 //               SamplingEstimationProcess CLASS
 //////////////////////////////////////////////////////////////////////
@@ -315,5 +317,4 @@ SamplingEstimationProcess::toSampleEstimates() const {
   return est;
 }
 
-
-
+} } // namespaces

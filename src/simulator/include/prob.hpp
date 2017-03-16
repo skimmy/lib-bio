@@ -140,19 +140,19 @@ public:
   SamplingEstimationProcess(size_t n_);
   ~SamplingEstimationProcess();
 
-  void inline
+  void 
   newSample(size_t sample);
 
-  double inline
+  double 
   sampleMean() const;
 
-  double inline
+  double 
   sampleVariance() const;
 
-  double inline
+  double 
   standardError() const;
   
-  size_t inline
+  size_t 
   sampleSize() const;
 
   size_t

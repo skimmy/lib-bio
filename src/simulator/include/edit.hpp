@@ -347,6 +347,15 @@ public:
     return dp_struct(0, m);
   }
 
+  CostType calculate(const IndexedType& s1, const IndexedType& s2,
+		     lbio_size_t band) {
+    lbio_size_t old_band = bandwidth;
+    change_bandwidth(band);
+    CostType result = calculate(s1, s2);
+    change_bandwidth(old_band);
+    return result;
+  }
+
   /**
      \brief Changes the bandwidth \e without reallocating the internal
      structure. It the new bandwidth cannot be accomodated the old

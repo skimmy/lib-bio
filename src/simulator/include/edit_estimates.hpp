@@ -175,10 +175,12 @@ difference_estimate_adaptive(lbio_size_t n, double precision, double z_delta,
   lbio_size_t n_2 = static_cast<lbio_size_t>(std::floor(n/2.0));
 
   lbio_size_t T_min = 1;
+  lbio_size_t T = T_min;
   lbio_size_t ed_diff_threshold = 0;
 
-  // these will be used for all calculations, only bandwidth value will change
+  // these will be used for all calculations, only bandwidth value will change  
   BandApprAlg ed_alg {n, n, n_2, {1,1,1}};
+  lbio_size_t ed_T, ed_2T = 0;
 
   lbio::sim::generator::IidPairGenerator gen_n {n, n};
   lbio::sim::generator::IidPairGenerator gen_n_2 {n_2, n_2};
@@ -189,11 +191,34 @@ difference_estimate_adaptive(lbio_size_t n, double precision, double z_delta,
   double approximation_error = 1.0;
 
   lbio_size_t k = 0;
+  
   do {
     auto pair_n = gen_n();      
     auto pair_n_2 = gen_n_2();
     // Adaptive estimation
-    lbio_size_t T = T_min;
+
+    // estimation of e(n)
+    T = T_min;
+    ed_T = ed_alg.calculate(pair_n.first, pair_n.second, T);
+    ed_2T = 0; 
+    while(ed_T - ed_2T > ed_diff_threshold) {
+      T *= 2;
+      ed_2T = ed_alg.calculate(pair_n.first, pair_n.second, T);
+    }
+    est_n.newSample(ed_2T);
+
+    // estimation of e(n/2)
+    T = T_min;
+    ed_T = ed_alg.calculate(pair_n_2.first, pair_n_2.second, T);
+    ed_2T = 0;
+    while(ed_T - ed_2T > ed_diff_threshold) {
+      T *= 2;
+      ed_2T = ed_alg.calculate(pair_n_2.first, pair_n_2.second, T);
+    }
+    est_n_2.newSample(ed_2T);
+
+
+    // combination and estimated error calculation
       
 
     callback(est_n.toSampleEstimates(), est_n_2.toSampleEstimates());

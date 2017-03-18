@@ -5,6 +5,7 @@
 #include <thread>
 #include <unordered_map>
 #include <ctime>
+#include <algorithm>
 
 // 2D matrix
 #include <structures/matrix.hpp>
@@ -252,12 +253,15 @@ void
 task_read_statistics(const std::string& reads, const string& w_dir,
 		     const string& prefix) {
 
+  using BaseQualPair = std::pair<char,int>;
   using IntIntMap = std::map<int,int>;
-  using CharIntMap = std::map<char,int>;
   IntIntMap lengths;
-  //IntIntMap qualities;
-  CharIntMap bases;
+  std::map<BaseQualPair,lbio_size_t> base_qual_freq;
   
+  //IntIntMap qualities;
+  //  CharIntMap bases;
+  
+  lbio_size_t total_pair = 0;
   // for each read in the stream
   std::ifstream ifs(reads, std::ifstream::in);
   for (std::istream_iterator<FastqRead> it(ifs);
@@ -268,8 +272,9 @@ task_read_statistics(const std::string& reads, const string& w_dir,
     std::string bs = read.getBases();
     std::string qs = read.getQualities();
     for (lbio_size_t i = 0; i < read_len; ++i) {
-      bases[bs[i]]++;
-    }
+      base_qual_freq[std::make_pair(bs[i], static_cast<int>(qs[i]-33))]++;
+      total_pair++;
+    }    
   }
   ifs.close();
 
@@ -281,4 +286,14 @@ task_read_statistics(const std::string& reads, const string& w_dir,
     lenFile << key.first << "\t" << key.second << "\n";
   }
   lenFile.close();
+
+  // save on file (Base,Qual) frequency
+  std::string pair_file_path { w_dir + prefix + "base_qual.btk" };
+  std::ofstream pairs_file(pair_file_path, std::ofstream::out);
+  std::for_each(base_qual_freq.cbegin(), base_qual_freq.cend(),
+		[&pairs_file](std::pair<BaseQualPair, lbio_size_t> pair) {
+		  pairs_file << pair.first.first << "\t" << pair.first.second 
+			     << "\t" << pair.second << "\n";
+		});
+  pairs_file.close();  
 }

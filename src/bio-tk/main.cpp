@@ -125,6 +125,6 @@ void test() {
 
 int main(int argc, char** argv) {
   runTask(argc, argv);
-  test();   
+  //  test();   
   return 0;
 }

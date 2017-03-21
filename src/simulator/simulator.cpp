@@ -414,11 +414,12 @@ editDistanceOpMode() {
       }
     }
     AlgorithmBand alg(n, n, T, {1,1,1});
-    // lambda for output
+    // lambda for output (opt_str for extra algorithm output)
     auto print_cb =
-      [=](const SampleEstimates& est_n, const SampleEstimates& est_n_2) {
-      std::cout << (n>>1) << "\t" << est_n_2 << "\n"
-	<< n << "\t" << est_n  << "\n"; };
+      [=](const SampleEstimates& est_n, const SampleEstimates& est_n_2,
+	  std::string opt_str = "") {
+      std::cout << (n>>1) << "\t" << est_n_2 << "\n"      
+                << n << "\t" << est_n  << "\t" << opt_str <<"\n"; };
     
     logInfo("Estimation...");
     // std::vector<SampleEstimates> est =

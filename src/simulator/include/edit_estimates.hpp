@@ -162,7 +162,8 @@ difference_estimate(size_t n, double precision, double z_delta,
 		   size_t k_max, Algorithm& alg) {
   
   auto dummy_cb = [](const SampleEstimates& est_n,
-		     const SampleEstimates& est_n_2) {};
+		     const SampleEstimates& est_n_2,
+                     std::string opt_str) {};
   return difference_estimate(n, precision, z_delta, k_max, alg, dummy_cb);
 }
 
@@ -200,7 +201,7 @@ difference_estimate_adaptive(lbio_size_t n, double precision, double z_delta,
     auto pair_n = gen_n();      
     auto pair_n_2 = gen_n_2();
     // Adaptive estimation
-
+    std::string band_str {""}; // extra output info
     // estimation of e(n)
     T = T_min;
     ed_T = ed_alg.calculate(pair_n.first, pair_n.second, T);
@@ -211,6 +212,7 @@ difference_estimate_adaptive(lbio_size_t n, double precision, double z_delta,
       ed_T = ed_2T;
     }
     est_n.newSample(ed_2T);
+    band_str += " " + std::to_string(T);
 
     // estimation of e(n/2)
     T = T_min;
@@ -222,7 +224,7 @@ difference_estimate_adaptive(lbio_size_t n, double precision, double z_delta,
       ed_T = ed_2T;
     }
     est_n_2.newSample(ed_2T);
-
+    band_str += " " + std::to_string(T);
 
     // combination and estimated error calculation
     // recompute params and error
@@ -232,9 +234,8 @@ difference_estimate_adaptive(lbio_size_t n, double precision, double z_delta,
     var_n = est_n.sampleVariance();
     var_n_2 = est_n_2.sampleVariance();
     rho = std::sqrt( (4*var_n_2 + var_n) / ((double)k) );
-      
-
-    callback(est_n.toSampleEstimates(), est_n_2.toSampleEstimates());
+    
+    callback(est_n.toSampleEstimates(), est_n_2.toSampleEstimates(), band_str);
     ++k;
   } while((k < kmin) || (k < kmax && ( rho >= precision * diff_n / z_delta )));
 

@@ -416,7 +416,7 @@ editDistanceOpMode() {
     AlgorithmBand alg(n, n, T, {1,1,1});
     // lambda for output
     auto print_cb =
-      [n](const SampleEstimates& est_n, const SampleEstimates& est_n_2) {
+      [=](const SampleEstimates& est_n, const SampleEstimates& est_n_2) {
       std::cout << (n>>1) << "\t" << est_n_2 << "\n"
 	<< n << "\t" << est_n  << "\n"; };
     
@@ -428,8 +428,8 @@ editDistanceOpMode() {
     logWarning("Developing new approach for ~g(n)");
     std::vector<SampleEstimates> est =
       edit::difference_estimate_adaptive(n, precision, z_confidence,
-				k_max, print_cb );
-    
+					 k_max, print_cb );
+    std::cout << 2*est[0].sampleMean - est[1].sampleMean << "\n";
     return;
   }
 

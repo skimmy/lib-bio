@@ -295,5 +295,5 @@ task_read_statistics(const std::string& reads, const string& w_dir,
 		  pairs_file << pair.first.first << "\t" << pair.first.second 
 			     << "\t" << pair.second << "\n";
 		});
-  pairs_file.close();  
+  pairs_file.close();
 }

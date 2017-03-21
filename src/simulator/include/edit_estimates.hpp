@@ -175,7 +175,7 @@ difference_estimate_adaptive(lbio_size_t n, double precision, double z_delta,
   using BandApprAlg = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
   lbio_size_t n_2 = static_cast<lbio_size_t>(std::floor(n/2.0));
 
-  lbio_size_t T_min = static_cast<lbio_size_t>( std::sqrt(n) / 2);
+  lbio_size_t T_min = static_cast<lbio_size_t>( std::sqrt(n) / 4);
   lbio_size_t T = T_min;
   lbio_size_t ed_diff_threshold = 0;
 
@@ -204,25 +204,25 @@ difference_estimate_adaptive(lbio_size_t n, double precision, double z_delta,
     std::string band_str {""}; // extra output info
     // estimation of e(n)
     T = T_min;
-    ed_T = ed_alg.calculate(pair_n.first, pair_n.second, T);
-    ed_2T = 0; 
-    while(ed_T - ed_2T > ed_diff_threshold) {
+    ed_2T = ed_alg.calculate(pair_n.first, pair_n.second, T);
+    ed_T = 0; 
+    do {
+      ed_T = ed_2T;
       T *= 2;
       ed_2T = ed_alg.calculate(pair_n.first, pair_n.second, T);
-      ed_T = ed_2T;
-    }
+    } while(ed_T - ed_2T > ed_diff_threshold);
     est_n.newSample(ed_2T);
     band_str += " " + std::to_string(T);
 
     // estimation of e(n/2)
     T = T_min;
-    ed_T = ed_alg.calculate(pair_n_2.first, pair_n_2.second, T);
-    ed_2T = 0;
-    while(ed_T - ed_2T > ed_diff_threshold) {
+    ed_2T = ed_alg.calculate(pair_n_2.first, pair_n_2.second, T);
+    ed_T = 0;
+    do {
+      ed_T = ed_2T;
       T *= 2;
       ed_2T = ed_alg.calculate(pair_n_2.first, pair_n_2.second, T);
-      ed_T = ed_2T;
-    }
+    } while(ed_T - ed_2T > ed_diff_threshold);
     est_n_2.newSample(ed_2T);
     band_str += " " + std::to_string(T);
 

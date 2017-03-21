@@ -400,10 +400,17 @@ editDistanceOpMode() {
     size_t k_max = Options::opts.k;
     double precision = Options::opts.precision;
     double z_confidence = Options::opts.confidence;
+    // lambda for output (opt_str for extra algorithm output)
+    auto print_cb =
+      [=](const SampleEstimates& est_n, const SampleEstimates& est_n_2,
+	  std::string opt_str = "") {
+      std::cout << (n>>1) << "\t" << est_n_2 << "\n"      
+                << n << "\t" << est_n  << "\t" << opt_str <<"\n"; };
+
     lbio_size_t T = static_cast<lbio_size_t>(std::floor(n / 2.0));
     lbio_size_t Tmin = static_cast<lbio_size_t>(std::sqrt(n));
     // Approximation is required find 'optimal' T >= sqrt(n)
-    if (Options::opts.approxLevel >= 0) { // -A 1+
+    if (Options::opts.approxLevel == 1) { // -A 1 --> Band with optimal width estimation
       if (flags & EDIT_DISTANCE_BANDWIDTH_ESTIMATE) {	
 	logInfo("Estimation of optimal bandwidth...");
 	Tmin = std::max(1, Options::opts.approxLevel);
@@ -411,26 +418,20 @@ editDistanceOpMode() {
 	logDebug(debug_string("[Band Estimate]\t",  "~T*: " + std::to_string(T)));
       } else {
 	T = Options::opts.approxLevel;
-      }
-    }
-    AlgorithmBand alg(n, n, T, {1,1,1});
-    // lambda for output (opt_str for extra algorithm output)
-    auto print_cb =
-      [=](const SampleEstimates& est_n, const SampleEstimates& est_n_2,
-	  std::string opt_str = "") {
-      std::cout << (n>>1) << "\t" << est_n_2 << "\n"      
-                << n << "\t" << est_n  << "\t" << opt_str <<"\n"; };
-    
-    logInfo("Estimation...");
-    // std::vector<SampleEstimates> est =
-    //   edit::difference_estimate(n, precision, z_confidence,
-    // 				k_max, alg, print_cb );
+      }      
+      AlgorithmBand alg(n, n, T, {1,1,1});
+      logInfo("Estimation...");
+      std::vector<SampleEstimates> est =
+        edit::difference_estimate(n, precision, z_confidence,
+				  k_max, alg, print_cb );
+    } // -A 1
 
-    logWarning("Developing new approach for ~g(n)");
-    std::vector<SampleEstimates> est =
-      edit::difference_estimate_adaptive(n, precision, z_confidence,
-					 k_max, print_cb );
-    std::cout << 2*est[0].sampleMean - est[1].sampleMean << "\n";
+    if (Options::opts.approxLevel == 2) { // -A 2 Adaptive T
+      logInfo("Adaptive Estimation...");
+      std::vector<SampleEstimates> est =
+	edit::difference_estimate_adaptive(n, precision, z_confidence,
+					 k_max, print_cb );     
+    }
     return;
   }
 

@@ -7,7 +7,7 @@
 
 
 #################### ESTIMATE ####################
-# Estimate of ~g(n) through approximated algorithm
+# Estimate of ~g(n) through bandiwdth algorithm
 
 
 # FLAGS
@@ -17,7 +17,10 @@
 #           Simulation stops when |~g - ~err| < f(epsilon, delta)
 #           f(e,d) is a function s.t. P[err>e] < delta
 #           Simulation may stop if k_max iterations have been performed
-# -A x  --> Use approximated edit distance algorithm when x > 0
+# -A x  --> Approximation type
+#           -A 1   Estimate optimal bandwith once for all
+#           -A 2   At each step estimate minimum bandwidth without
+#                  variation w.r.t. the previous one.
 
 
 # PARAMTERS
@@ -30,7 +33,7 @@
 
 # EXAMPLE
 
-./simulator.out -O 6 -N 8192 -A 1 -f 64 -P 0.05 -c 2 -k 50000
+./simulator.out -O 6 -N 8192 -A 2 -f 64 -P 0.05 -c 2 -k 50000
 
 
 # NOTE

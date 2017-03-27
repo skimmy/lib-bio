@@ -526,13 +526,29 @@ editDistanceOpMode() {
 
 void
 prototyping() {
-  std::string proto_task_msg = make_bold("Edit Distance");
+  std::string proto_task_msg = make_bold("Edit Distance (AlphabetIterator)");
   logInfo("Working on " + proto_task_msg + " prototyping");
-  std::string s_A = "ACATTTAT";
-  std::string s_B = "AGTTTCAC";
-  EditDistanceWF<lbio_size_t, std::string> alg(s_A.size(),s_B.size(), {1,1,1});
-  alg.calculate(s_A, s_B);
-  alg.print_dp_matrix();
+
+  lbio_size_t n = Options::opts.N;
+  using BandAlgorithm = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
+  lbio_size_t bandwidth = static_cast<lbio_size_t>(n >>1);
+  BandAlgorithm alg(n, n, bandwidth, {1,1,1});
+
+  std::string center(n, 'N');
+  generateIIDString(center);
+  std::vector<lbio_size_t> hulls(n+1,0);
+  AlphabetIterator it(n);
+  std::string b {""};
+  for(; it != it.end(); ++it) {
+    b = *it;
+    lbio_size_t d = alg.calculate(center, b);
+//    std::cout << b << "\t" << d << "\n";
+    hulls[d]++;
+  }
+  std::cout << center << "\n";
+  for (lbio_size_t r = 0; r != n+1; ++r) {
+    std::cout << r << "\t" << hulls[r] << "\n";
+  }
 }
 
 int main(int argc, char** argv) {   

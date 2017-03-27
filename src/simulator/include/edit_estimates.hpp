@@ -141,7 +141,7 @@ difference_estimate(size_t n, double precision, double z_delta,
     callback(est_n.toSampleEstimates(), est_n_2.toSampleEstimates());
     // stopping condition
     // - max iteration number reached or
-    // - rho < epsilon * |2e(n/2) - e(n)
+    // - rho < epsilon * |2e(n/2) - e(n)|
     
   } while(k < k_max && ( rho >= precision * diff_n / z_delta ));
 

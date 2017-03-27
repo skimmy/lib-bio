@@ -10,6 +10,8 @@
 #include <iostream>
 #include <algorithm>
 
+#include <cmath>
+
 // Edit distance flgas
 #define EDIT_DISTANCE_ESTIMATE_EXHAUSTIVE 0x1
 #define EDIT_DISTANCE_ALGORITHM_QUADRATIC 0x2
@@ -91,7 +93,63 @@ size_t edit_distance_encoded(uint64_t s1, lbio_size_t n1, uint64_t s2,
 double
 test_exhaustive_edit_distance_encoded(lbio_size_t n, double* freq);
 
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                           ALPHABET ITERATOR                              //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
 
+// TODO: templetize for different alphabet sizes
+class AlphabetIterator {
+private:
+  using numeric_type = int;
+  using string_type = std::string;
+  const lbio_size_t AlphabetSize = 4;
+
+  lbio_size_t size;
+  numeric_type max_value;
+  numeric_type current;  
+  bool end_iter;  
+  
+public:
+  AlphabetIterator(lbio_size_t n)
+    : size {n},
+      max_value { static_cast<numeric_type>(std::pow(AlphabetSize, n)) },
+      current {0}, end_iter{false} { }
+
+  AlphabetIterator& operator++() {
+    end_iter = (++current >= max_value);
+    return *this;
+  }
+
+  string_type operator*() {
+    string_type Sigma {"ACGT"};
+    string_type out {""};
+    numeric_type current_copy {current};
+    for (lbio_size_t i = 0; i < size; ++i) {
+      out = Sigma[current_copy & 0x3] + out;
+      current_copy >>= 2;
+    }
+    return out;
+  }
+
+  bool operator==(const AlphabetIterator& other) {
+    return ( end_iter && other.end_iter )
+      || ( !end_iter && !other.end_iter && current == other.current);
+      
+  }
+
+  bool operator!=(const AlphabetIterator& other) {
+    return !(*this == other);
+  }
+
+  AlphabetIterator end() const {
+    static AlphabetIterator _end(size);
+    _end.end_iter = true;
+    return _end;
+  }
+  
+};
 
 } } } //namespaces
 

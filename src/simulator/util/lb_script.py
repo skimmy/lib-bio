@@ -110,7 +110,7 @@ def bound_for_hulls(n, Sigma):
     
 
 
-def bound(n, Sigma=4):
+def loose_bound(n, Sigma=4):
     hulls_bound = list([(0,1)]) + bound_for_hulls(n,Sigma)
     lb = sum([entry[0]*entry[1] for entry in hulls_bound])
     volumes_bound = [0]*len(hulls_bound)
@@ -119,6 +119,24 @@ def bound(n, Sigma=4):
         volumes_bound[i] = volumes_bound[i-1] + hulls_bound[i][1]
     ub = n*pow(Sigma,n) - sum([volumes_bound[r] for r in range(1,n)])
     return (lb , ub, hulls_bound)
+
+def bound(n, Sigma=4):
+    lb = 0
+    ub = 0
+    hulls_bound = [(i,0) for i in range(n+1)]
+
+    
+    remaining_strings = pow(Sigma,n) - 1
+    r = 1    
+    while (remaining_strings > 0 and r <= n):
+        hull_count = count_canonical_annotated_path_r(n,r, Sigma)     
+        pay = min(hull_count, remaining_strings)
+        lb += pay*r
+        remaining_strings = remaining_strings - hull_count
+        hulls_bound[r] = (r,lb)
+        r += 1
+    
+    return (lb, ub, hulls_bound)
 
 ##############################################################################
 #                                                                            #
@@ -131,7 +149,8 @@ if __name__ == "__main__":
     if (len(sys.argv) > 1):
         verbosity = int(sys.argv[1])
     
-    n_max = 16
+    n_max = 128
+    
 
     for n in range(1,n_max+1):
         norm_const = float(n * pow(4,n))
@@ -141,5 +160,4 @@ if __name__ == "__main__":
             print("  r\tS_r\n----------------")
             for entry in hulls_bound:
                 print("  {0}\t{1}".format(entry[0],entry[1]))
-#        print("\nUB\t{1}\n".format(n, lb / norm_const))
-        print("\nLB\t{1}\n".format(n, ub / norm_const))
+        print("\nLB\t{1}\n".format(n, lb / norm_const))

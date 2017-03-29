@@ -136,7 +136,7 @@ def bound(n, Sigma=4):
         hulls_bound[r] = (r,lb)
         r += 1
     
-    return (lb, ub, hulls_bound)
+    return (lb, ub, hulls_bound, r-1)
 
 ##############################################################################
 #                                                                            #
@@ -145,19 +145,22 @@ def bound(n, Sigma=4):
 ##############################################################################
 
 if __name__ == "__main__":
-    verbosity = 0
+       
+    n_max = 16
     if (len(sys.argv) > 1):
-        verbosity = int(sys.argv[1])
-    
-    n_max = 128
+        n_max = int(sys.argv[1])
+
+    verbosity = 0
+    if (len(sys.argv) > 2):
+        verbosity = int(sys.argv[2])
+
     
 
     for n in range(1,n_max+1):
         norm_const = float(n * pow(4,n))
-        (lb, ub, hulls_bound)  = bound(n)
-        print("      n = {0}      ".format(n))
+        (lb, ub, hulls_bound, r_sat) = bound(n)
         if (verbosity > 0):
             print("  r\tS_r\n----------------")
             for entry in hulls_bound:
                 print("  {0}\t{1}".format(entry[0],entry[1]))
-        print("\nLB\t{1}\n".format(n, lb / norm_const))
+        print("{0}\t{1: .12f}\t{2}".format(n, lb / norm_const, r_sat))

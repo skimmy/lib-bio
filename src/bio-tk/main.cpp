@@ -6,7 +6,7 @@
 #include "../algorithms.h"
 
 #include <include/prob/probability.hpp>
-
+#include <include/prob/generator.hpp>
 
 #include <vector>
 #include <iostream>
@@ -118,7 +118,7 @@ void test() {
   std::cout << base_prob_space.probability_if([](char c)
 					      { return (c <='C');
 					      }) << "\n";
-  
+  lbio::IIDSampler<lbio::DiscreteProbability<char>> sampler(base_prob_space);
 }
 
 #include "../core/DNAAlphabet2Bits.hpp"

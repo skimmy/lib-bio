@@ -23,6 +23,7 @@
 
 #include <algorithm>
 #include <unordered_map>
+#include <random>
 
 DEFAULT_NAMESPACE_BEGIN
 
@@ -111,8 +112,19 @@ public:
 			     }); 
     return p;
   }
-  
-  
+
+  /**
+     \brief Returns a \c std::discrete_distribution for this object
+   */
+  std::discrete_distribution<>
+  to_std_discrete_distribution() const {
+    // extract weights (i.e., probability
+    std::vector<probability_type> _weights;
+    for (auto it = _events.cbegin(); it != _events.cend(); ++it) {
+      _weights.push_back((*it).second);
+    }
+    return std::discrete_distribution<>(_weights.cbegin(), _weights.cend());
+  }
 
 private:
   using entry_type = std::pair<event_type, probability_type>;

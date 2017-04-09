@@ -125,7 +125,7 @@ void test() {
   mmap[2] = 22;
   mmap[3] = 333;  
   lbio::map_key_iterator<std::map<int,int>> ii_iter(mmap);
-  lbio::map_value_iterator<std::map<int,int>> iv_iter(mmap);
+  lbio::map_value_iterator<std::map<int,int>> iv_iter(mmap.begin());
   while(ii_iter != mmap.end()) {
     std::cout << *ii_iter << "\n";
     ++ii_iter;

@@ -7,6 +7,7 @@
 
 #include <include/prob/probability.hpp>
 #include <include/prob/generator.hpp>
+#include <include/util/iterator_ext.hpp>
 
 #include <vector>
 #include <iostream>
@@ -119,12 +120,26 @@ void test() {
 					      { return (c <='C');
 					      }) << "\n";
   lbio::IIDSampler<lbio::DiscreteProbability<char>> sampler(base_prob_space);
+  std::map<int,int> mmap;
+  mmap[1] = 1;
+  mmap[2] = 22;
+  mmap[3] = 333;  
+  lbio::map_key_iterator<std::map<int,int>> ii_iter(mmap);
+  lbio::map_value_iterator<std::map<int,int>> iv_iter(mmap);
+  while(ii_iter != mmap.end()) {
+    std::cout << *ii_iter << "\n";
+    ++ii_iter;
+  }
+  while(iv_iter != mmap.end()) {
+    std::cout << *iv_iter << "\n";
+    ++iv_iter;
+  }
 }
 
 #include "../core/DNAAlphabet2Bits.hpp"
 
 int main(int argc, char** argv) {
   runTask(argc, argv);
-  //  test();   
+  test();   
   return 0;
 }

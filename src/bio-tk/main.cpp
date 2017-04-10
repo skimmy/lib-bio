@@ -1,23 +1,8 @@
 #include "options.hpp"
 #include "tasks.hpp"
 
-#include "../core.h"
-#include "../io.h"
-#include "../algorithms.h"
-
-#include <include/prob/probability.hpp>
-#include <include/prob/generator.hpp>
-#include <include/util/iterator_ext.hpp>
-
-#include <vector>
 #include <iostream>
-#include <iomanip>
-#include <fstream>
-#include <unordered_map>
-#include <queue>
 
-#include <cstdlib>
-#include <cmath>
 
 #define DEBUG 1
 
@@ -99,36 +84,9 @@ void test() {
   std::cout << "\n********** WARNING ********** \n" <<  
     "  This is a Test Release \n" << 
     "***************************** \n" <<  std::endl;
-  std::map<char,double> bases_map =
-    {
-      {'A',0.25},
-      {'C',0.25},
-      {'G',0.25},
-      {'T',0.25}
-    };
-  lbio::DiscreteProbability<char>
-    base_prob_space(bases_map.cbegin(), bases_map.cend());
-
-  for (auto b : bases_map) {
-    std::cout << b.first << "\t" <<
-      base_prob_space.probability_of(b.first) << "\n";
-  }
-  std::vector<char> acg = {'A','C','G'};
-  std::cout << base_prob_space.probability_of(acg.cbegin(), acg.cend()) << "\n";
-
-  std::cout << base_prob_space.probability_if([](char c)
-					      { return (c <='C');
-					      }) << "\n";
-
-  lbio::IIDCharSampler sampler(base_prob_space);
-  auto samples = sampler.sample(10);
-  for (char x : samples) {
-    std:: cout << x << ' ';
-  }
-  std::cout << "\n";
+  
 }
 
-#include "../core/DNAAlphabet2Bits.hpp"
 
 int main(int argc, char** argv) {
   runTask(argc, argv);

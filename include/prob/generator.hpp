@@ -38,6 +38,9 @@ public:
   using event_type = typename distribution::event_type;
   using probability_type = typename distribution::probability_type;
 
+  /**
+     \brief Constructs an IIDSampler from a \c distribution
+   */
   IIDSampler(const distribution& _d)
     : _events {} {
     std::vector<probability_type> weights {};
@@ -47,12 +50,16 @@ public:
       weights.push_back(event.second);
     }
     _dist = std::discrete_distribution<>(weights.begin(), weights.end());
+    std::random_device rd;
+    _gen = std::mt19937(rd());
   }
 
+  /**
+     \brief Returns a \c std::vector of elements of type \c event_type
+     containing \c k samples from the underlying distribution
+   */
   std::vector<event_type>
-  sample(lbio_size_t k = 1) {
-    std::random_device rd;
-    std::mt19937 _gen(rd());
+  sample(lbio_size_t k = 1) {   
     std::vector<event_type> samples;
     while (k > 0) {
       samples.push_back(_events[_dist(_gen)]);
@@ -61,9 +68,24 @@ public:
     return samples;
   }
 
+  /**
+     \brief Fills the range <em>[_beg, _end]</em> with random samples
+     from the underlying distribution
+   */
+  template <typename _IterT>
+  lbio_size_t
+  sample(_IterT _beg, _IterT _end) {
+    lbio_size_t count {0};
+    for (; _beg != _end; ++_beg, ++count) {
+      *_beg = _events[_dist(_gen)];
+    }
+    return count;
+  }
+
 private:
   std::vector<event_type> _events;
   std::discrete_distribution<> _dist;
+  std::mt19937 _gen;
   
 };
 

@@ -35,21 +35,39 @@ class IIDSampler
 {
 public:
   using distribution = _Dist;
-  using distribution_ref = distribution&;
-  using sample_type = typename distribution::event_type;
+  using event_type = typename distribution::event_type;
+  using probability_type = typename distribution::probability_type;
 
-  IIDSampler(distribution_ref d)
-    : _std_distr {d.to_std_discrete_distribution()}  { }
-
-  sample_type sample() {
-    sample_type s = sample_type{0};
-    return s;
+  IIDSampler(const distribution& _d)
+    : _events {} {
+    std::vector<probability_type> weights {};
+    auto _d_map = _d.get_container();
+    for (auto event : _d_map) {
+      _events.push_back(event.first);
+      weights.push_back(event.second);
+    }
+    _dist = std::discrete_distribution<>(weights.begin(), weights.end());
   }
-  
+
+  std::vector<event_type>
+  sample(lbio_size_t k = 1) {
+    std::random_device rd;
+    std::mt19937 _gen(rd());
+    std::vector<event_type> samples;
+    while (k > 0) {
+      samples.push_back(_events[_dist(_gen)]);
+      --k;
+    }
+    return samples;
+  }
+
 private:
-  std::discrete_distribution<> _std_distr;
+  std::vector<event_type> _events;
+  std::discrete_distribution<> _dist;
   
 };
+
+using IIDCharSampler = IIDSampler<DiscreteProbability<char>>;
 
 DEFAULT_NAMESPACE_END
 

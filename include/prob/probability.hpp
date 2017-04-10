@@ -54,6 +54,8 @@ public:
   using event_type = _Event;
   using probability_type = _Prob;
 
+  using container = std::unordered_map<event_type, probability_type>;
+
   template <typename _Iter>
   DiscreteProbability(_Iter _beg, _Iter _end)
     : _events{_beg,_end} { }
@@ -114,21 +116,16 @@ public:
   }
 
   /**
-     \brief Returns a \c std::discrete_distribution for this object
+     \brief Returns a copy of the underlying container which is of
+     type of \c container.
    */
-  std::discrete_distribution<>
-  to_std_discrete_distribution() const {
-    // extract weights (i.e., probability
-    std::vector<probability_type> _weights;
-    for (auto it = _events.cbegin(); it != _events.cend(); ++it) {
-      _weights.push_back((*it).second);
-    }
-    return std::discrete_distribution<>(_weights.cbegin(), _weights.cend());
+  const container
+  get_container() const {
+    return _events;
   }
 
 private:
   using entry_type = std::pair<event_type, probability_type>;
-  using container = std::unordered_map<event_type, probability_type>;
 
   container _events;
 };

@@ -1,4 +1,5 @@
 \input texinfo
+@setfilename biotk.info
 @settitle Usage of bio-tk
 
 @titlepage
@@ -21,16 +22,19 @@ This chapter presents the @emph{reads statistics} task of @t{bio-tk}. The follow
 
 @end itemize
 
-@unnumberedsubsec{Example}
-To produce all statistics for the file @emph{~/data/in.fastq} and output in the @emph{~/data/out_dir/} directory with all files having the format @emph{experiment001_*} use the command
+@example
+To produce all statistics for the file @emph{~/data/in.fastq} and output in the
+@emph{~/data/out_dir/} directory with all files having the format
+@emph{experiment001_*} use the command
 @verbatim
   bio-tk readstats 
       -r ~/data/in.fastq
       -d ~/data/out_dir
       -X experiment001_
 @end verbatim
+@end example
 
-@section {Statistics produced}
+@section Statistics produced
 The @emph{reads statistics} task currently computes the following statistcs.
 @itemize
 @item

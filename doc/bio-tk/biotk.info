@@ -1,0 +1,58 @@
+This is biotk.info, produced by makeinfo version 6.3 from usage.texi.
+
+1 Statistics of Read
+********************
+
+This chapter presents the _reads statistics_ task of bio-tk.  The
+following options are relevant to this task
+
+   * --read, -r indicates the file containing the reads.
+
+   * --outuput-dir, -d indicates the directory where the output will be
+     written.
+
+   * --file-name-prefix,-X will use the supplied string as prefix to
+     every file name produced.
+
+     To produce all statistics for the file _~/data/in.fastq_ and output in the
+     _~/data/out_dir/_ directory with all files having the format
+     _experiment001_*_ use the command
+       bio-tk readstats
+           -r ~/data/in.fastq
+           -d ~/data/out_dir
+           -X experiment001_
+
+1.1 Statistics produced
+=======================
+
+The _reads statistics_ task currently computes the following statistcs.
+   * _length_ calculate the distribution of lengths of all reads.
+     Results are saved in _prefix_len.btk file.
+
+2 List of all bio-tk options
+****************************
+
+   * "help", 0, NULL, 'h' ,
+   * "verbose", 0, NULL, 'v' ,
+   * "no-align", 0, NULL, 'n',
+   * "translate", 0, NULL, 't',
+   * "genome", 1, NULL, 'g' ,
+
+   * "output-genome", 1, NULL, 'G' ,
+   * "genome-format", 1, NULL, 'f' ,
+   * "reads", 1, NULL, 'r' ,
+   * "output-reads", 1, NULL, 'R' ,
+   * "reads-format", 1, NULL, 'F' ,
+   * "output-align", 1, NULL, 'o' ,
+   * "output-dir", 1, NULL, 'd' ,
+   * "file-name-prefix", 1, NULL, 'X' ,
+   * "padding", 1, NULL, 'p' ,
+   * "genome-copies", 1, NULL, 'c' ,
+   * "algorithm-type", 1, NULL, 'A' ,
+   * "kmer-size", 1, NULL, 'k' ,
+   * "threads", 1, NULL, 'T'
+
+
+Tag Table:
+
+End Tag Table

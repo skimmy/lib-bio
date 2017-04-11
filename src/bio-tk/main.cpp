@@ -7,7 +7,7 @@
 #include <include/prob/probability.hpp>
 #include <generate_task.hpp>
 
-
+#include <util/io_helper.hpp>
 
 #define DEBUG 1
 
@@ -108,7 +108,11 @@ void test() {
   std::cout << "\n********** WARNING ********** \n" <<  
     "  This is a Test Release \n" << 
     "***************************** \n" <<  std::endl;
-  
+  std::stringstream _str_str {"1,Pippo\n2,Plut\n3,John el ton 333"};
+  auto _in = lbio::stream_to_map<int,std::string>(_str_str);
+  for (auto k : _in) {
+    std::cout << k.first << "\t" << k.second << "\n";
+  }
 }
 
 

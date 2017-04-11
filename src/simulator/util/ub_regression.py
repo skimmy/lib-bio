@@ -13,9 +13,6 @@ import sys
 import math
 from scipy import stats
 
-def g(n, gamma, beta):
-    return gamma*pow(n, beta)
-
 def plot_curves(params_dict):
     import matplotlib.pyplot as plt
 
@@ -34,9 +31,10 @@ def plot_curves(params_dict):
         y = []
         for i in range(1,len(dpoints)):
             n = dpoints[i][0]
+            logn = math.log(n,2)
             ns.append(n)
             exp_points.append(dpoints[i][1])
-            y.append(2*g(n/2.0, gamma, beta) - g(n, gamma, beta))
+            y.append(pow(2, gamma+beta*logn))
 
         style_curve = plt_colors[color_i] + '-'
         style_point = plt_colors[color_i] + 'o'
@@ -76,23 +74,28 @@ def regression(points):
     slope, intercept, r_v, p_v, std_err = stats.linregress(x,y)
     return slope, intercept, std_err
 
+def test(log_p, g, b):
+    pass
+
 if (__name__ == "__main__"):
-    print()
+    print("")
     file_names = sys.argv[1].split(',')
     params_dict = dict()
+    # for each given file
     for file_name in file_names:
+        # load and transform into log space
         datapoints, en = load_point(file_name)
-        print (datapoints)
         logpoints = loglog_scale(datapoints)
+        # regression
         beta_p, gamma_p, err = regression(logpoints)
-        beta = beta_p
-        gamma =  pow(2,gamma_p) / (pow(2,beta+1) - 1)
-        params_dict[file_name] = (beta, gamma, err, datapoints, logpoints)
+        params_dict[file_name] = (beta_p, gamma_p, err, datapoints, logpoints)
         print("File: {0}\tm = {1}".format(file_name, len(en)))
-        print()
+        print("")
         print("Gamma'  = {0}\nBeta'   = {1}\nError  = {2}".format(gamma_p, beta_p, err))
-        print()
-        print("Gamma  = {0}\nBeta   = {1}".format(gamma, beta))
-        print()
+        # if test is mode is on
+        if (sys.argv.count("-test") > 0):
+            test(logpoints, gamma_p, beta_p)
+            exit(0)
+    # plots all the curves and sample points
     if (sys.argv.count("-plot") > 0):
         plot_curves(params_dict)

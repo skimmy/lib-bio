@@ -89,7 +89,6 @@ private:
   
 };
 
-using IIDCharSampler = IIDSampler<DiscreteProbability<char>>;
 
 DEFAULT_NAMESPACE_END
 

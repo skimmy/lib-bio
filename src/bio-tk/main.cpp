@@ -3,6 +3,11 @@
 
 #include <iostream>
 
+#include <include/prob/generator.hpp>
+#include <include/prob/probability.hpp>
+#include <generate_task.hpp>
+
+
 
 #define DEBUG 1
 
@@ -70,6 +75,25 @@ int runTask(int argc, char** argv) {
       string prefix = opts.prefixFile;
       task_read_statistics(reads, w_dir, prefix);
       break;
+    }
+  case 6:
+    {
+      using IIDCharSampler = lbio::IIDSampler<lbio::DiscreteProbability<char>>;
+
+      // generation
+      // TODO: proper parameters
+      lbio_size_t L = 100;
+      std::map<char,double> equal_prob_bases =
+	{
+	  { 'A', 0.25},
+	  { 'C', 0.25},
+	  { 'G', 0.25},
+	  { 'T', 0.25}
+	};
+      lbio::DiscreteProbability<char,double> _distr(equal_prob_bases.cbegin(),
+						    equal_prob_bases.cend());
+      IIDCharSampler sampler(_distr);
+      std::string seq = generate_iid_bases(L, sampler);
     }
   default:
     std::cout << "Unrecognized operation" << std::endl;

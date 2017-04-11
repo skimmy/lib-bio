@@ -35,6 +35,9 @@ public:
   // this iterators have deference key of the underlying map
   using value_type = typename _Map::key_type;
   using map_iterator = typename _Map::iterator;
+
+  map_key_iterator(const map_iterator& _iter)
+    : _map_iter {_iter} { } 
   
   map_key_iterator(_Map& _orig_map) {
     _map_iter = _orig_map.begin();
@@ -78,6 +81,10 @@ class map_value_iterator
   // this iterators have deference key of the underlying map
   using value_type = typename _Map::mapped_type;
   using map_iterator = typename _Map::iterator;
+
+  map_value_iterator(const map_iterator& _iter)
+    : _map_iter {_iter} { } 
+
   
   map_value_iterator(_Map& _orig_map) {
     _map_iter = _orig_map.begin();

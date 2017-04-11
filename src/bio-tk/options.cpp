@@ -17,7 +17,8 @@ const std::vector<std::string> tVec =
     std::string("kspectrum"),
     std::string("kmapping"),
     std::string("kscore"),
-    std::string("readstats")
+    std::string("readstats"),
+    std::string("generate")
   };
 
 

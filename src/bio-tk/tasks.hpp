@@ -62,4 +62,8 @@ void taskKmerScoreReads(const string& reference, const string& reads, size_t k, 
 
 void task_read_statistics(const std::string& reads, const string& w_dir, const string& prefix);
 
+void
+task_generate(std::map<std::string,std::string> gen_params);
+
+
 #endif

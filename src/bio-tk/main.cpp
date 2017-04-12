@@ -78,22 +78,14 @@ int runTask(int argc, char** argv) {
     }
   case 6:
     {
-      using IIDCharSampler = lbio::IIDSampler<lbio::DiscreteProbability<char>>;
 
-      // generation
-      // TODO: proper parameters
-      lbio_size_t L = 100;
-      std::map<char,double> equal_prob_bases =
-	{
-	  { 'A', 0.25},
-	  { 'C', 0.25},
-	  { 'G', 0.25},
-	  { 'T', 0.25}
-	};
-      lbio::DiscreteProbability<char,double> _distr(equal_prob_bases.cbegin(),
-						    equal_prob_bases.cend());
-      IIDCharSampler sampler(_distr);
-      std::string seq = generate_iid_bases(L, sampler);
+      std::map<std::string, std::string> gen_opts =
+       {
+	 {"N", "2"},
+	 {"L", "200"}
+       };
+      task_generate(gen_opts);
+      break;
     }
   default:
     std::cout << "Unrecognized operation" << std::endl;
@@ -108,11 +100,6 @@ void test() {
   std::cout << "\n********** WARNING ********** \n" <<  
     "  This is a Test Release \n" << 
     "***************************** \n" <<  std::endl;
-  std::stringstream _str_str {"1,Pippo\n2,Plut\n3,John el ton 333"};
-  auto _in = lbio::stream_to_map<int,std::string>(_str_str);
-  for (auto k : _in) {
-    std::cout << k.first << "\t" << k.second << "\n";
-  }
 }
 
 

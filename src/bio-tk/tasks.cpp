@@ -9,6 +9,11 @@
 
 // 2D matrix
 #include <structures/matrix.hpp>
+// prob utilities
+#include <prob/generator.hpp>
+#include <prob/probability.hpp>
+
+#include "generate_task.hpp"
 
 #include "tasks.hpp"
 #include "../core.h"
@@ -296,4 +301,34 @@ task_read_statistics(const std::string& reads, const string& w_dir,
 			     << "\t" << pair.second << "\n";
 		});
   pairs_file.close();
+}
+
+void
+task_generate(std::map<std::string,std::string> gen_params) {
+  using IIDCharSampler = lbio::IIDSampler<lbio::DiscreteProbability<char>>;
+  std::map<char,double> equal_prob_bases =
+    {
+      { 'A', 0.25},
+      { 'C', 0.25},
+      { 'G', 0.25},
+      { 'T', 0.25}
+    };
+  
+  lbio::DiscreteProbability<char,double> _distr(equal_prob_bases.cbegin(),
+						equal_prob_bases.cend());
+
+  IIDCharSampler sampler(_distr);
+
+  lbio_size_t _N = atoi(gen_params["N"].c_str());
+  lbio_size_t _L = atoi(gen_params["L"].c_str());
+  for (size_t _i = 0; _i < _N; ++_i) {
+    std::string seq = generate_iid_bases(_L, sampler);
+    std::string quals(_L,'!');
+    std::stringstream read_stream {};
+    read_stream << ">ID\n" << seq << "\n+\n" << quals << "\n";
+    
+    FastqRead r;
+    read_stream >> r;
+    std::cout << r << "\n";
+  }
 }

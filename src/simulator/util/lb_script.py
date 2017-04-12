@@ -8,69 +8,56 @@ import scipy.special as spec
 #                                                                            #
 ##############################################################################
 
-'''Convenienve function (if ever needed to improve) to compute
-  binom(a,b) * binom(c,d) * Sigma^d'''
-def Fd(a,b,c,d,e):
-    return spec.binom(a,b) * spec.binom(c,d) * pow(e,d)
+'''Convenience function for computing binomial coefficient. Here all
+optimization can be made (e.g., Tartaglia's triangle based computation)'''
+def binomial(n,k):
+    return spec.binom(n,k)
 
-def compute_fd00(n, r, D, q, Sigma):
-    # the case q=M+1=n-r+d+1 is not possible
-    if (q >= n-r+D+1):
-        return 0
-    return Fd(n-D+1, q, n-D-q, r-2*D, Sigma)
+def composition(n,k):
+    return binomial(n-1,k-1)
 
-def compute_fd01(n, r, D, q, Sigma):
-    return 0
-
-def compute_fd10(n, r, D, q, Sigma):
-    # the case q=M+1=n-r+d+1 is not possible
-    if (q >= n-r+D+1):
-        return 0
-    return 0
-
-def compute_fd11(n, r, D, q, Sigma):    
-    return 0
 
 # Case q=0 (i.e., main diagonal path)
-def computeQ0(n, r, Sigma):
-    return spec.binom(n, r) * pow(Sigma-1, r)
+def compute_Q0(n, r, Sigma): # Ok
+    return binomial(n, r) * pow(Sigma-1, r)
 
-def compute_fd(n, r, D, q, delta_s, delta_e, Sigma):    
+def compute_fd(n, r, D, q, delta_s, delta_e, Sigma): # Ok
     t = q + 1 - (delta_s + delta_e) # t = q + delta
-    return Fd(n-D-1, t-1, n-D-q+delta_e, r - 2*D, Sigma-1)
+    return binomial(n-D-1, t-1)*binomial(n-D-q+delta_e, r -
+                                         2*D)*pow(Sigma-1,r - 2*D)
     
-def compute_fn(n, r, D, q, delta_s, delta_e, Sigma):
+def compute_fn(n, r, D, q, delta_s, delta_e, Sigma):  # Ok
     count = 0
     # no diagonal segment at the end
     if (delta_e == 0):
         d_max = min(q-1,D)
         for d in range(1,d_max+1):
-            count += (spec.binom(q,d) * spec.binom(D-1, d-1)
-                      * spec.binom(D-1,q-d-1))
+            count += (binomial(q,d) * composition(D, d)
+                      * composition(D,q-d))
         count *= pow(Sigma-1, D)
     # diagonal at the end
     else:
         # ending del
-        d_bar = min(q-1,D)
+        d_bar = min(q-2,D-1)
         for d in range(d_bar):
-            count += (spec.binom(q-1,d) * spec.binom(D-1,d)
-                      * spec.binom(D-1, q-d-1))
+            count += (binomial(q-1,d-1) * composition(D,d)
+                      * composition(D, q-d-1))
         count *= pow(Sigma-1, D)
         
         # ending ins
-        i_bar = min(q-1, D)
-        for i in range(i_bar):
-            part_count = 0
-            for j in range(1,D-i):
-                part_count += (spec.binom(D-j-1,i) * spec.binom(D-1,q-i-1) *
-                               pow(Sigma,j) * pow(Sigma-1,D-j))
-            count += part_count * spec.binom(q-1,i)
+        count += pow(Sigma, D) * composition(D, q-1)
+        i_bar = min(q-2, D-1)
+        for i in range(1,i_bar+1):
+            for j in range(1,D-i+1):
+                count += (binomial(q-1, i) * composition(D-j, i)
+                          * composition(D, q-i-1)
+                          * pow(Sigma, j) * pow(Sigma, D-j))
             
     return count
 
 ##############################################################################
 #                                                                            #
-#                          NEW BOUND FUNCTIONS                               #
+#                            BOUND FUNCTIONS                                 #
 #                                                                            #
 ##############################################################################
 
@@ -84,59 +71,38 @@ def count_canonical_annotated_path_r_D_q(n, r, D, q, Sigma):
             count += fd*fn
     return count
             
-def count_canonical_annotated_path_r_D(n, r, D, Sigma):
-    # TODO ...
+def count_canonical_annotated_path_r_D(n, r, D, Sigma): # OK
+    if (D == 0):
+        return compute_Q0(n, r, Sigma) # Q0 + ...
     count = 0
-    q_max = min(2*D, n - r + D) ####### CHECK!!!!!!!
+    q_max = min(2*D, n - r + D +1) # +1 is delta_e
     for q in range(2,q_max+1):
         count += count_canonical_annotated_path_r_D_q(n, r, D, q, Sigma)
     return count
 
-'''Counts the number of canonical annotated paths of cost r'''
-def count_canonical_annotated_path_r(n, r, Sigma):
-    count = computeQ0(n, r, Sigma) # Q0 + ...
-    Dmax = int(math.floor(r / 2.0)) # !!!!!! CHECK !!!!!!
-    for D in range(1,Dmax+1):
+'''Counts the number of canonical annotated paths of cost r: S_r^UB'''
+def count_canonical_annotated_path_r(n, r, Sigma): # OK
+    count = 0
+    Dmax = int(math.floor(r / 2.0)) 
+    for D in range(Dmax+1):
         count += count_canonical_annotated_path_r_D(n, r, D, Sigma)
     return count;
 
-
-def bound_for_hulls(n, Sigma):
-    up_r = []
-    for r in range(1,n+1):
-        bound_r = count_canonical_annotated_path_r(n, r, Sigma)
-        up_r.append((r,bound_r))
-    return up_r
-    
-
-
-def loose_bound(n, Sigma=4):
-    hulls_bound = list([(0,1)]) + bound_for_hulls(n,Sigma)
-    lb = sum([entry[0]*entry[1] for entry in hulls_bound])
-    volumes_bound = [0]*len(hulls_bound)
-    volumes_bound[0] = hulls_bound[0][1]
-    for i in range(1,len(hulls_bound)):
-        volumes_bound[i] = volumes_bound[i-1] + hulls_bound[i][1]
-    ub = n*pow(Sigma,n) - sum([volumes_bound[r] for r in range(1,n)])
-    return (lb , ub, hulls_bound)
-
-def bound(n, Sigma=4):
-    lb = 0
-    ub = 0
-    hulls_bound = [(i,0) for i in range(n+1)]
-
-    
+'''Returns the lower bound for given n, the saturation radius and the
+upper bounds on all the hulls between 0 and the saturation radius'''
+def bound(n, Sigma=4): # OK
+    hulls_bound = [(i,0) for i in range(n+1)]    
     remaining_strings = pow(Sigma,n) - 1
+    lb = 0
     r = 1    
     while (remaining_strings > 0 and r <= n):
-        hull_count = count_canonical_annotated_path_r(n,r, Sigma)     
-        pay = min(hull_count, remaining_strings)
-        lb += pay*r
+        lb += remaining_strings
+        hull_count = count_canonical_annotated_path_r(n,r, Sigma)             
         remaining_strings = remaining_strings - hull_count
         hulls_bound[r] = (r,lb)
         r += 1
     
-    return (lb, ub, hulls_bound, r-1)
+    return (lb, hulls_bound, r-1)
 
 ##############################################################################
 #                                                                            #
@@ -145,20 +111,22 @@ def bound(n, Sigma=4):
 ##############################################################################
 
 if __name__ == "__main__":
-       
+    if (sys.argv.count("--help") > 0 or sys.argv.count("-h") > 0):
+        print("\nUSAGE\n\tpython lb_script.py [n_max] [verbosity] [options]\n\n")
+        print("  Options\n\t-h, --help\n")
+        exit(0)
+    
     n_max = 16
     if (len(sys.argv) > 1):
         n_max = int(sys.argv[1])
 
     verbosity = 0
     if (len(sys.argv) > 2):
-        verbosity = int(sys.argv[2])
-
-    
+        verbosity = int(sys.argv[2])    
 
     for n in range(1,n_max+1):
         norm_const = float(n * pow(4,n))
-        (lb, ub, hulls_bound, r_sat) = bound(n)
+        (lb, hulls_bound, r_sat) = bound(n)
         if (verbosity > 0):
             print("  r\tS_r\n----------------")
             for entry in hulls_bound:

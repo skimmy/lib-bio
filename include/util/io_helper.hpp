@@ -47,10 +47,12 @@ stream_to_map(std::istream& _is, char delimiter=',', char comment='#') {
   while(!_is.eof()) {
     std::string line {};
     std::getline(_is, line);
+    // empty lines and comment lines are allowed
     if (line.empty() || line[0]==comment) {
       continue;
     }
-    // Tokenization
+    // Tokenization: assumes 'Key [sep] Val' other occurrences of [sep]
+    // are considered part of Val
     auto _sep_iter = std::find(line.begin(), line.end(), delimiter);
     _KeyT _key = from_string<_KeyT>(std::string {line.begin(), _sep_iter});
     _ValT _val = from_string<_ValT>(std::string { ++_sep_iter, line.end()});

@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <ctime>
 #include <algorithm>
+#include <random>
 
 #include <util/io_helper.hpp>
 // 2D matrix
@@ -21,6 +22,15 @@
 #include "../core.h"
 #include "../io.h"
 #include "../algorithms.h"
+
+
+double rand_double() {
+  
+  static std::random_device rd;
+  static std::mt19937 gen(rd());
+  static std::uniform_real_distribution<double> _dist(0.0,1.0);
+  return _dist(gen);
+}
 
 //#include "util/io.hpp"
 
@@ -331,6 +341,12 @@ task_generate(std::map<std::string,std::string> gen_params) {
       std::string motif = gen_params["motif"];
       double p_motif = lbio::from_string<double>(gen_params["p_motif"]);
       // implant motif
+      for (size_t _j = 0; _j < seq.size() - motif.size(); ++_j) {
+	if (rand_double() < p_motif) {
+	  seq.replace(_j, motif.size(), motif);
+	  _j += motif.size();
+	}
+      }
     }
     std::string quals(_L,'!');
     std::stringstream read_stream {};

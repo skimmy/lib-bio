@@ -2,6 +2,7 @@
 #include "tasks.hpp"
 
 #include <iostream>
+#include <fstream>
 
 #include <include/prob/generator.hpp>
 #include <include/prob/probability.hpp>
@@ -11,13 +12,10 @@
 
 #define DEBUG 1
 
-int runTask(int argc, char** argv) {
+int runTask(OPTIONS& opts) {
   // parse arguments
-  OPTIONS opts;
-  opts.parseInputArgs(argc, argv);
-#ifndef DEBUG
-  opts.printOptions(std::cout);
-#endif
+  
+
   int task = opts.task;
   std::string taskSelectedMsg = "None";
   switch(task) {
@@ -78,12 +76,12 @@ int runTask(int argc, char** argv) {
     }
   case 6:
     {
-
+      std::ifstream _conf(opts.config_file);
       std::map<std::string, std::string> gen_opts =
-       {
-	 {"N", "2"},
-	 {"L", "200"}
-       };
+	lbio::stream_to_map<std::string, std::string>(_conf, '=');
+      for (auto x : gen_opts) {
+	std::cerr << x.first << "\t" << x.second << "\n";
+      }
       task_generate(gen_opts);
       break;
     }
@@ -95,16 +93,22 @@ int runTask(int argc, char** argv) {
   return 0;
 } 
 
-void test() {
+void test(OPTIONS& opts) {
   // Test disclaimer
   std::cout << "\n********** WARNING ********** \n" <<  
     "  This is a Test Release \n" << 
     "***************************** \n" <<  std::endl;
+
 }
 
 
 int main(int argc, char** argv) {
-  runTask(argc, argv);
-  test();   
+  OPTIONS opts;
+  opts.parseInputArgs(argc, argv);
+#ifndef DEBUG
+  opts.printOptions(std::cout);
+#endif
+  runTask(opts);
+  test(opts);   
   return 0;
 }

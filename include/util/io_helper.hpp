@@ -17,8 +17,11 @@
 #ifndef LBIO_IO_HELPER_HPP
 #define LBIO_IO_HELPER_HPP
 
+#include <lbio.h>
+
 #include <iostream>
 #include <map>
+
 
 DEFAULT_NAMESPACE_BEGIN
 
@@ -31,7 +34,7 @@ _T from_string(std::string str) {
 }
 
 template<>
-std::string
+inline std::string
 from_string<std::string>(std::string str) {
   // hopefully compiler will optimize
   return  str;
@@ -39,11 +42,14 @@ from_string<std::string>(std::string str) {
 
 template <typename _KeyT, typename _ValT>
 std::map<_KeyT,_ValT>
-stream_to_map(istream& _is, char delimiter=',') {
+stream_to_map(std::istream& _is, char delimiter=',', char comment='#') {
   std::map<_KeyT, _ValT> _map;
   while(!_is.eof()) {
     std::string line {};
     std::getline(_is, line);
+    if (line.empty() || line[0]==comment) {
+      continue;
+    }
     // Tokenization
     auto _sep_iter = std::find(line.begin(), line.end(), delimiter);
     _KeyT _key = from_string<_KeyT>(std::string {line.begin(), _sep_iter});
@@ -52,6 +58,8 @@ stream_to_map(istream& _is, char delimiter=',') {
   }
   return _map;
 }
+
+using StringStringMap = typename std::map<std::string, std::string>;
 
 DEFAULT_NAMESPACE_END
 

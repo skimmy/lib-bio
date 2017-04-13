@@ -8,6 +8,7 @@
 #include <map>
 
 #include <chrono>
+using namespace std;
 using Clock = std::chrono::system_clock;
 
 const std::vector<std::string> tVec = 
@@ -134,11 +135,12 @@ remove_punctuation_and_spaces(const std::string& in) {
 
 // END UTIL FUNCTIONS
 
-const char* shortOptions = "hvntg:G:f:r:R:F:o:d:X:p:c:A:k:T:";
+const char* shortOptions = "hvC:ntg:G:f:r:R:F:o:d:X:p:c:A:k:T:";
 const struct option longOptions[] = 
   {
     { "help", 0, NULL, 'h' },
     { "verbose", 0, NULL, 'v' },
+    { "config", 1, NULL, 'C'},
     { "no-align", 0, NULL, 'n' },
     { "translate", 0, NULL, 't' },
     { "genome", 1, NULL, 'g' },
@@ -161,6 +163,8 @@ options::options() {
 
   task = 0;
   verbose = false;
+
+  config_file = "biotk.conf";
 
   genomeFormat = GENOME_CUSTOM;
   readsFormat = READS_CUSTOM;
@@ -207,6 +211,9 @@ void options::parseInputArgs(int argc, char** argv) {
       break;
     case 'v':
       this->verbose = true;
+      break;
+    case 'C':
+      this->config_file = optarg;
       break;
     case 'n':
       this->align = false;

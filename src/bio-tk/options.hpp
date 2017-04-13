@@ -3,8 +3,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 enum GenomeFormat { GENOME_CUSTOM, FAST };
 enum ReadsFormat { READS_CUSTOM, FASTQ, CSFASTA };
 enum AlignAlgorithm { CPU_DP, GPU_DP };
@@ -21,6 +19,8 @@ struct options {
 
   // DEBUG INFO
   bool verbose;
+
+  std::string config_file;
   
   // input information
   /**
@@ -34,11 +34,11 @@ struct options {
   /**
    * \brief The path of the input genome file
    */
-  string genomeFile;
+  std::string genomeFile;
   /**
    * The path of the input reads file
    */
-  string readsFile;
+  std::string readsFile;
 
   // ---------------------------------------------------------
   //                   OUTPUT INFORMATION
@@ -47,25 +47,25 @@ struct options {
    * \brief The path of the output genome file (for enabled
    * output)
    */
-  string genomeOutputFile;
+  std::string genomeOutputFile;
   /**
    * \brief The path of the output reads file (for enbled output)
    */
-  string readsOutputFile;
+  std::string readsOutputFile;
   /**
    * \brief The path of the alignment file (for enabled alignment)
    */
-  string alignOutputFile;
+  std::string alignOutputFile;
 
   /**
    * \brief When multiple files are outputted this is the destination
    * directory.
    */
-  string outputDir;
+  std::string outputDir;
   /**
    * \brief Prefix used on each output file
    */
-  string prefixFile;
+  std::string prefixFile;
 
   // ---------------------------------------------------------
   //                 PREPROCESSING INFORMATION
@@ -134,7 +134,7 @@ struct options {
    *
    * \sa printOptions()
    */
-  void printUsage(ostream& os, const char* name, int exitCode);
+  void printUsage(std::ostream& os, const char* name, int exitCode);
   /**
    * \brief Extract options from the input line arguments
    *
@@ -153,7 +153,7 @@ struct options {
    * \param os The stream where output will bi printed
    * \sa printUsage()
    */
-  void printOptions(ostream& os);
+  void printOptions(std::ostream& os);
 
 };
 

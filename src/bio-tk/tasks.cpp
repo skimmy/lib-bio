@@ -7,11 +7,13 @@
 #include <ctime>
 #include <algorithm>
 
+#include <util/io_helper.hpp>
 // 2D matrix
 #include <structures/matrix.hpp>
 // prob utilities
 #include <prob/generator.hpp>
 #include <prob/probability.hpp>
+
 
 #include "generate_task.hpp"
 
@@ -316,19 +318,26 @@ task_generate(std::map<std::string,std::string> gen_params) {
   
   lbio::DiscreteProbability<char,double> _distr(equal_prob_bases.cbegin(),
 						equal_prob_bases.cend());
-
   IIDCharSampler sampler(_distr);
 
   lbio_size_t _N = atoi(gen_params["N"].c_str());
   lbio_size_t _L = atoi(gen_params["L"].c_str());
+  std::ofstream _fastq(gen_params["fastq"]);
+  
   for (size_t _i = 0; _i < _N; ++_i) {
     std::string seq = generate_iid_bases(_L, sampler);
+    // if pattern is in config insert it with specific probability
+    if (gen_params.count("motif") and gen_params.count("p_motif")) {
+      std::string motif = gen_params["motif"];
+      double p_motif = lbio::from_string<double>(gen_params["p_motif"]);
+      // implant motif
+    }
     std::string quals(_L,'!');
     std::stringstream read_stream {};
-    read_stream << ">ID\n" << seq << "\n+\n" << quals << "\n";
+    read_stream << "> " << _i << "\n" << seq << "\n+\n" << quals << "\n";
     
     FastqRead r;
     read_stream >> r;
-    std::cout << r << "\n";
+    _fastq << r << "\n";
   }
 }

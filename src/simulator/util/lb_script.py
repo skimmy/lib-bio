@@ -1,5 +1,6 @@
 import sys
 import math
+import numpy as np
 import scipy.special as spec
 
 ##############################################################################
@@ -8,13 +9,38 @@ import scipy.special as spec
 #                                                                            #
 ##############################################################################
 
+binom_table = None
+
+def construct_binom_table(n):
+    global binom_table
+    binom_table = np.ones([n+1,n+1])
+    # 'external edges of Tartaglia's (Pascal) triangle
+    for i in range(n+1):
+        binom_table[i,i] = 1
+        binom_table[i,1] = 1
+    # remaining entries
+    for i in range(3, n+1):
+        for j in range(2, i):
+            binom_table[i,j] = binom_table[i-1,j-1]+binom_table[i-1,j]
+
+def test_binom_table(n):
+    for i in range(1,n):
+        for j in range(1,i+1):
+            true = spec.binom(i,j)
+            table = binom_table[i+1,j+1]
+            diff = true - table
+            if (diff != 0):
+                raise ValueError("Binomial Table Test Fails")
+
 '''Convenience function for computing binomial coefficient. Here all
 optimization can be made (e.g., Tartaglia's triangle based computation)'''
 def binomial(n,k):
-    return spec.binom(n,k)
+    return binom_table[n+1,k+1]
+    #return spec.binom(n,k)
 
 def composition(n,k):
-    return binomial(n-1,k-1)
+    return binom_table[n,k]
+#    return binomial(n-1,k-1)
 
 
 # Case q=0 (i.e., main diagonal path)
@@ -122,7 +148,10 @@ if __name__ == "__main__":
 
     verbosity = 0
     if (len(sys.argv) > 2):
-        verbosity = int(sys.argv[2])    
+        verbosity = int(sys.argv[2])
+
+    construct_binom_table(n_max+1)
+#    test_binom_table(n_max)
 
     for n in range(1,n_max+1):
         norm_const = float(n * pow(4,n))

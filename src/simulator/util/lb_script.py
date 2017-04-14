@@ -150,10 +150,14 @@ if __name__ == "__main__":
     if (len(sys.argv) > 2):
         verbosity = int(sys.argv[2])
 
+    n_min = 1
+    if (len(sys.argv) > 3):
+        n_min = int(sys.argv[3])
+        
     construct_binom_table(n_max+1)
 #    test_binom_table(n_max)
 
-    for n in range(1,n_max+1):
+    for n in range(n_min,n_max+1):
         norm_const = float(n * pow(4,n))
         (lb, hulls_bound, r_sat) = bound(n)
         if (verbosity > 0):

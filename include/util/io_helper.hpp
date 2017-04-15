@@ -19,6 +19,7 @@
 
 #include <lbio.h>
 
+#include <algorithm>
 #include <iostream>
 #include <map>
 

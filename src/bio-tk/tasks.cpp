@@ -354,6 +354,6 @@ task_generate(std::map<std::string,std::string> gen_params) {
     
     FastqRead r;
     read_stream >> r;
-    _fastq << r << "\n";
+    _fastq << r;
   }
 }

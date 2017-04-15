@@ -1,4 +1,4 @@
-// generator_task.hpp
+// hamming_distance.hpp
 
 // Copyright 2017 Michele Schimd
 
@@ -14,12 +14,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef LBIO_HAMMING_DISTANCE_HPP
+#define LBIO_HAMMING_DISTANCE_HPP
+
 #include <lbio.h>
 
-template <typename _Sampler>
-std::string
-generate_iid_bases(lbio_size_t len, _Sampler& sampler) {
-  std::string _bases(len, 'N');
-  sampler.sample(_bases.begin(), _bases.end());
-  return _bases;
+DEFAULT_NAMESPACE_BEGIN
+
+template <typename _IterT>
+lbio_size_t
+hamming_distance(_IterT b1, _IterT e1, _IterT b2) {
+  lbio_size_t d = 0;
+  for (; b1 != e1; ++b1, ++b2) {
+    d += static_cast<lbio_size_t>(*b1 != *b2);
+  }
+  return d;
 }
+
+DEFAULT_NAMESPACE_END
+
+#endif
+

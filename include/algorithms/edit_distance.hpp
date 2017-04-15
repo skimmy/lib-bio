@@ -22,7 +22,10 @@
 
 #include <iterator>
 
+
 DEFAULT_NAMESPACE_BEGIN
+
+
 
 /**
    \brief Implements the Wagner Fischer algorithm for the edit distance.

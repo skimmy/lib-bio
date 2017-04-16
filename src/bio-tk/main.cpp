@@ -118,10 +118,11 @@ void test(OPTIONS& opts) {
   //   ++_it1;
   //   ++_it2;
   // }
-  std::string s1 = "ACGT";
-  std::string s2 = "AACG";
-  lbio_size_t d2 = lbio::d2<std::string>(2, s1.cbegin(), s1.cend(),
-					 s2.cbegin(), s2.cend());
+  std::string s1 = "ACAACGT";
+  std::string s2 = "ACACACG";
+  double d2 = lbio::D2_star<std::string>(2, s1.cbegin(), s1.cend(),
+					      s2.cbegin(), s2.cend(),
+					      [] (std::string s) { return (0.25*0.25);} );
   std::cout << d2 << "\n";
 }
 

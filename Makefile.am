@@ -1,1 +1,2 @@
-SUBDIRS = src/core src/simulator src/io src/algorithms src/bio-tk
+SUBDIRS = src/core src/simulator src/io src/algorithms src/bio-tk \
+	test/algorithms

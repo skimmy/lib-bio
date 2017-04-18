@@ -41,7 +41,11 @@ def plot_curves(params_dict):
         ax.plot(ns, exp_points, style_point)
         ax.plot(ns, y, style_curve)
         color_i += 1
-                
+    plt.title("Sample points and regression curve")
+    plt.xlabel("n")
+    plt.ylabel("2g(n/2) - g(n)")
+    plt.xlim(xmin=0)
+    plt.grid(True)
     plt.show()
 
 
@@ -90,8 +94,9 @@ if (__name__ == "__main__"):
         beta_p, gamma_p, err = regression(logpoints)
         params_dict[file_name] = (beta_p, gamma_p, err, datapoints, logpoints)
         print("File: {0}\tm = {1}".format(file_name, len(en)))
+        print("\n".join([str(x[1]) for x in datapoints]))
         print("")
-        print("Gamma'  = {0}\nBeta'   = {1}\nError  = {2}".format(gamma_p, beta_p, err))
+        print("Gamma'  = {0}\nBeta'   = {1}\nError  = {2}".format(gamma_p, beta_p, err))        
         # if test is mode is on
         if (sys.argv.count("-test") > 0):
             test(logpoints, gamma_p, beta_p)

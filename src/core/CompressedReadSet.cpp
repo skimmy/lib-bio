@@ -1,4 +1,4 @@
-#include "CompressedReadSet.h"
+#include <core/CompressedReadSet.h>
 
 #include <math.h>
 #include <string.h>

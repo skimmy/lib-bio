@@ -1,5 +1,8 @@
 #include "spectrum.hpp"
 
+#include <core/NumericKMer.hpp>
+#include <core/DNAAlphabet2Bits.hpp>
+
 const size_t NoPos = (size_t) -1;
 
 /**

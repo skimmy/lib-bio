@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <core/Reference.hpp>
+#include <core/DNAAlphabet2Bits.hpp>
 
 #include "../algorithms.h"
 

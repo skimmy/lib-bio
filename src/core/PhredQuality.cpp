@@ -1,10 +1,9 @@
-#include "PhredQuality.hpp"
+#include <core/PhredQuality.hpp>
 
 #include <string.h>
 #include <math.h>
 
 #include "../quality.h"
-#include "../util.h"
 
 #include <iostream>
 using namespace std;
@@ -341,7 +340,7 @@ PhredQuality::~PhredQuality() {
 
 double* PhredQuality::getProbabilities(size_t begin, size_t length) const {
   size_t M = ( length != 0 ) ? length : ( this->n - begin);
-  size_t N = ( length != 0 ) ? MIN(length, this->n - begin) : M;
+  size_t N = ( length != 0 ) ? std::min(length, this->n - begin) : M;
   double* out = new double[M];
   for (size_t i = 0; i < N; ++i) {
     out[i] = ProbabilisticQuality::toProbabilistic(this->qualVector[begin+i]);
@@ -351,7 +350,7 @@ double* PhredQuality::getProbabilities(size_t begin, size_t length) const {
 
 int* PhredQuality::getQualities(size_t begin, size_t length) const {
   size_t M = ( length != 0 ) ? length : ( this->n - begin);
-  size_t N = ( length != 0 ) ? MIN(length, this->n - begin) : M;
+  size_t N = ( length != 0 ) ? std::min(length, this->n - begin) : M;
   int* out = new int[M];
   memcpy(out, &(this->qualVector[begin]), N * sizeof(int));
   return out;

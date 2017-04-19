@@ -1,7 +1,7 @@
 #include <memory>
 
-#include "Reference.hpp"
-#include "ColorAlphabet.hpp"
+#include <core/Reference.hpp>
+#include <core/ColorAlphabet.hpp>
 
 
 // -------------------------- STATIC FACTORY METHODS -------------------------

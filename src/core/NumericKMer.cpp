@@ -1,6 +1,5 @@
-#include <iostream>
-
-#include "../core.h"
+#include <core/NumericKMer.hpp>
+#include <core/DNAAlphabet2Bits.hpp>
 
 namespace seq
 {
@@ -67,7 +66,7 @@ uint64_t NumericKMer::fromChars(const char* chars, size_t k) {
 //                                     IOSTREAM
 // -----------------------------------------------------------------------------
 
-ostream& operator<< (ostream& os, const NumericKMer& kmer) {
+std::ostream& operator<< (std::ostream& os, const NumericKMer& kmer) {
   uint64_t copy = kmer.kmer;
   size_t k = kmer.k;
   std::string out("");

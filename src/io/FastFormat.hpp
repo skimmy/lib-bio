@@ -2,7 +2,7 @@
 #define FASTFORMAT_H
 
 #include "Format.hpp"
-#include "../core/Reference.hpp"
+#include <core/Reference.hpp>
 
 /**
  * \brief This class represents a <em>fast format</em> file.

@@ -1,5 +1,4 @@
 #include "SmithWatermanDP.hpp"
-#include "../util.h"
 
 /***************** CONSTRUCTOR(S)/DESTRUCTOR ****************/
 
@@ -51,8 +50,8 @@ void SmithWatermanDP::initMatrix() {
 
 void SmithWatermanDP::computeEntry(size_t i, size_t j) {
   //  int tmp = MAX(1,3);
-  int tmp = MAX( (matrix[i-1][j] - gapPenalty), (matrix[i][j-1] - gapPenalty));
-  matrix[i][j] = MAX((tmp), (matrix[i-1][j-1] + sim[(int)x[i-1]][(int)y[j-1]]));
+  int tmp = std::max( (matrix[i-1][j] - gapPenalty), (matrix[i][j-1] - gapPenalty));
+  matrix[i][j] = std::max((tmp), (matrix[i-1][j-1] + sim[(int)x[i-1]][(int)y[j-1]]));
 }
 
 void SmithWatermanDP::computeMatrix() {

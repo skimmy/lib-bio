@@ -1,4 +1,4 @@
-#include "CompressedSequence.h"
+#include <core/CompressedSequence.h>
 
 #include <iostream>
 #include <fstream>

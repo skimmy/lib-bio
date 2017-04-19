@@ -1,6 +1,5 @@
 #include <string.h>
 
-#include "../util.h"
 #include "../quality.h"
 
 using namespace std;
@@ -35,7 +34,7 @@ double* ProbabilisticQuality::getProbabilities(size_t begin, size_t length) cons
 
 int* ProbabilisticQuality::getQualities(size_t begin, size_t length) const {
   size_t M = ( length != 0 ) ? length : ( this->n - begin);
-  size_t N = ( length != 0 ) ? MIN(length, this->n - begin) : M;
+  size_t N = ( length != 0 ) ? std::min(length, this->n - begin) : M;
   int* out = new int[M];
   for (size_t i = 0; i < N; ++i) {
     out[i] = PhredQuality::toPhred(probabilities[begin+i]);

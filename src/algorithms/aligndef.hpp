@@ -1,7 +1,7 @@
 #ifndef ALIGN_DEF_H
 #define ALIGN_DEF_H
 
-#include "../core.h"
+#include <core/Read.hpp>
 #include "Position.hpp"
 
 #include <vector>

@@ -1,11 +1,13 @@
 #ifndef SPECTRUM_H
 #define SPECTRUM_H
 
+#include <core/Sequence.h>
+
 #include <unordered_map>
 #include <list>
 
-#include "../core.h"
 #include "../algorithms.h"
+
 
 /**
    \file spectrum.hpp

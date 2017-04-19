@@ -1,4 +1,4 @@
-#include "QualifiedSequence.hpp"
+#include <core/QualifiedSequence.hpp>
 
 /**************** CONSTRUCTORS AND DESTRUCTOR ***************/
 

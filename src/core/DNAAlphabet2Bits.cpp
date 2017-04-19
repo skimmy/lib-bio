@@ -1,7 +1,9 @@
-#include "../core.h"
+#include <core/DNAAlphabet2Bits.hpp>
 
-map<char, uint64_t> initBasesMap() {
-  map<char, uint64_t> basesMap;
+#include <map>
+
+std::map<char, uint64_t> initBasesMap() {
+  std::map<char, uint64_t> basesMap;
   char basesUpper[] = "ACGT";
   char basesLower[] = "acgt";
   for (uint64_t i = 0; i < 4; ++i) {
@@ -15,7 +17,7 @@ map<char, uint64_t> initBasesMap() {
 //                               UTILITY FUNCTIONS
 // -----------------------------------------------------------------------------
 uint64_t fromChar(const char c) {
-  static map<char, uint64_t> basesMap = initBasesMap();
+  static std::map<char, uint64_t> basesMap = initBasesMap();
   return basesMap[c] & 0x3;
 }
 
@@ -35,6 +37,6 @@ uint64_t DNAAlphabet2Bits::charToInt(char c) {
   return fromChar(c);
 }
 
-map<char, uint64_t> DNAAlphabet2Bits::charToIntMap() {
+std::map<char, uint64_t> DNAAlphabet2Bits::charToIntMap() {
   return initBasesMap();
 }

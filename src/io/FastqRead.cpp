@@ -1,5 +1,7 @@
 #include "FastqRead.hpp"
 
+#include <core/ProbabilisticQuality.hpp>
+
 #include <fstream>
 
 // Remove when 'getFileLength' will be moved to new util sub-project

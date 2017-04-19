@@ -1,5 +1,7 @@
 #include "CSFastRead.hpp"
 
+#include <core/PhredQuality.hpp>
+
 #define MAX_BUFFER_SIZE 4096
 
 // ---------------------------------------------------------

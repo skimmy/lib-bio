@@ -1,7 +1,8 @@
 #ifndef FASTQ_READ_H
 #define FASTQ_READ_H
 
-#include "../core.h"
+#include <core/Read.hpp>
+#include <core/Quality.hpp>
 
 #include <iostream>
 #include <vector>

@@ -1,4 +1,4 @@
-#include "DNAAlphabet.hpp"
+#include <core/DNAAlphabet.hpp>
 
 const char SYMBOLS[] = {'A', 'C', 'G', 'T'};
 const char SYMBOLS_LOWER_CASE[] = {'a', 'c', 'g', 't'};

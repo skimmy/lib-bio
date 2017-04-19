@@ -1,4 +1,4 @@
-#include "DNACompressedSymbol.h"
+#include <core/DNACompressedSymbol.h>
 
 #include <map>
 using namespace std;

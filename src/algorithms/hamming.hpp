@@ -1,7 +1,7 @@
 #ifndef HAMMING_H
 #define HAMMING_H
 
-#include "../core.h"
+#include <core/Sequence.h>
 
 namespace bio {
   /**

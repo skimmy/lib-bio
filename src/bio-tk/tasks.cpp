@@ -19,7 +19,7 @@
 #include "generate_task.hpp"
 
 #include "tasks.hpp"
-#include "../core.h"
+#include <core/core.h>
 #include "../io.h"
 #include "../algorithms.h"
 

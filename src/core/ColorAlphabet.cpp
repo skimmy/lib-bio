@@ -1,5 +1,5 @@
-#include "ColorAlphabet.hpp"
-#include "DNAAlphabet.hpp"
+#include <core/ColorAlphabet.hpp>
+#include <core/DNAAlphabet.hpp>
 
 const char SYMBOLS[] = { '0', '1', '2', '3' };
 const int TRANSLATION_MATRIX[4][4] = {

@@ -1,4 +1,4 @@
-#include "KMer.hpp"
+#include <core/KMer.hpp>
 
 // ---------------------------------------------------------
 //                CONSTRUCTOS AND DESTRUCTOR

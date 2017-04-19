@@ -1,12 +1,13 @@
 #ifndef CSFAST_READ_H
 #define CSFAST_READ_H
 
-
-#include "../core.h"
+#include <core/Read.hpp>
+#include <core/FullyQualifiedSequence.hpp>
+#include <core/ColorAlphabet.hpp>
 
 #include <iostream>
 #include <list>
-using namespace std;
+
 
 /**
  * \brief This class represents a Read stored in the colors space format
@@ -34,7 +35,7 @@ using namespace std;
  */
 class CSFastRead : public Read {
 private:
-  string qualityFileName;
+  std::string qualityFileName;
   char primer;
 public:
   // ---------------------------------------------------------
@@ -119,7 +120,8 @@ public:
    * \sa PhredQuality
    *
    */
-  list< FullyQualifiedSequence< ColorAlphabet > > getFullyQualifiedKMerList(size_t k) const;
+  std::list<FullyQualifiedSequence<ColorAlphabet>>
+  getFullyQualifiedKMerList(size_t k) const;
 
   // ---------------------------------------------------------
   //                  '>>' AND '<<' OPERATORS
@@ -142,7 +144,8 @@ public:
    * \sa loadBasesAndQualitiesFromFiles()
    * \sa operator<<()
    */
-  friend istream& operator>>(istream& is, CSFastRead& read);
+  friend std::istream&
+  operator>>(std::istream& is, CSFastRead& read);
   /**
    * \brief Writes on an ouptut stream the color sequence
    * and the header of the read
@@ -157,7 +160,8 @@ public:
    *
    * \sa operator>>()
    */
-  friend ostream& operator<<(ostream& os, CSFastRead& read);
+  friend std::ostream&
+  operator<<(std::ostream& os, CSFastRead& read);
 
   /**
    * \brief Loads color sequence, header and quality values
@@ -179,7 +183,8 @@ public:
    * \sa operator>>()
    * 
    */
-  void loadBasesAndQualitiesFromFiles(istream& bases_is, istream& qual_is);
+  void
+  loadBasesAndQualitiesFromFiles(std::istream& bases_is, std::istream& qual_is);
   // TODO: provide a writeBasesAndQualitiesToFiles() method
 };
 

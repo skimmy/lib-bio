@@ -10,6 +10,7 @@
 #include <algorithms/hamming_distance.hpp>
 #include <algorithms/edit_distance.hpp>
 #include <algorithms/d2_distance.hpp>
+#include <util/rand.hpp>
 #include <../io.h>
 
 #define DEBUG 1
@@ -66,7 +67,7 @@ int runTask(OPTIONS& opts) {
       taskKmerScoreReads(ref, reads, k, out, nThreads);
       break;
     }
-  case 5:
+  case 5: 
     {
       // statistics of reads
       taskSelectedMsg = "Reads statistics";
@@ -76,8 +77,9 @@ int runTask(OPTIONS& opts) {
       task_read_statistics(reads, w_dir, prefix);
       break;
     }
-  case 6:
+  case 6: // generate
     {
+      // data generation
       std::ifstream _conf(opts.config_file);
       std::map<std::string, std::string> gen_opts =
 	lbio::stream_to_map<std::string, std::string>(_conf, '=');
@@ -118,12 +120,22 @@ void test(OPTIONS& opts) {
   //   ++_it1;
   //   ++_it2;
   // }
-  std::string s1 = "ACAACGT";
-  std::string s2 = "ACACACG";
-  double d2 = lbio::D2_star<std::string>(2, s1.cbegin(), s1.cend(),
-					      s2.cbegin(), s2.cend(),
-					      [] (std::string s) { return (0.25*0.25);} );
-  std::cout << d2 << "\n";
+  // std::string s1 = "ACAACGT";
+  // std::string s2 = "ACACACG";
+  // double d2 = lbio::D2_star<std::string>(2, s1.cbegin(), s1.cend(),
+  // 					      s2.cbegin(), s2.cend(),
+  // 					      [] (std::string s) { return (0.25*0.25);} );
+  // std::cout << d2 << "\n";
+
+  std::discrete_distribution<int> _dd {1,1,1,1};
+  for (int i = 0; i < 10; ++i) {
+    auto& g = lbio::global_rand_generator<std::mt19937>();
+    int s = _dd(g);
+    std::cout << s << "\n";
+
+
+  }
+  
 }
 
 

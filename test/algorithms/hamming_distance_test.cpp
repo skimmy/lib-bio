@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifdef HAVE_BOOST
 
 #define BOOST_TEST_MODULE hamming_distance_test
 #include <boost/test/included/unit_test.hpp>
@@ -27,4 +26,4 @@ void free_test_function()
   BOOST_TEST( true /* test assertion */ );
 }
 
-#endif
+

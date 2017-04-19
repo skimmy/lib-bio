@@ -318,6 +318,7 @@ task_read_statistics(const std::string& reads, const string& w_dir,
 void
 task_generate(std::map<std::string,std::string> gen_params) {
   using IIDCharSampler = lbio::IIDSampler<lbio::DiscreteProbability<char>>;
+  using CharDoubleDistr = lbio::DiscreteProbability<char,double>;
   std::map<char,double> equal_prob_bases =
     {
       { 'A', 0.25},
@@ -325,14 +326,46 @@ task_generate(std::map<std::string,std::string> gen_params) {
       { 'G', 0.25},
       { 'T', 0.25}
     };
-  
-  lbio::DiscreteProbability<char,double> _distr(equal_prob_bases.cbegin(),
-						equal_prob_bases.cend());
+  CharDoubleDistr _distr(equal_prob_bases.cbegin(), equal_prob_bases.cend());
   IIDCharSampler sampler(_distr);
-
+  
   lbio_size_t _N = atoi(gen_params["N"].c_str());
   lbio_size_t _L = atoi(gen_params["L"].c_str());
   std::ofstream _fastq(gen_params["fastq"]);
+  
+  // reads from reference
+  if (gen_params.count("reference") > 0 && !gen_params["reference"].empty()) {
+    // when reference length G is given, reference must be generated
+    if (gen_params.count("G") > 0) {
+      // generate reference
+      lbio_size_t _G = lbio::from_string<lbio_size_t>(gen_params["G"]);
+      std::string ref = generate_iid_bases(_G, sampler);
+      // save reference to file
+      std::ofstream ref_os(gen_params["reference"]);
+      // TODO: Divide reference into lines
+      ref_os << "> G=" << _G << "\n" << ref << "\n";
+      ref_os.close();
+      std::uniform_int_distribution<lbio_size_t> position_gen(0,_G-1-_L);
+      auto& gen = lbio::global_rand_generator<std::mt19937>();
+      // reads from reference
+      for (lbio_size_t i = 0; i < _N; ++i) {
+	lbio_size_t j = position_gen(gen);
+	std::string read = ref.substr(j, _L);
+
+	std::string quals(_L,'!');
+	std::stringstream read_stream {};
+	read_stream << "> " << i << "pos=" << j << "\n" << read << "\n+\n" << quals << "\n";
+    
+	FastqRead r;
+	read_stream >> r;
+	_fastq << r;
+      }
+    }
+    return;
+  }
+  
+ 
+
   
   for (size_t _i = 0; _i < _N; ++_i) {
     std::string seq = generate_iid_bases(_L, sampler);

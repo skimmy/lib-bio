@@ -19,7 +19,7 @@
 
 #include <lbio.h>
 
-#include <random>
+#include <util/rand.hpp>
 
 DEFAULT_NAMESPACE_BEGIN
 
@@ -50,8 +50,6 @@ public:
       weights.push_back(event.second);
     }
     _dist = std::discrete_distribution<>(weights.begin(), weights.end());
-    std::random_device rd;
-    _gen = std::mt19937(rd());
   }
 
   /**
@@ -59,7 +57,8 @@ public:
      containing \c k samples from the underlying distribution
    */
   std::vector<event_type>
-  sample(lbio_size_t k = 1) {   
+  sample(lbio_size_t k = 1) {
+    auto& _gen = global_rand_generator<std::mt19937>();
     std::vector<event_type> samples;
     while (k > 0) {
       samples.push_back(_events[_dist(_gen)]);
@@ -75,6 +74,7 @@ public:
   template <typename _IterT>
   lbio_size_t
   sample(_IterT _beg, _IterT _end) {
+    auto& _gen = global_rand_generator<std::mt19937>();
     lbio_size_t count {0};
     for (; _beg != _end; ++_beg, ++count) {
       *_beg = _events[_dist(_gen)];
@@ -84,9 +84,7 @@ public:
 
 private:
   std::vector<event_type> _events;
-  std::discrete_distribution<> _dist;
-  std::mt19937 _gen;
-  
+  std::discrete_distribution<> _dist;  
 };
 
 

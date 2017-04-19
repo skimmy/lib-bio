@@ -14,6 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef BIOTK_GENERATE_TASK_HPP
+#define BIOTK_GENERATE_TASK_HPP
+
 #include <lbio.h>
 
 template <typename _Sampler>
@@ -23,3 +26,5 @@ generate_iid_bases(lbio_size_t len, _Sampler& sampler) {
   sampler.sample(_bases.begin(), _bases.end());
   return _bases;
 }
+
+#endif

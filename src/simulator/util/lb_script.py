@@ -99,11 +99,15 @@ def count_canonical_annotated_path_r_D_q(n, r, D, q, Sigma):
             
 def count_canonical_annotated_path_r_D(n, r, D, Sigma): # OK
     if (D == 0):
+        print("\t{0}\t{1}\t{2}\t{3}".format(r,D,0,compute_Q0(n, r, Sigma)))
         return compute_Q0(n, r, Sigma) # Q0 + ...
+    
     count = 0
     q_max = min(2*D, n - r + D +1) # +1 is delta_e
     for q in range(2,q_max+1):
-        count += count_canonical_annotated_path_r_D_q(n, r, D, q, Sigma)
+        _Qq = count_canonical_annotated_path_r_D_q(n, r, D, q, Sigma)
+        count += _Qq
+        print("\t{0}\t{1}\t{2}\t{3}".format(r,D,q,_Qq))
     return count
 
 '''Counts the number of canonical annotated paths of cost r: S_r^UB'''
@@ -111,7 +115,9 @@ def count_canonical_annotated_path_r(n, r, Sigma): # OK
     count = 0
     Dmax = int(math.floor(r / 2.0)) 
     for D in range(Dmax+1):
-        count += count_canonical_annotated_path_r_D(n, r, D, Sigma)
+        ub_r_d = count_canonical_annotated_path_r_D(n, r, D, Sigma)
+        count += ub_r_d #count_canonical_annotated_path_r_D(n, r, D, Sigma)
+        #print("\t{2}\t{0}\t{1}".format(D,ub_r_d,r))
     return count;
 
 '''Returns the lower bound for given n, the saturation radius and the

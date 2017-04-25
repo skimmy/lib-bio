@@ -1,17 +1,13 @@
 #include "options.hpp"
 #include "tasks.hpp"
+#include "edaf_task.hpp"
 
 #include <fstream>
 
 #include <util/io_helper.hpp>
 
 // testing includes
-#include <iterator>
-#include <algorithms/hamming_distance.hpp>
-#include <algorithms/edit_distance.hpp>
-#include <algorithms/d2_distance.hpp>
-#include <util/rand.hpp>
-#include <../io.h>
+#include <util/str_util.hpp>
 
 #define DEBUG 1
 
@@ -89,6 +85,14 @@ int runTask(OPTIONS& opts) {
       task_generate(gen_opts);
       break;
     }
+  case 7: // edaf (Edit Distance VS Alignment FreE)
+    {
+      std::ifstream _conf(opts.config_file);
+      std::map<std::string, std::string> gen_opts =
+	lbio::stream_to_map<std::string, std::string>(_conf, '=');
+      edaf_task(gen_opts);
+      break;
+    }
   default:
     std::cout << "Unrecognized operation" << std::endl;
     return 1;
@@ -127,13 +131,10 @@ void test(OPTIONS& opts) {
   // 					      [] (std::string s) { return (0.25*0.25);} );
   // std::cout << d2 << "\n";
 
-  std::discrete_distribution<int> _dd {1,1,1,1};
-  for (int i = 0; i < 10; ++i) {
-    auto& g = lbio::global_rand_generator<std::mt19937>();
-    int s = _dd(g);
+  std::string st {"Hey@you !@! "};
+  std::vector<std::string> vs = lbio::split(st.begin(), st.end(), '@');
+  for (auto s : vs) {
     std::cout << s << "\n";
-
-
   }
   
 }

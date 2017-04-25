@@ -87,6 +87,7 @@ int runTask(OPTIONS& opts) {
     }
   case 7: // edaf (Edit Distance VS Alignment FreE)
     {
+      std::cout << "EDAF\n";
       std::ifstream _conf(opts.config_file);
       std::map<std::string, std::string> gen_opts =
 	lbio::stream_to_map<std::string, std::string>(_conf, '=');
@@ -107,35 +108,6 @@ void test(OPTIONS& opts) {
     "  This is a Test Release \n" << 
     "***************************** \n" <<  std::endl;
   
-  // std::ifstream _fastq1("/home/skimmy/data/EDAF/iid_test_1.fastq");
-  // std::ifstream _fastq2("/home/skimmy/data/EDAF/iid_test_2.fastq");
-  // std::istream_iterator<FastqRead> _it1(_fastq1);
-  // std::istream_iterator<FastqRead> _it2(_fastq2);
-  // std::istream_iterator<FastqRead> _it_end;
-  // lbio::edit_distance_wf<std::string> edit(500,500);
-  // while ( (_it1 != _it_end) and (_it2 != _it_end) ) {
-  //   FastqRead r1 {*_it1};
-  //   FastqRead r2 {*_it2};
-  //   std::string s1 = r1.getBases();
-  //   std::string s2 = r2.getBases();
-  //   lbio_size_t d = lbio::hamming_distance(s1.cbegin(), s1.cend(), s2.cbegin());
-  //   lbio_size_t e = edit.compute(s1, s1.size(), s2, s2.size());
-  //   std::cout << s1 << "\n" << s2 << "\n" << d << "\t" << e << "\n";
-  //   ++_it1;
-  //   ++_it2;
-  // }
-  // std::string s1 = "ACAACGT";
-  // std::string s2 = "ACACACG";
-  // double d2 = lbio::D2_star<std::string>(2, s1.cbegin(), s1.cend(),
-  // 					      s2.cbegin(), s2.cend(),
-  // 					      [] (std::string s) { return (0.25*0.25);} );
-  // std::cout << d2 << "\n";
-
-  std::string st {"Hey@you !@! "};
-  std::vector<std::string> vs = lbio::split(st.begin(), st.end(), '@');
-  for (auto s : vs) {
-    std::cout << s << "\n";
-  }
   
 }
 

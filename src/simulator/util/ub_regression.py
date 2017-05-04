@@ -13,7 +13,15 @@ import sys
 import math
 from scipy import stats
 
-def plot_curves(params_dict):
+'''Returns the smallest integer greater than or equal to x and divisible by n'''
+def get_ceil_divisible_by(x, n):
+    x_ceil = int(math.ceil(x))
+    k = 1
+    while(k < x_ceil):
+        k += n
+    return k
+
+def plot_curves(params_dict, save_file=False):
     import matplotlib.pyplot as plt
 
     # dictionary items
@@ -21,6 +29,9 @@ def plot_curves(params_dict):
     plt_colors = ['b', 'r', 'g', 'k', 'y']
     color_i = 0
     fig, ax = plt.subplots()
+    #ax.set_autoscale_on(False)
+    max_val = 0
+    max_n = 0
     for k,v in params_dict.items():
         name = k
         beta = v[0]
@@ -34,19 +45,28 @@ def plot_curves(params_dict):
             logn = math.log(n,2)
             ns.append(n)
             exp_points.append(dpoints[i][1])
-            y.append(pow(2, gamma+beta*logn))
-
+            y.append(pow(2, gamma+beta*logn))            
         style_curve = plt_colors[color_i] + '-'
         style_point = plt_colors[color_i] + 'o'
         ax.plot(ns, exp_points, style_point)
         ax.plot(ns, y, style_curve)
         color_i += 1
+        max_n = max(max_n,max(ns))
+        max_val = max(max_val, max(max(y), max(exp_points) ))
+        
+        
     plt.title("Sample points and regression curve")
     plt.xlabel("n")
     plt.ylabel("2g(n/2) - g(n)")
     plt.xlim(xmin=0)
+    print(max_val)
+    y_max = get_ceil_divisible_by(max_val,5)
+    plt.ylim([0, y_max])
     plt.grid(True)
-    plt.show()
+    if (save_file):
+        plt.savefig("plot.pdf")
+    else:
+        plt.show()
 
 
 def load_point(file_name):
@@ -103,4 +123,7 @@ if (__name__ == "__main__"):
             exit(0)
     # plots all the curves and sample points
     if (sys.argv.count("-plot") > 0):
-        plot_curves(params_dict)
+        save= False
+        if(sys.argv.count("-save") > 0):
+            save = True
+        plot_curves(params_dict, save)

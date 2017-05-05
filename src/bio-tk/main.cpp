@@ -7,7 +7,8 @@
 #include <util/io_helper.hpp>
 
 // testing includes
-#include <util/str_util.hpp>
+//#include <util/str_util.hpp>
+#include <generate_task.hpp>
 
 #define DEBUG 1
 
@@ -107,7 +108,11 @@ void test(OPTIONS& opts) {
   std::cout << "\n********** WARNING ********** \n" <<  
     "  This is a Test Release \n" << 
     "***************************** \n" <<  std::endl;
-  
+  std::vector<double> p_ops {0.06, 0.03, 0.03}; // Sub ~6% Del=Ins ~3% -> Mat ~88%
+  std::string read = "ACCGTTGCGTAAAGAT";
+  std::string noisy_read = generate_iid_edit_transformation(read, p_ops);
+  std::cout << std::endl << read << std::endl;
+  std::cout << noisy_read << std::endl;
   
 }
 

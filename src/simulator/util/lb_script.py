@@ -5,6 +5,33 @@ import scipy.special as spec
 
 ##############################################################################
 #                                                                            #
+#                         NO BINOMIAL FUNCTIONS                              #
+#                                                                            #
+##############################################################################
+
+def compute_phi(n, r, Sigma):
+    prod = 1.0
+    for i in range(r):
+        prod *= (Sigma-1)*(n-i)/(i+1)
+    return prod
+
+def compute_mu0(n, r, q, D, Sigma):
+    # mu_0 = mu_00 + mu_01
+    prod_1 = 1.0
+    prod_2 = 1.0
+    for l in range(1,q+1):
+        prod_1 *= (n-D-l) / l
+    for l in range(1,r-2*D+1):
+        prod_2 *= (Sigma-1)*(n-D-q-(l-1))/l
+        
+    return prod_1 * prod_2 * (n-D) / q
+
+def compute_mu1(n, r, q, D, Sigma):
+    pass
+
+
+##############################################################################
+#                                                                            #
 #                         CONVENIENCE FUNCTIONS                              #
 #                                                                            #
 ##############################################################################
@@ -36,11 +63,15 @@ def test_binom_table(n):
 optimization can be made (e.g., Tartaglia's triangle based computation)'''
 def binomial(n,k):
     return binom_table[n+1,k+1]
-    #return spec.binom(n,k)
 
 def composition(n,k):
     return binom_table[n,k]
-#    return binomial(n-1,k-1)
+
+##############################################################################
+#                                                                            #
+#                           COUNTING FUNCTIONS                               #
+#                                                                            #
+##############################################################################
 
 
 # Case q=0 (i.e., main diagonal path)
@@ -48,9 +79,7 @@ def compute_Q0(n, r, Sigma): # Ok
     return binomial(n, r) * pow(Sigma-1, r)
 
 def compute_fd(n, r, D, q, delta_s, delta_e, Sigma): # Ok
-    t = q + 1 - (delta_s + delta_e) # t = q + delta
-    return binomial(n-D-1, t-1)*binomial(n-D-q+delta_e, r -
-                                         2*D)*pow(Sigma-1,r - 2*D)
+    return binomial(n-D-1, q-delta_s-delta_e)*binomial(n-D-q+delta_e, r - 2*D)*pow(Sigma-1,r - 2*D)
     
 def compute_fn(n, r, D, q, delta_s, delta_e, Sigma):  # Ok
     count = 0
@@ -138,6 +167,31 @@ def bound(n, Sigma=4): # OK
 
 ##############################################################################
 #                                                                            #
+#                                 TEST                                       #
+#                                                                            #
+##############################################################################
+
+def run_tests():
+    n = 8
+    Sigma = 4
+    construct_binom_table(n+1)
+    for r in range(n+1):
+        phi = compute_phi(n, r, Sigma)
+        Q0 = compute_Q0(n,r,Sigma)
+        #print(phi-Q0)
+        D_max = int(math.floor(r/2.0))
+        for D in range(D_max+1):
+            bar_q = min(2*D, n-r+D+1)
+            for q in range(2,bar_q+1):
+                fd_00 = compute_fd(n, r, D, q, 0, 0, Sigma)
+                fd_10 = compute_fd(n, r, D, q, 1, 0, Sigma)
+                mu_0 = compute_mu0(n, r, q, D, Sigma)
+                diff = mu_0 - (fd_00+fd_10)
+                print("{0} - ({6}+{7}) = {2}\t {3},{4},{5}".format(mu_0 , (fd_00+fd_10), diff,r,q,D,fd_00,fd_10))
+        
+
+##############################################################################
+#                                                                            #
 #                                 MAIN                                       #
 #                                                                            #
 ##############################################################################
@@ -146,6 +200,10 @@ if __name__ == "__main__":
     if (sys.argv.count("--help") > 0 or sys.argv.count("-h") > 0):
         print("\nUSAGE\n\tpython lb_script.py [n_max] [verbosity] [options]\n\n")
         print("  Options\n\t-h, --help\n")
+        exit(0)
+
+    if (sys.argv.count("--test") > 0):
+        run_tests()
         exit(0)
     
     n_max = 16

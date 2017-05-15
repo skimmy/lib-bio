@@ -116,8 +116,8 @@ def regression(points, weighted=False):
         weight = 1
         if (weighted):
             weight = points[i][2]
-        x[i] = points[i][0] / weight
-        y[i] = points[i][1] / weight
+        x[i] = points[i][0] / math.sqrt(weight)
+        y[i] = points[i][1] / math.sqrt(weight)
     
     # x = [p[0]*weights[0] for p in points]
     # y = [p[1] for p in points]
@@ -137,7 +137,6 @@ if (__name__ == "__main__"):
         # load and transform into log space
         datapoints, en = load_point(file_name)       
         logpoints = loglog_scale(datapoints)
-        print(logpoints)
         
         # regression
         beta_p, gamma_p, err = regression(logpoints, weighted)

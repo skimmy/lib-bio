@@ -3,15 +3,29 @@ import ub_regression as ubreg
 import numpy as np
 
 import sys
+import math
 
-def sum_of_squares_loss(tilde_e, model):
+def sum_of_squares_loss(tilde_e, model, weighted=False):
     squares_sum = 0
+    weight = 1
     for p in tilde_e:
         residual = model(p[0]) - p[1]
-        squares_sum += residual*residual
+        if (weighted):
+            weight = 1.0 / p[2]
+        squares_sum += residual*residual * weight
     return squares_sum
 
-def mesh_parameter_estimation(tilde_e, alpha_int, beta_int, gamma_int, loss_func):
+def sum_of_modules_loss(tilde_e, model, wighted=False):
+    module_sum = 0;
+    weight = 1
+    for p in tilde_e:
+        if (weighted):
+            weight = 1.0 / math.sqrt(p[2])
+        residual = model(p[0]) - p[1]
+        module_sum += abs(residual) * weight
+    return module_sum
+
+def mesh_parameter_estimation(tilde_e, alpha_int, beta_int, gamma_int, loss_func, weighted=False):
     alpha_0 = alpha_int[0]
     alpha_1 = alpha_int[1]
     N_alpha = alpha_int[2]
@@ -35,7 +49,7 @@ def mesh_parameter_estimation(tilde_e, alpha_int, beta_int, gamma_int, loss_func
         for b in range(N_beta):
             gamma = gamma_0
             for c in range(N_gamma):
-                mesh[a][b][c] = loss_func(tilde_e, lambda x: (alpha*x + gamma / pow(x,beta)))
+                mesh[a][b][c] = loss_func(tilde_e, lambda x: (alpha*x + gamma / pow(x,beta)), weighted)
                 #print ("({0}, {1}, {2}) {3}".format(alpha,beta,gamma,mesh[a][b][c]))
                 gamma += gamma_step
                 c +=1                
@@ -67,19 +81,20 @@ def plot_mesh(mesh):
 if (__name__ == "__main__"):
 
     dp, tilde_en = ubreg.load_point(sys.argv[1])
+    weighted = (sys.argv.count("-weight") > 0)
     mesh_edge = 64
 
     for rec_steps in range(1):
 
-        alpha_i = (0.4, 0.6, mesh_edge)
+        alpha_i = (0.5, 0.52, mesh_edge)
         beta_i  = (0, 1, mesh_edge)
-        gamma_i = (0, 1, mesh_edge)
+        gamma_i = (0, 50, mesh_edge)
         alpha_s = (alpha_i[1]-alpha_i[0]) / alpha_i[2]
         beta_s = (beta_i[1]-beta_i[0]) / beta_i[2]
         gamma_s = (gamma_i[1]-gamma_i[0]) / gamma_i[2]
     
-        mesh = mesh_parameter_estimation(tilde_en, alpha_i, beta_i,
-                                         gamma_i, sum_of_squares_loss)
+        mesh = mesh_parameter_estimation(tilde_en, alpha_i, beta_i, gamma_i,
+                                         sum_of_modules_loss, weighted)
 
         min_loss = np.amin(mesh)
         print(min_loss)

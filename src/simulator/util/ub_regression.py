@@ -11,6 +11,7 @@
 
 import sys
 import math
+import numpy as np
 from scipy import stats
 
 '''Returns the smallest integer greater than or equal to x and divisible by n'''
@@ -68,6 +69,14 @@ def plot_curves(params_dict, save_file=False):
     else:
         plt.show()
 
+'''Prepares the datapoints for weighted MSE by multipliying x and y
+by the inverse of variance'''
+def scaled_points(points):
+    out = []
+    for p in points:
+        var = p[2]
+        out.append([p[0]/var, p[1]/var, var, p[3]])
+    return out
 
 def load_point(file_name):
     in_file = open(file_name)
@@ -76,25 +85,42 @@ def load_point(file_name):
     for line in in_file:
         if (line[0] == '#'):
             continue
-        (str_x, str_y) = line.strip().split()
-        e_n.append((float(str_x), float(str_y)))        
-    in_file.close()
-    # transform
+        entry = [float(p) for p in line.strip().split()]
+        e_n.append(entry)        
+    in_file.close()    
+  
     datapoints = []
     for i in range(1,len(e_n)):
         n = e_n[i][0]
+
         en = e_n[i][1]
         en_half = e_n[i-1][1]
-        datapoints.append( (float(n), 2.0*en_half - en) )
+        
+        var_n = e_n[i][2]
+        var_n_half = e_n[i-1][2]
+        
+        datapoints.append( [float(n), 2.0*en_half - en, 4*var_n_half + var_n] )
     return datapoints, e_n
 
 def loglog_scale(line_points, base=2):
-    log_points = [( math.log(x[0],base), math.log(x[1],base) ) for x in line_points]    
+    log_points = []
+    for x in line_points:        
+        log_points.append([math.log(x_i,base) for x_i in x])
     return log_points
 
-def regression(points):
-    x = [p[0] for p in points]
-    y = [p[1] for p in points]
+def regression(points, weighted=False):
+    m = len(points)
+    x = np.zeros(m)
+    y = np.zeros(m)
+    for i in range(m):
+        weight = 1
+        if (weighted):
+            weight = points[i][2]
+        x[i] = points[i][0] / weight
+        y[i] = points[i][1] / weight
+    
+    # x = [p[0]*weights[0] for p in points]
+    # y = [p[1] for p in points]
     slope, intercept, r_v, p_v, std_err = stats.linregress(x,y)
     return slope, intercept, std_err
 
@@ -104,14 +130,17 @@ def test(log_p, g, b):
 if (__name__ == "__main__"):
     print("")
     file_names = sys.argv[1].split(',')
+    weighted = sys.argv.count("-weight")>0
     params_dict = dict()
     # for each given file
     for file_name in file_names:
         # load and transform into log space
-        datapoints, en = load_point(file_name)
+        datapoints, en = load_point(file_name)       
         logpoints = loglog_scale(datapoints)
+        print(logpoints)
+        
         # regression
-        beta_p, gamma_p, err = regression(logpoints)
+        beta_p, gamma_p, err = regression(logpoints, weighted)
         params_dict[file_name] = (beta_p, gamma_p, err, datapoints, logpoints)
         print("File: {0}\tm = {1}".format(file_name, len(en)))
         print("\n".join([str(x[1]) for x in datapoints]))

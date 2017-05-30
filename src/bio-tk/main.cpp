@@ -86,7 +86,7 @@ int runTask(OPTIONS& opts) {
       task_generate(gen_opts);
       break;
     }
-  case 7: // edaf (Edit Distance VS Alignment FreE)
+  case 7: // edaf (Edit Distance VS Alignment Free)
     {
       std::cout << "EDAF\n";
       std::ifstream _conf(opts.config_file);

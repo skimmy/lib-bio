@@ -21,7 +21,7 @@
 
 #include <lbio.h>
 #include <algorithms/dynamic_programming.hpp>
-#include <algorithms/edit_distance.hpp>
+#include <algorithms/distances.hpp>
 
 #include <iostream>
 #include <vector>

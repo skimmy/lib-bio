@@ -34,7 +34,7 @@ DEFAULT_NAMESPACE_BEGIN
    \tparam _Alloc     An allocator type
 
    This implementation uses one single array to store the two
-   dimensional matrix. This means that accesses all happen in constant
+   dimensional matrix. This means that any accesses requires constant
    time, but moving rows and columns always requires to move the
    actual elements.
  */
@@ -63,11 +63,13 @@ struct _2D_matrix
     delete[] _mat;
   }
 
-  content_type operator()(index_type _i, index_type _j) const {
+  content_type
+  operator()(index_type _i, index_type _j) const {
     return _mat[_i*_cols + _j];
   }
 
-  content_type& operator()(index_type _i, index_type _j) {
+  content_type&
+  operator()(index_type _i, index_type _j) {
     return _mat[_i*_cols + _j];
   }
 };

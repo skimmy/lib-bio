@@ -141,14 +141,14 @@ if (__name__ == "__main__"):
     k = 4
     max_rec_level = 2
 
-    alpha_i = (0.5, 0.6, mesh_edge)
-    beta_i  = (0.2, 0.4, mesh_edge)
-    gamma_i = (0, 6, mesh_edge)
+    alpha_i = (0.45, 0.6, mesh_edge)
+    beta_i  = (0.2, 0.8, mesh_edge)
+    gamma_i = (0, 4, mesh_edge)
 
-    intervals = {}
-    intervals["alpha"] = (0.5, 0.6)
-    intervals["beta"]  = (0.2, 0.4)
-    intervals["gamma"] = (0,6)
+    # intervals = {}
+    # intervals["alpha"] = (0.5, 0.6)
+    # intervals["beta"]  = (0.2, 0.4)
+    # intervals["gamma"] = (0,6)
     #compute_minima(tilde_en, intervals, mesh_edge, sum_of_squares_loss, k)
     
     
@@ -158,6 +158,9 @@ if (__name__ == "__main__"):
 
        
         q = Q[0]
+        alpha_i = q[0]
+        beta_i = q[1]
+        gamma_i = q[2]
         Q = Q[1:]
         mesh = mesh_parameter_estimation(tilde_en, q[0], q[1], q[2],
                                          sum_of_squares_loss, weighted)

@@ -463,15 +463,15 @@ namespace lbio { namespace sim { namespace edit {
 // on the 64 for bits input integers (strings can't be longer than 32
 // characters). The actual lengths of the strings are given as
 // parameters
-size_t
-edit_distance_encoded(uint64_t s1, size_t n1, uint64_t s2,
-		    size_t n2, size_t** dpMatrix) {
-  for (size_t i = 1; i < n1+1; ++i) {
-    for(size_t j = 1; j < n2+1; ++j) {
+lbio_size_t
+edit_distance_encoded(uint64_t s1, lbio_size_t n1, uint64_t s2,
+		    lbio_size_t n2, lbio_size_t** dpMatrix) {
+  for (lbio_size_t i = 1; i < n1+1; ++i) {
+    for(lbio_size_t j = 1; j < n2+1; ++j) {
       // pre compute matrix {A,C,G,T} x [1...n]
       uint64_t x = ( s1 >> 2*(i-1) ) & 0x3; 
       uint64_t y = ( s2 >> 2*(j-1) ) & 0x3;
-      size_t delta = (x == y) ? 0 : 1;       
+      lbio_size_t delta = (x == y) ? 0 : 1;       
       dpMatrix[i][j] =
 	std::min( std::min(dpMatrix[i-1][j]+1, dpMatrix[i][j-1]+1),
 		  dpMatrix[i-1][j-1] + delta ) ;
@@ -480,25 +480,66 @@ edit_distance_encoded(uint64_t s1, size_t n1, uint64_t s2,
   return dpMatrix[n1][n2];
 }
 
-double
-test_exhaustive_edit_distance_encoded(lbio_size_t n, double* freq) {
-  size_t** dpMatrix = new size_t*[n+1];
-  for (size_t i = 0; i < n+1; ++i) {
-    dpMatrix[i] = new size_t[n+1];
-  }
-
-
+void
+edit_distance_exhastive_with_info(lbio_size_t n) {
+  lbio_size_t** dpMatrix = allocMatrix<lbio_size_t>(n+1,n+1);
   // initialization of first row and column
-  for (size_t i = 0; i < n+1; ++i) {
+  for (lbio_size_t i = 0; i < n+1; ++i) {
     dpMatrix[i][0] = i;
   }
-  for (size_t j = 0; j < n+1; ++j) {
+  for (lbio_size_t j = 0; j < n+1; ++j) {
+    dpMatrix[0][j] = j;
+  }
+
+  uint64_t N = pow(4,n);
+  double tot_dist = 0;
+  
+  double min_dist = n;
+  uint64_t min_center = 0;
+  double max_dist = 0;
+  uint64_t max_center = 0;
+  
+  for (uint64_t i = 0; i < N; ++i) {
+    lbio_size_t dist = 0;
+    
+    for (uint64_t j = 0; j <N; ++j) {
+      dist += edit_distance_encoded(i, n, j, n, dpMatrix);
+    }
+
+    double ddist = dist / static_cast<double>(N);
+    tot_dist += dist;
+    if (ddist < min_dist) {
+      min_center = i;
+      min_dist = ddist;      
+    }
+    if (ddist > max_dist) {
+      max_center = i;
+      max_dist = ddist;
+    }
+  }
+  tot_dist /= static_cast<double>(N*N);
+  freeMatrix(n+1, n+1, dpMatrix);
+  std::cout << "Min: " << min_center << "\t" << min_dist << "\n";
+  std::cout << "Max: " << max_center << "\t" << max_dist << "\n";
+  std::cout << "Avg: " << tot_dist << "\n";
+}
+
+double
+test_exhaustive_edit_distance_encoded(lbio_size_t n, double* freq) {
+
+  lbio_size_t** dpMatrix = allocMatrix<lbio_size_t>(n+1,n+1);
+
+  // initialization of first row and column
+  for (lbio_size_t i = 0; i < n+1; ++i) {
+    dpMatrix[i][0] = i;
+  }
+  for (lbio_size_t j = 0; j < n+1; ++j) {
     dpMatrix[0][j] = j;
   }
 
   uint64_t N = pow(4,n);
   double ed = 0;
-  size_t dist = 0;
+  lbio_size_t dist = 0;
   for (uint64_t i = 0; i < N; ++i) {
     freq[0]++;
     for (uint64_t j = i+1; j <N; ++j) {
@@ -507,10 +548,7 @@ test_exhaustive_edit_distance_encoded(lbio_size_t n, double* freq) {
       ed += 2*dist;
     }
   }
-  for (size_t i = 0; i < n+1; ++i) {
-    delete[] dpMatrix[i];
-  }
-  delete[] dpMatrix;
+  freeMatrix(n+1, n+1, dpMatrix);
   return ((double)ed) / ((double) (N*N));
 }
 

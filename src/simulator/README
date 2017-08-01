@@ -1,0 +1,20 @@
+Simulator Options
+-----------------
+
+--task [simulator operation]
+   6 Edit Distance
+
+-B [sub-task]
+   0  Edit distance calculation (default)
+   32 Algorithms comparison
+   64 g(n) Estimation with bounded error on difference
+
+-f [flags]
+   Edit distance calculation
+   0  Sample, Linear (default)
+   1  Exhaustive
+   5  Exhaustive with min and max centers 
+   4  Sample, Linear and info (prototype)
+   14 Sample, Quadratic and Info  
+   32 Bounded error on e(n)
+   64 Bounded error on difference 2e(n/2) - e(n) 

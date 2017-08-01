@@ -93,6 +93,9 @@ size_t edit_distance_encoded(uint64_t s1, lbio_size_t n1, uint64_t s2,
 double
 test_exhaustive_edit_distance_encoded(lbio_size_t n, double* freq);
 
+      
+void edit_distance_exhastive_with_info(lbio_size_t n);
+      
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
 //                           ALPHABET ITERATOR                              //

@@ -356,14 +356,14 @@ editDistanceOpMode() {
   // mean and variance output
   // no script
   // no sample matrix
-  int flags = Options::opts.optFlags;
+  int flags = Options::opts.optFlags; // -f
   size_t n = Options::opts.N;
-  int task = Options::opts.subTask;
+  int task = Options::opts.subTask; // -B
   edOut->distPDF = new double[n+1];
   std::fill_n(edOut->distPDF, n+1, 0);
 
   // TASK - Scripts Generation (8)
-  if (task == EDIT_DISTANCE_SUBTASK_SCRIPT_DIST) {
+  if (task == EDIT_DISTANCE_SUBTASK_SCRIPT_DIST) { // -B 8
     logInfo("Task 'Script Distribution'");
 
     AlgorithmExact alg {n, n, {1,1,1}};
@@ -382,10 +382,9 @@ editDistanceOpMode() {
       for (std::string script : allScripts) {
 	std::cout << script << "\n";
       }
-    }
-    
+    }     
     return;
-  }
+  } 
 
   // TASK - Algorithms comparison (32)
   if (task == EDIT_DISTANCE_SUBTASK_COMPARE_ALGS) {
@@ -394,7 +393,7 @@ editDistanceOpMode() {
     return;
   }
 
-  // Task - Default (0)
+  // TASK - Edit distance calculation (0, default)
   if (flags & EDIT_DISTANCE_DIFF_BOUNDED_ERROR) { // -f 64
     logInfo("Task 'g(n) Esitmation'");
     size_t k_max = Options::opts.k;
@@ -435,7 +434,7 @@ editDistanceOpMode() {
     return;
   }
 
-  if (flags & EDIT_DISTANCE_BOUNDED_ERROR) {
+  if (flags & EDIT_DISTANCE_BOUNDED_ERROR) { // -f 32
     double precision = Options::opts.precision;
     double z_confidence = Options::opts.confidence;
     SampleEstimates beEst =
@@ -444,13 +443,22 @@ editDistanceOpMode() {
 	      << beEst.sampleVariance << "\n";
     return;
   }
-  
+  // Task Exhaustive 
   if (flags & EDIT_DISTANCE_ESTIMATE_EXHAUSTIVE) {
-    // Exhasutve (only quadratic)
-    logWarning("only \033[1;37mqudratic algorithm\033[0m" 
-	       " available with exhaustive option");
-    double avgDist = test_exhaustive_edit_distance_encoded(n, edOut->distPDF);
-    std::cout << avgDist << std::endl;    
+    if (flags & EDIT_DISTANCE_INFO_PARTIAL) { // -f 5
+      logWarning("only \033[1;37mqudratic algorithm\033[0m" 
+		 " available with exhaustive option");
+      logInfo("Exhaustive edit distance with min-max info");
+      edit_distance_exhastive_with_info(n);
+    }
+    else {
+      // Exhasutve (only quadratic)
+      logWarning("only \033[1;37mqudratic algorithm\033[0m" 
+		 " available with exhaustive option");
+      logInfo("Exhaustive edit distance");
+      double avgDist = test_exhaustive_edit_distance_encoded(n, edOut->distPDF);
+      std::cout << avgDist << std::endl;
+    }
   }
   
   else {

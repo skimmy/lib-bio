@@ -534,29 +534,24 @@ editDistanceOpMode() {
 
 void
 prototyping() {
-  std::string proto_task_msg = make_bold("Edit Distance (AlphabetIterator)");
+  std::string proto_task_msg = make_bold("Edit Distance (Fixed string samples)");
   logInfo("Working on " + proto_task_msg + " prototyping");
 
   lbio_size_t n = Options::opts.N;
-  using BandAlgorithm = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
-  lbio_size_t bandwidth = static_cast<lbio_size_t>(n >>1);
-  BandAlgorithm alg(n, n, bandwidth, {1,1,1});
+  lbio_size_t k = Options::opts.k;
+  std::string s(n, 'N');
+  for (lbio_size_t i = 0; i<n; ++i) {
+    s[i] = bases[i%4];
+  }
+  std::vector<size_t> v = edit_samples_fixed_string(n, k, s);
+  
 
-  std::string center(n, 'N');
-  generateIIDString(center);
-  std::vector<lbio_size_t> hulls(n+1,0);
-  AlphabetIterator it(n);
-  std::string b {""};
-  for(; it != it.end(); ++it) {
-    b = *it;
-    lbio_size_t d = alg.calculate(center, b);
-//    std::cout << b << "\t" << d << "\n";
-    hulls[d]++;
+  double sum = 0;
+  for (size_t x : v) {
+    sum += static_cast<double>(x) / static_cast<double>(n) ;
+    std::cout << static_cast<double>(x) / static_cast<double>(n) << "\n";
   }
-  std::cout << center << "\n";
-  for (lbio_size_t r = 0; r != n+1; ++r) {
-    std::cout << r << "\t" << hulls[r] << "\n";
-  }
+  std::cout << "AVG: " << sum / static_cast<double>(k) << "\n";
 }
 
 int main(int argc, char** argv) {   

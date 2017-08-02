@@ -483,6 +483,8 @@ editDistanceLinSpaceInfo(const std::string& s1, const std::string& s2,
 			 EditDistanceInfo* v0, EditDistanceInfo* v1,
 			 EditDistanceInfo** sampleMat = NULL);
 
+std::vector<size_t>
+edit_samples_fixed_string(size_t n, size_t k_samples, const std::string& s2);
 
 size_t
 editDistanceBandwiseApprox(const std::string& s1,

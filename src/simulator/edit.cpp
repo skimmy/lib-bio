@@ -309,6 +309,25 @@ editDistSamplesInfoLinSpace(size_t n, size_t k_samples,
   return samples;
 }
 
+std::vector<size_t>
+edit_samples_fixed_string(size_t n, size_t k_samples, const std::string& s2) {
+  std::vector<size_t> samples;
+  std::string s1(n, 'N');
+
+  size_t* v0 = new size_t[n+1];
+  size_t* v1 = new size_t[n+1];
+
+  for (size_t k = 0; k < k_samples; ++k) {
+    generateIIDString(s1);
+    samples.push_back(editDistanceLinSpace(s1,s2, v0, v1));
+  }
+
+  delete[] v1;
+  delete[] v0;
+  
+  return samples;
+}
+
 // ----------------------------------------------------------------------
 //                          ESTIMATION PROCEDURE
 // ----------------------------------------------------------------------

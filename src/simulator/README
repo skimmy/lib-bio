@@ -2,6 +2,7 @@ Simulator Options
 -----------------
 
 --task [simulator operation]
+   0 Testing
    6 Edit Distance
 
 -B [sub-task]
@@ -18,3 +19,4 @@ Simulator Options
    14 Sample, Quadratic and Info  
    32 Bounded error on e(n)
    64 Bounded error on difference 2e(n/2) - e(n) 
+

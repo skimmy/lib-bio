@@ -539,19 +539,37 @@ prototyping() {
 
   lbio_size_t n = Options::opts.N;
   lbio_size_t k = Options::opts.k;
+
+  // sampling w.r.t. "ACGT*"
   std::string s(n, 'N');
   for (lbio_size_t i = 0; i<n; ++i) {
     s[i] = bases[i%4];
   }
-  std::vector<size_t> v = edit_samples_fixed_string(n, k, s);
-  
 
+  std::vector<size_t> v = edit_samples_fixed_string(n, k, s);
+  auto est = estimatesFromSamples(v.cbegin(), v.cend(), k);
+  std::cout << est << "\n";
+  
+  // double sum = 0;
+  // double square_suma = 0;
+  // for (size_t x : v) {
+  //   double d = static_cast<double>(x);
+  //   sum += d / static_cast<double>(n);
+  //   square_sum += d*d;
+  // }
+  // souble sample_mean = sum / static_cast<double>(k);
+  // std::cout << "AVG (ACGT*): " << sample_mean << "\n";
+  // std::cout << "Var (ACGT*): " << square_sum - sample_mean*sample_mean
+
+  // sampling w.r.t. "A*"
+  s = std::string(n, 'A');
+  v = edit_samples_fixed_string(n, k, s);
   double sum = 0;
   for (size_t x : v) {
     sum += static_cast<double>(x) / static_cast<double>(n) ;
-    std::cout << static_cast<double>(x) / static_cast<double>(n) << "\n";
   }
-  std::cout << "AVG: " << sum / static_cast<double>(k) << "\n";
+  std::cout << "AVG (A*):    " << sum / static_cast<double>(k) << "\n";
+
 }
 
 int main(int argc, char** argv) {   

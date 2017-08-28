@@ -89,6 +89,32 @@ SampleEstimates estimatesFromSamples(T samples[], size_t k) {
   return est;
 }
 
+/**
+ * \brief Computes the estimators for the given range
+ */
+template<typename T>
+SampleEstimates estimatesFromSamples(T begin, T end, lbio_size_t k) {
+  SampleEstimates est;
+  est.sampleSize = k;
+
+  // estimates the 'sample mean'
+  for (T it = begin; it != end; ++it) {
+    est.sampleMean += (double)*it;    
+  }
+  est.sampleMean /= (double)est.sampleSize;
+
+  // estimates the 'sample variance'
+  double tmp = 0;
+
+  for (T it = begin; it != end; ++it) {
+    tmp = (*it - est.sampleMean);
+    est.sampleVariance += tmp*tmp;
+  }
+  est.sampleVariance /= (double)(est.sampleSize - 1);
+  return est;
+  
+}
+
 void initProbabilities();
 void clearProbabilities();
 double randomReadsOverlapProbNoErr(const std::string& s1, const std::string& s2, size_t s);

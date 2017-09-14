@@ -17,11 +17,11 @@
 #define EDIT_DISTANCE_ALGORITHM_QUADRATIC 0x2
 #define EDIT_DISTANCE_INFO_PARTIAL        0x4
 #define EDIT_DISTANCE_INFO_SCRIPT         0x8
-
+#define EDIT_DISTANCE_MINMAX_STRING       0x10 // 16
 #define EDIT_DISTANCE_BOUNDED_ERROR       0x20 // 32
 #define EDIT_DISTANCE_DIFF_BOUNDED_ERROR  0x40 // 64
-
 #define EDIT_DISTANCE_BANDWIDTH_ESTIMATE  0x80 // 128
+
 // Approx ~g(n) --> 64+128 = 192 --> -f 192
 
 // edit distance subtasks

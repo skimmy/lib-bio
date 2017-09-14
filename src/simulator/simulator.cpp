@@ -461,15 +461,15 @@ editDistanceOpMode() {
     }
   }
   
-  else {
+  else { // Not exhaustive
     // SAMPLE
     size_t k = Options::opts.k;
 
-    if (flags & EDIT_DISTANCE_ALGORITHM_QUADRATIC) {
+    if (flags & EDIT_DISTANCE_ALGORITHM_QUADRATIC) {      
       // QUADRATIC + Sample
-      if (flags & EDIT_DISTANCE_INFO_PARTIAL) {
+      if (flags & EDIT_DISTANCE_INFO_PARTIAL) { 
 	// Sample + Quadratic + Partial Info
-	if (flags & EDIT_DISTANCE_INFO_SCRIPT) {
+	if (flags & EDIT_DISTANCE_INFO_SCRIPT) { // -f 14
 	  logInfo("Sample quadratic algorithms info");
 	  AlgorithmExact algExact {n, n, {1,1,1}};
 	  EditDistanceSample<AlgorithmExact> generator {n, n};
@@ -487,9 +487,10 @@ editDistanceOpMode() {
     }
 
     
-    else {
-      // LINEAR + Sample
-      if (flags & EDIT_DISTANCE_INFO_PARTIAL) {
+    else { 
+      // LINEAR + Sample     
+      
+      if (flags & EDIT_DISTANCE_INFO_PARTIAL) { // -f 4
 	// PARTIAL INFO + Sample + Linear
 	logWarning("Partial info for linear under developement");
 	std::unique_ptr<EditDistanceInfo[]> samples =
@@ -513,13 +514,34 @@ editDistanceOpMode() {
 	    std::cout << samples[i] << std::endl;
 	  }
 	}
-
 	std::cout << subEst.sampleMean << "\t" << subEst.sampleVariance << "\n";
 	std::cout << delEst.sampleMean << "\t" << delEst.sampleVariance << "\n";
-	std::cout << insEst.sampleMean << "\t" << insEst.sampleVariance << "\n";
-	
+	std::cout << insEst.sampleMean << "\t" << insEst.sampleVariance << "\n";	
       }
-      else {
+
+      if (flags & EDIT_DISTANCE_MINMAX_STRING) { // -f 16
+	logInfo("Sampling periodic/constant string distribution");
+
+	std::cout << std::endl;
+	// Sampling e("ACGT^*, Y)
+	std::string s(n, 'N');
+	for (lbio_size_t i = 0; i<n; ++i) {
+	  s[i] = bases[i%4];
+	}
+	std::vector<size_t> v = edit_samples_fixed_string(n, k, s);
+	auto est = estimatesFromSamples(v.cbegin(), v.cend(), k);
+	std::cout << "ACGT*\t" << est << "\n";
+
+	// sampling  e("A*", Y)
+	s = std::string(n, 'A');
+	v = edit_samples_fixed_string(n, k, s);
+	est = estimatesFromSamples(v.cbegin(), v.cend(), k);
+	std::cout << "A*\t" << est << "\n";
+	std::cout << std::endl;	
+	return;
+      }
+      
+      else { // -f 0
 	// MINIMAL INFO (mean + var) + Sample + Linear
 	logInfo("Basic sampling");
 	AlgorithmBand alg(n, n, std::ceil(n/2.0), {1,1,1});
@@ -536,40 +558,6 @@ void
 prototyping() {
   std::string proto_task_msg = make_bold("Edit Distance (Fixed string samples)");
   logInfo("Working on " + proto_task_msg + " prototyping");
-
-  lbio_size_t n = Options::opts.N;
-  lbio_size_t k = Options::opts.k;
-
-  // sampling w.r.t. "ACGT*"
-  std::string s(n, 'N');
-  for (lbio_size_t i = 0; i<n; ++i) {
-    s[i] = bases[i%4];
-  }
-
-  std::vector<size_t> v = edit_samples_fixed_string(n, k, s);
-  auto est = estimatesFromSamples(v.cbegin(), v.cend(), k);
-  std::cout << est << "\n";
-  
-  // double sum = 0;
-  // double square_suma = 0;
-  // for (size_t x : v) {
-  //   double d = static_cast<double>(x);
-  //   sum += d / static_cast<double>(n);
-  //   square_sum += d*d;
-  // }
-  // souble sample_mean = sum / static_cast<double>(k);
-  // std::cout << "AVG (ACGT*): " << sample_mean << "\n";
-  // std::cout << "Var (ACGT*): " << square_sum - sample_mean*sample_mean
-
-  // sampling w.r.t. "A*"
-  s = std::string(n, 'A');
-  v = edit_samples_fixed_string(n, k, s);
-  double sum = 0;
-  for (size_t x : v) {
-    sum += static_cast<double>(x) / static_cast<double>(n) ;
-  }
-  std::cout << "AVG (A*):    " << sum / static_cast<double>(k) << "\n";
-
 }
 
 int main(int argc, char** argv) {   

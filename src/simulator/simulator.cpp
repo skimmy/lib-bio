@@ -21,6 +21,7 @@
 #include <include/edit.hpp>
 #include <include/edit_estimates.hpp>
 #include <include/online.hpp>
+#include <include/lcs.hpp>
 
 // standard includes
 #include <cstdlib>
@@ -34,6 +35,7 @@
 using namespace lbio::sim;
 using namespace lbio::sim::generator;
 using namespace lbio::sim::edit;
+using namespace lbio::sim::lcs;
 using namespace lbio::sim::log;
 
 // output quantities (common to online and offline)
@@ -556,8 +558,15 @@ editDistanceOpMode() {
 
 void
 prototyping() {
-  std::string proto_task_msg = make_bold("Edit Distance (Fixed string samples)");
+  std::string proto_task_msg = make_bold("LCS (greedy)");
   logInfo("Working on " + proto_task_msg + " prototyping");
+  std::string s1 {"ACCGTTAG"};
+  std::string s2 {"TTCGATGG"};
+  auto res = lcs_greedy(s1.begin(), s1.end(), s2.begin(), s2.end());
+  std::cout << s1 << "\n" << s2 << "\n";
+  for (std::pair<lbio_size_t, lbio_size_t> x : res) {
+    std::cout << "(" << x.first << ", " << x.second << ")\t" << s1[x.first]  << " " << s2[x.second] << "\n" ;
+  }
 }
 
 int main(int argc, char** argv) {   

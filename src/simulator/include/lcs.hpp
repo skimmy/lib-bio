@@ -24,6 +24,36 @@
 
 namespace lbio { namespace sim { namespace lcs {
 
+template<typename _T>
+std::vector<std::pair<lbio_size_t, lbio_size_t>>
+lcs_greedy(const _T& s1, lbio_size_t n, const _T& s2, lbio_size_t m) {
+  std::vector<std::pair<lbio_size_t, lbio_size_t>> lcs_list {};
+  lbio_size_t i {0};
+  lbio_size_t j {0};
+  while (i<n and j<m) {    
+    lbio_size_t d_max = (n-i) + (m-j);
+    lbio_size_t d = 0;
+    bool loop = true;
+    while (d <= d_max and loop) {
+//      std::cout << "(" << i <<","<<j<<") " <<d <<" "  << d_max << "\n";
+      for (lbio_size_t h = 0; h <= d; ++h) {
+	lbio_size_t di = d-h;
+	lbio_size_t dj = h;
+//	std::cout << "\t" << "(" << i+di << "," <<j+dj<<") " << s1[i+di] << " " << s2[j+dj] << "\n";
+	if (s1[i+di] == s2[j+dj]) {
+	  lcs_list.push_back(std::make_pair(i+di, j+dj));
+	  i += di + 1;
+	  j += dj + 1;
+	  loop = false; 
+	  break; // exit the for h=0,...,d
+	}
+      }
+      ++d;
+    }
+  }
+  return lcs_list;
+}
+
 template <typename _IterT>
 std::vector<std::pair<lbio_size_t, lbio_size_t> > 
 lcs_greedy(_IterT b1, _IterT e1, lbio_size_t n,
@@ -42,13 +72,13 @@ lcs_greedy(_IterT b1, _IterT e1, lbio_size_t n,
     else {
       lbio_size_t d = 1;
       bool end_loop = false;
-      while ( (!end_loop) and (d < (n-i+1) + (m-j+1)) ) {
-	for (lbio_size_t h = 0; h < d; ++h) {
+      while ( (!end_loop) and (d < (n-i+2) + (m-j+2) ) ) {
+	for (lbio_size_t h = 0; h <= d; ++h) {
 	  lbio_size_t di = d - h;
 	  lbio_size_t dj = h;
 	  if (*(b1+di) == *(b2+dj)) {
-	    i += di;
-	    j += dj;
+	    i += di+1;
+	    j += dj+1;
 	    lcs_list.push_back(std::make_pair(i,j));
 	    b1 += di;
 	    b2 += dj;
@@ -56,10 +86,8 @@ lcs_greedy(_IterT b1, _IterT e1, lbio_size_t n,
 	  }
 	}
 	++d;
-      }
-
+      }    
     }
-    
   }
   return lcs_list;
 }

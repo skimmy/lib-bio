@@ -17,12 +17,52 @@
 #ifndef SIM_LCS_H
 #define SIM_LCS_H
 
+#include <include/edit.hpp>
 #include <include/common.hpp>
 
 #include <vector>
 #include <iterator>
 
 namespace lbio { namespace sim { namespace lcs {
+
+/**
+   Longest common subsequence calculation based on the qudratic dynamic
+   programming algorithm and canonical backtracking (see G. Lueker 2009).
+ */
+template<typename _T>
+std::vector<std::pair<lbio_size_t, lbio_size_t>>
+lcs_full_dp(const _T& s1, lbio_size_t n, const _T& s2, lbio_size_t m,
+	    DynamicProgramming<lbio_size_t>& matrix) {
+  // forward
+  for (lbio_size_t r = 1; r <= n; ++r) {
+    for (lbio_size_t c = 1; c <= m; ++c) {
+      if (s1[r-1] == s2[c-1]) {
+	matrix(r,c) = std::max(std::max(matrix(r-1,c), matrix(r,c-1)), matrix(r-1,c-1) + 1);
+      } else {
+	matrix(r,c) = std::max(matrix(r-1,c), matrix(r,c-1));
+      }
+    }
+  }
+
+  // backtrack
+  std::vector<std::pair<lbio_size_t, lbio_size_t>> lcs;
+  lbio_size_t r = n;
+  lbio_size_t c = m;
+  while(r>0 and c>0) {
+    if (matrix(r,c) == matrix(r-1,c)) {
+      --r;
+      continue;
+    }
+    if (matrix(r,c) == matrix(r,c-1)) {
+      --c;
+      continue;
+    }
+    --c;
+    --r;
+    lcs.push_back(std::make_pair(r,c));
+  }
+  return lcs;
+}
 
 template<typename _T>
 std::vector<std::pair<lbio_size_t, lbio_size_t>>
@@ -35,11 +75,9 @@ lcs_greedy(const _T& s1, lbio_size_t n, const _T& s2, lbio_size_t m) {
     lbio_size_t d = 0;
     bool loop = true;
     while (d <= d_max and loop) {
-//      std::cout << "(" << i <<","<<j<<") " <<d <<" "  << d_max << "\n";
       for (lbio_size_t h = 0; h <= d; ++h) {
 	lbio_size_t di = d-h;
 	lbio_size_t dj = h;
-//	std::cout << "\t" << "(" << i+di << "," <<j+dj<<") " << s1[i+di] << " " << s2[j+dj] << "\n";
 	if (s1[i+di] == s2[j+dj]) {
 	  lcs_list.push_back(std::make_pair(i+di, j+dj));
 	  i += di + 1;

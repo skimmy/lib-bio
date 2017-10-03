@@ -560,26 +560,28 @@ void
 prototyping() {
   std::string proto_task_msg = make_bold("LCS (greedy)");
   logInfo("Working on " + proto_task_msg + " prototyping");
+  
   std::string s1 {"ACCGTTAG"};
   std::string s2 {"TTCGATGG"};
-  auto res = lcs_greedy(s1, s1.size(), s2, s2.size());
-//lcs_greedy(s1.begin(), s1.end(), s2.begin(), s2.end());
+  DynamicProgramming<lbio_size_t> dp_matrix {s1.size(), s2.size()};
+  auto res = lcs_full_dp(s1, s1.size(), s2, s2.size(), dp_matrix);
   std::cout << s1 << "\n" << s2 << "\n";
   for (std::pair<lbio_size_t, lbio_size_t> x : res) {
     std::cout << "(" << x.first << ", " << x.second << ")\t" << s1[x.first]  << " " << s2[x.second] << "\n" ;
   }
+  dp_matrix.print_matrix();
 
-  lbio_size_t n = 1 << 24;
-  lbio::sim::generator::IidPairGenerator gen {n,n};
-  double gamma_est = 0;
-  lbio_size_t k = 1;
-  while(k<100) {
-    auto pair = gen();
-    auto res_pair = lcs_greedy(pair.first, n, pair.second, n);
-    gamma_est += static_cast<double>(res_pair.size()) / static_cast<double>(n);
-    std::cout << gamma_est / k << "\n";
-    ++k;
-  }
+  // Lbio_size_t n = 1 << 24;
+  // lbio::sim::generator::IidPairGenerator gen {n,n};
+  // double gamma_est = 0;
+  // lbio_size_t k = 1;
+  // while(k<100) {
+  //   auto pair = gen();
+  //   auto res_pair = lcs_greedy(pair.first, n, pair.second, n);
+  //   gamma_est += static_cast<double>(res_pair.size()) / static_cast<double>(n);
+  //   std::cout << gamma_est / k << "\n";
+  //   ++k;
+  // }
 }
 
 int main(int argc, char** argv) {   

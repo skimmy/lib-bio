@@ -2,6 +2,10 @@ import sys
 import math
 import scipy.special as spec
 
+def H(p):
+    q = 1-p
+    return p*math.log2(1/p) + q*math.log2(1/q)
+
 def s_r_UB_q_approx(n, r, nD, q, Sigma):
     delta_term = ( spec.binom(n-r+nD,q) + spec.binom(n-r+nD,q-1) ) 
     return delta_term * spec.binom(q , int(math.floor(q/2)))*spec.binom(2*nD-1, q-2)

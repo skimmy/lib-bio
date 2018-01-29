@@ -14,6 +14,7 @@ void
 edaf_task(std::map<std::string, std::string> params) {
   lbio_size_t L_max = std::atoi(params["L"].c_str());
   lbio_size_t k = std::atof(params["k"].c_str());
+  int verbosity = std::atof(params["verbosity"].c_str());  
   std::string files_opts = params["fastq"];
   std::vector<std::string> files =
     lbio::split(files_opts.cbegin(), files_opts.cend(), ',');
@@ -36,7 +37,10 @@ edaf_task(std::map<std::string, std::string> params) {
      double D2 = lbio::D2_star<std::string>(k, s1.cbegin(), s1.cend(),
 					    s2.cbegin(), s2.cend(),
 					    [] (std::string c) { return 0.25; });
-     std::cout << s1 << "\n" << s2 << "\n" << d << "\t" << e << "\t" << D2 << "\n";
+     if (verbosity > 0) {
+       std::cout << s1 << "\n" << s2 << "\n";
+     }
+     std::cout<< d << "\t" << e << "\t" << D2 << "\n";
      ++it_1;
      ++it_2;
    }

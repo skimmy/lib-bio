@@ -69,6 +69,36 @@ def composition(n,k):
 
 ##############################################################################
 #                                                                            #
+#                     APPROXIMATE COUNTING FUNCTIONS                         #
+#                                                                            #
+##############################################################################
+
+def tilde_mu(n, r, D, q, delta_e, Sigma, Simple=False):
+    t_mu = binomial(n-r+D, q-delta_e)
+    if (Simple):
+        return t_mu
+    else:
+        a = float(n-D-q+delta_e)
+        b = float(q-delta_e)
+        return float(t_mu) * max(a,b) / float(n-D)
+
+def compute_approx_fd(n, r, D, q, delta_s, delta_e, Sigma):
+    fn = binomial(n-D,r-2*D) * pow(Sigma-1, r-2*D)
+    return fn * tilde_mu(n,r,D,q,delta_e,Sigma)
+
+def tilde_psi(n, r, D, q, Sigma):
+    q_2_floor = int(math.floor(q/2.0))
+    t_psi = binomial(q,q_2_floor) * binomial(2*D-2, q-2)    
+    return t_psi
+
+def compute_approx_fn(n, r, D, q, delta_s, delta_e, Sigma):
+    rho = Sigma*delta_e + (Sigma-1)*(1-delta_e)
+    return pow(rho,D)*tilde_psi(n, r, D, q, Sigma)
+
+
+
+##############################################################################
+#                                                                            #
 #                           COUNTING FUNCTIONS                               #
 #                                                                            #
 ##############################################################################
@@ -121,8 +151,8 @@ def count_canonical_annotated_path_r_D_q(n, r, D, q, Sigma):
     # sum of fd*fn
     for delta_s in range(2):
         for delta_e in range(2):
-            fd = compute_fd(n, r, D, q, delta_s, delta_e, Sigma)
-            fn = compute_fn(n, r, D, q, delta_s, delta_e, Sigma)
+            fd = compute_fd(n, r, D, q, delta_s, delta_e, Sigma) # fd=mu
+            fn = compute_fn(n, r, D, q, delta_s, delta_e, Sigma) # fn=psi
             count += fd*fn
     return count
             
@@ -188,6 +218,32 @@ def run_tests():
                 mu_0 = compute_mu0(n, r, q, D, Sigma)
                 diff = mu_0 - (fd_00+fd_10)
                 print("{0} - ({6}+{7}) = {2}\t {3},{4},{5}".format(mu_0 , (fd_00+fd_10), diff,r,q,D,fd_00,fd_10))
+    # tests tilde_mu
+    print("\n**** TESTS FOR tilde_mu ****\n")
+    print("(n, r, D, q)")
+    print("----------------------")
+    for r in range(n+1):
+        D_max = int(math.floor(r/2.0))
+        for D in range(D_max+1):
+            bar_q = min(2*D, n-r+D+1)
+            for q in range(2,bar_q+1):                
+                t_mu = tilde_mu(n, r, D, q, 0, Sigma)
+                t_mu_s = tilde_mu(n, r, D, q, 0, Sigma, True)
+                fd_appr = compute_approx_fd(n,r,D,q,0,0,Sigma)
+                print("({0}, {1}, {2}, {3}) ---> {4:.1f}\t{5}\t{6:.1f}".format(n,r,D,q,t_mu,t_mu_s,fd_appr))
+
+    print("\n**** TESTS FOR tilde_psi ****\n")
+    print("(n, r, D, q)")
+    print("----------------------")
+    for r in range(n+1):
+        D_max = int(math.floor(r/2.0))
+        for D in range(D_max+1):
+            bar_q = min(2*D, n-r+D+1)
+            for q in range(2,bar_q+1):                
+                t_psi = tilde_psi(n, r, D, q, Sigma)
+                fn_appr = compute_approx_fn(n, r, D, q, 0, 1, Sigma)
+                print("({0}, {1}, {2}, {3}) ---> {4:.0f}\t{5:.0f}".format(n,r,D,q,t_psi,fn_appr))
+
         
 
 ##############################################################################

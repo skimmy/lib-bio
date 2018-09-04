@@ -67,6 +67,10 @@ def binomial(n,k):
 def composition(n,k):
     return binom_table[n,k]
 
+def init(n):
+    construct_binom_table(n+1)
+
+
 ##############################################################################
 #                                                                            #
 #                     APPROXIMATE COUNTING FUNCTIONS                         #

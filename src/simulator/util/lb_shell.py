@@ -79,12 +79,7 @@ def find_rsat_volume_n(n, sigma, v_n, step=1):
         v = v_n(rs, n, sigma)
     return rs-step
 
-def bbb(x, n, sigma=4):
-    return np.power(sigma, x)
-
-def bbb_n(x, n, sigma=4):
-    return np.power(sigma,x) / np.power(sigma,n)
-
+# Insertion distance bounds
 def vr_ub_n_2(r, n, sigma):
     return spec.binom(n,r)**2 / np.power(sigma, n-r)
 
@@ -95,23 +90,67 @@ def vr_ub_n(r, n, sigma):
         p += 2*np.log2(1+r/i) -  log2_sigma
     return np.power(2,p)
 
-if (__name__ == "__main__"):
-    # n = 10
-    # rs = 3
-    # sigma = 4
-    # a = bound_with_shells(n, rs, sigma, bbb, False)
-    # an = bound_with_shells(n, rs, sigma, bbb_n)
-    # print(a)
-    # print(an)
+# Simple bound
+def wr_ub_n_r(r, n, sigma):
+    s = 0
+    dmax = int(np.floor(r/2))
+    for d in range(dmax+1):
+        s += (spec.binom(n,d)**2)*spec.binom(n-d,r-2*d)*np.power(4/9,d)
+    return s*np.power(3,r)/np.power(sigma,n)
 
-    # b = bound_with_volumes(n, rs, sigma, bbb, False)
-    # bn = bound_with_volumes(n, rs, sigma, bbb_n)
-    # print(b)
-    # print(bn)
+def util_sum_log2(low, high):
+    s = 0
+    for i in range(low,high+1):
+        s += np.log2(i) # could use pre-computed table here
+    return s
+
+def wr_ub_n_r_2(r, n, sigma):
+    dmax = int(np.floor(r/2))
+    s = 0
+    for d in range(dmax+1):
+        C = 1 + np.log2(3.0)*(r-2*d) + 2*(d-n)
+        L1 = 0
+        for i in range(1,d+1):
+            L1 += np.log2((n-i+1)/i)
+        L2 = 0
+        for i in range(1,r-2*d+1):
+            L2 += np.log2((n-d-i+1)/i)
+        L = 2*L1 + L2
+        s+= np.power(2,C + L)
+    return s
+
+def wr_ub_n_2(r, n, sigma):
+    if (r == 0):
+        return np.power(sigma,-float(n))
+    wr = wr_ub_n_r_2(r, n, sigma)
+    wr_1 = wr_ub_n_r_2(r-1, n, sigma)
+    return wr + wr_1
+
+def wr_ub_n(r, n, sigma):
+    # notice that the bound is W_r + W_{r-1}
+    if (r == 0):
+        return 1/np.power(sigma,n)
+    wr = wr_ub_n_r(r, n, sigma)
+    wr_1 = wr_ub_n_r(r-1, n, sigma)
+    return wr+wr_1
+
+def evaluate_insertion_distance_bound():
     sigma = 4
     N = 10000
     for n in range(401,N,239):
         rs = find_rsat_volume_n(n, sigma, vr_ub_n, step=7)
         v = bound_with_volumes(n, rs, sigma, vr_ub_n)
-#        v2 = bound_with_volumes(n, rs, sigma, vr_ub_n_2)
         print("{0}\t{1}\t{2:.4f}".format(n, rs, v, step=1))
+
+def evaluate_simple_bound():
+    sigma = 4
+    N = 10000
+    for n in range(10,N,100):
+        rs = find_rsat_volume_n(n,sigma, wr_ub_n_2, step=1)
+        bound = 0 #bound_with_volumes(n, rs, sigma, wr_ub_n)
+        bound2 = bound_with_volumes(n, rs, sigma, wr_ub_n_2)
+        print("{0}\t{1}\t{2}".format(n, bound, bound2))
+
+if (__name__ == "__main__"):
+    #evaluate_insertion_distance_bound()
+    evaluate_simple_bound()

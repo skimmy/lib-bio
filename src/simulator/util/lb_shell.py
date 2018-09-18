@@ -137,7 +137,7 @@ def wr_ub_n(r, n, sigma):
 def evaluate_insertion_distance_bound():
     sigma = 4
     N = 10000
-    for n in range(401,N,239):
+    for n in range(100,N,100):
         rs = find_rsat_volume_n(n, sigma, vr_ub_n, step=7)
         v = bound_with_volumes(n, rs, sigma, vr_ub_n)
         print("{0}\t{1}\t{2:.4f}".format(n, rs, v, step=1))
@@ -152,5 +152,5 @@ def evaluate_simple_bound():
         print("{0}\t{1}\t{2}".format(n, bound, bound2))
 
 if (__name__ == "__main__"):
-    #evaluate_insertion_distance_bound()
-    evaluate_simple_bound()
+    evaluate_insertion_distance_bound()
+    #evaluate_simple_bound()

@@ -33,6 +33,7 @@ def parseArguments():
     parser.add_argument("--mat-col", dest="matrixColumn", help="Prints the content of the specified column of the frequency matrix")
     parser.add_argument("--stretch-stat", dest="stretchStat", default=None,
                         help="Name of the files (one per operation) where statistic of stretches will be saved")
+    parser.add_argument("--gap-stat", dest="gapStat", default=None, help="Name of the files where distribution of match ggaps is stored")
     parser.add_argument("--diagonal-stat", dest="diagonalStats", default=None,
                         help="Name of the files the will contain passages through diagonal statistics of scripts")
     parser.add_argument("-a", "--archive-dir", dest="archive", help="Creates an 'archived' version in the directory given as parameter")
@@ -104,6 +105,26 @@ def computeStretchesDistribution(n, scripts):
                 countedChar = 1
         dictOfDists[currentChar][countedChar] += 1
     return (mSDist, sSDist, dSDist, iSDist)
+
+'''Computes the distribution of the distance between two conecutive matches'''
+def computeMatchGapStats(n, scripts):
+    mSGap = np.zeros(n)
+    for script in scripts:
+        i = 0
+        m = len(script)
+        while (script[i] != 'M' and i < m):
+            i += 1
+        # Now we are at the first 'M'
+        gap = 0
+        while(i < m):
+            # skip all 'M'
+            if (script[i] == 'M'):
+                gap = 0
+            else:
+                gap += 1
+            mSGap[gap] += 1
+            i += 1
+    return mSGap
 
 def calculateScriptsStats(n, scripts):
     mat = np.zeros((n,n))
@@ -258,6 +279,9 @@ if __name__ == "__main__":
     if (args.stretchStat is not None):
         mStretch, sStretch, dStretch, iStretch = computeStretchesDistribution(n+1, allScripts)
 
+    if (args.gapStat is not None):
+        mGap = computeMatchGapStats(n+1, allScripts)
+
     if(args.diagonalStats is not None):
         diagEnter, diagExit, diagLength = calculateDiagonalStats(n+1, allScripts)
         diagonalStatAverageLengths(n+1, allScripts, [t for t in range(-int(math.sqrt(n)) , int(math.sqrt(n) + 1)) ] )
@@ -296,6 +320,10 @@ if __name__ == "__main__":
             np.save(os.path.join(archivePath, "S_" + args.stretchStat), sStretch)
             np.save(os.path.join(archivePath, "D_" + args.stretchStat), dStretch)
             np.save(os.path.join(archivePath, "I_" + args.stretchStat), iStretch)
+
+        # save gap(s)
+        if (args.gapStat is not None):
+            np.save(os.path.join(archivePath, "M_" + args.gapStat), mGap)
     
         if (args.diagonalStats is not None):
             np.save(os.path.join(archivePath, "Enter_" + args.diagonalStats), diagEnter)

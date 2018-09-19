@@ -22,12 +22,19 @@ def get_ceil_divisible_by(x, n):
         k += n
     return k
 
-def plot_curves(params_dict, save_file=False):
+# TODO: We added a callback function that receives the ax object and
+# that can change its parameters before showing/saving of the
+# plot. This will be useful when refining the chart for the final
+# publication. The callaback could be None (default value) meaning
+# that nothing will be done.
+def plot_curves(params_dict, save_file=False, ax_callback=None):
     import matplotlib.pyplot as plt
 
     # dictionary items
     # (beta, gamma, err, datapoints, logpoints)
-    plt_colors = ['b', 'r', 'g', 'k', 'y']
+    plt_colors = ['C0', 'C1', 'C2', 'C3', 'C4']
+    plt_lines = ['-', '--', ':', '-.']
+    plt_points = ['o', 's', 'V', 'x', '+']
     color_i = 0
     fig, ax = plt.subplots()
     #ax.set_autoscale_on(False)
@@ -47,15 +54,16 @@ def plot_curves(params_dict, save_file=False):
             ns.append(n)
             exp_points.append(dpoints[i][1])
             y.append(pow(2, gamma+beta*logn))            
-        style_curve = plt_colors[color_i] + '-'
-        style_point = plt_colors[color_i] + 'o'
-        ax.plot(ns, exp_points, style_point)
+        style_curve = plt_colors[color_i] + plt_lines[color_i]
+        style_point = plt_colors[color_i] + plt_points[color_i]
+        ax.plot(ns, exp_points, style_point, label=name)
         ax.plot(ns, y, style_curve)
+        ax.legend()
         color_i += 1
         max_n = max(max_n,max(ns))
         max_val = max(max_val, max(max(y), max(exp_points) ))
-        
-        
+       
+    
     plt.title("Sample points and regression curve")
     plt.xlabel("n")
     plt.ylabel("2g(n/2) - g(n)")
@@ -64,6 +72,8 @@ def plot_curves(params_dict, save_file=False):
     y_max = get_ceil_divisible_by(max_val,5)
     plt.ylim([0, y_max])
     plt.grid(True)
+    if (ax_callback is not None):
+        ax_callback(plt, ax, fig)
     if (save_file):
         plt.savefig("plot.pdf")
     else:
@@ -125,6 +135,9 @@ def regression(points, weighted=False):
     return slope, intercept, std_err
 
 def test(log_p, g, b):
+    pass
+
+def dummy_callback(plt, ax, fig):
     pass
 
 if (__name__ == "__main__"):

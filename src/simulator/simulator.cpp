@@ -584,11 +584,34 @@ shift_distance(_IterT s1_b, _IterT s1_e, _IterT s2_b, _IterT s2_e, lbio_size_t n
   return sd;
 }
 
+const lbio_size_t n0_ = 64;
+lbio_size_t small_dp_m[n0_][n0_];
+
+lbio_size_t
+small_ed(const std::string& s1, const std::string& s2,
+	 lbio_size_t i1, lbio_size_t i2, lbio_size_t n) {
+  for (lbio_size_t i = 0; i <= n; ++i) {
+    small_dp_m[0][i] = i;
+    small_dp_m[i][0] = i;
+  }
+  for (lbio_size_t i = 1; i <= n; ++i) {
+    for (lbio_size_t j = 1; j <= n; ++j) {
+      lbio_size_t delta = (s1[i1+i-1] == s2[i2+j-1]) ? 0 : 1;
+      small_dp_m[i][j] = std::min(std::min(small_dp_m[i-1][j] + 1, small_dp_m[i][j-1] + 1),
+				  small_dp_m[i-1][j-1] + delta);
+    }
+  }
+  return small_dp_m[n][n];
+}
+
 lbio_size_t
 shift_distance_recursive(const std::string& s1, const std::string& s2,
 			 lbio_size_t i1, lbio_size_t i2, lbio_size_t n) {
-  if (n == 1) {
+  /*if (n == 1) {
     return static_cast<lbio_size_t>(s1[i1] != s2[i2]);
+    }*/
+  if (n <= 8) {
+    return small_ed(s1, s2, i1, i2, n);
   }
   lbio_size_t sd = shift_distance(s1.begin()+i1, s1.begin()+i1+n, s2.begin()+i2, s2.begin()+i2+n, n);
   lbio_size_t srec_1 = shift_distance_recursive(s1, s2, i1, i2, n >> 1);
@@ -598,41 +621,25 @@ shift_distance_recursive(const std::string& s1, const std::string& s2,
 
 void
 prototyping() {
-  // WARNING: possibly don't remove next two lines !!!
+  // !!! WARNING: possibly don't remove next two lines !!!
   std::string proto_task_msg = make_bold("Shift Distance");
   logInfo("Working on " + proto_task_msg + " prototyping");
-  for(lbio_size_t l = 4; l < 12; ++l) {
+  // -------------------------------------------------------
+  
+  for(lbio_size_t l = 4; l < 17; ++l) {
     lbio_size_t n = 1 << l;
-      lbio_size_t k = 2000; 
-      std::string s1(n, 'N');// { "ACTCTGGGGGGGGactct" };
-      std::string s2(n, 'N');// { "CTCTAGGGGGGGGctcta" };
+      lbio_size_t k = 200; 
+      std::string s1(n, 'N');
+      std::string s2(n, 'N');
       lbio_size_t sum_dist = 0;
       for (lbio_size_t i = 0; i < k; ++i) {
 	generator::generateIIDString(s1);
 	generator::generateIIDString(s2);
-	lbio_size_t d = shift_distance_recursive(s1, s2, 0, 0, n);
-	//std::cout << s1 << "\n" << s2 << "\n" << d << "\n\n";
+	lbio_size_t d = shift_distance_recursive(s1, s2, 0, 0, n);	
 	sum_dist += d;
       }
       std::cout << n << "\t" << ((double)sum_dist) / ((double)k*n) << "\n";
-  }
-
-  
-
-  // lbio_size_t n1 = s1.length();
-  // lbio_size_t n2 = s2.length();
-
-  // if (n1 != n2) {
-  //   logWarning("Strings have different size. Truncating the largest");
-  // }
-
-  // std::cout << s1 << "\n" << s2 << "\n";
-  // std::cout << "SD = " << shift_distance(s1.begin(), s1.end(), s2.begin(), s2.end(), n1) << "\n";
-  // std::cout << "SD = " << shift_distance_recursive(s1, s2, 0, 0, n1) << "\n";
-
-
-  
-  
+  }  
 }
 
 int main(int argc, char** argv) {   

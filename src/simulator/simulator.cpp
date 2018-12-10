@@ -638,6 +638,39 @@ void shift_distance_prototyping() {
 
 //--------------------------------------------------------------------------------
 
+template<typename V_>
+void
+decrement(V_& v, lbio_size_t k, const V_& def) {
+  lbio_size_t i = k-1;
+  while(v[i] == 0 and i > 0) {
+    v[i] = def[i];
+    i--;
+  }
+  if (i>0) {
+    v[i]--;
+  }
+}
+
+template<typename V_>
+void
+increment(V_& v, const V_& def, lbio_size_t n_v) {
+  lbio_size_t carry = 0;
+  lbio_size_t i = n_v-1;
+  do {
+    v[i] = (v[i]+1) % def[i];
+    carry = (v[i] != 0) ? 0 : 1;
+    i--;
+  } while (carry > 0 && i>=0);
+}
+
+template<typename V_>
+void
+minus_one_non_negative(V_& v, lbio_size_t v_n) {
+  for (lbio_size_t i = 0; i < v_n; ++i) {
+    v[i] = std::max<lbio_size_t>(0, v[i]-1);
+  }
+}
+
 
 void
 prototyping() {
@@ -653,7 +686,33 @@ prototyping() {
   for (lbio_size_t d = 0; d <= n; ++d) {
     std::cout << d << "\t" << f[d] << "\t" << (double)f[d]/N << "\n";
   }
+  std::cout << "\n\n";
+  std::string Sigma = "0123";
+  std::vector<lbio_size_t> part;
+  part.push_back(2);
+  part.push_back(1);
+  part.push_back(1);
+  part.push_back(1);
+  minus_one_non_negative(part, part.size());
+  std::vector<lbio_size_t> def(part.size(), 0); 
   
+  lbio_size_t total_strings = 1;
+  lbio_size_t str_len = 0;
+  for (lbio_size_t s = 0; s<Sigma.size(); ++s) {
+    def[s] = std::pow(s+1, part[s]);
+    total_strings *= def[s];
+    str_len += part[s];
+  }
+
+  for (lbio_size_t i = 0; i<part.size(); ++i) {
+    std::cout << part[i] << "\t" << def[i] << "\n";
+  }
+  std::cout << total_strings << "\t" << str_len << "\n";
+
+  std::string X(str_len, 'N');
+  for (lbio_size_t i = 0; i < part.size(); ++i) {
+    std::cout << X << "\n";
+  }
 }
 
 int main(int argc, char** argv) {   

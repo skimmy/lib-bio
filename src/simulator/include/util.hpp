@@ -232,4 +232,7 @@ using ListOfPartitions = std::vector<Partition>;
 ListOfPartitions
 recursive_int_partition(lbio_size_t n, lbio_size_t k);
 
+void
+number_to_string(lbio_size_t n, const std::string alphabet, std::string& s, lbio_size_t asize=0);
+
 #endif

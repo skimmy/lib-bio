@@ -123,3 +123,15 @@ recursive_int_partition(lbio_size_t n, lbio_size_t k) {
   return P;     
 }
 
+void
+number_to_string(lbio_size_t n, const std::string alphabet, std::string& s, lbio_size_t asize) {  
+  if (asize == 0) {
+    asize = alphabet.size();
+  }
+  auto it_s_ = s.rbegin();
+  while(n > 0 and it_s_ != s.rend()) {
+    *it_s_ = alphabet[n % asize];
+    n /= asize;
+    *it_s_++;
+  }
+}

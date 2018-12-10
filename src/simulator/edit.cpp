@@ -571,6 +571,36 @@ test_exhaustive_edit_distance_encoded(lbio_size_t n, double* freq) {
   return ((double)ed) / ((double) (N*N));
 }
 
+double
+exhaustive_edit_distance_improved(lbio_size_t n, std::vector<lbio_size_t>& freqs, lbio_size_t sigma) {
+
+  // DP matrix initialization
+  lbio_size_t** dpMatrix = allocMatrix<lbio_size_t>(n+1,n+1);  
+  for (lbio_size_t i = 0; i < n+1; ++i) {
+    dpMatrix[i][0] = i;
+  }
+  for (lbio_size_t j = 0; j < n+1; ++j) {
+    dpMatrix[0][j] = j;
+  }
+
+  // cumulative counter to be returned
+  double expected_ed = 0;
+    
+  // Generate all the x representatives of permutations of the bases
+  // This is done generating all strings of the form
+  // 0*1{0,1}*2{0,1,2}* ...
+  
+  // First decide how many distinct bases appear in the string
+  for (lbio_size_t s = 1; s <= sigma; ++s) {    
+    // Second we partition the integer n-s into s integers >=0.  This
+    // represents the way blocks are sized in the n substrings. The
+    // substring j for j=0,...,s-1 can be any string in {0,...,j}^nj
+    // The generation of the partition is done by traversing a tree with 
+    ListOfPartitions parts = recursive_int_partition(n, s);
+    
+  }
+  return expected_ed;
+}
 
 
 // Useful alias used throughout the code

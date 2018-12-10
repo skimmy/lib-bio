@@ -95,6 +95,9 @@ test_exhaustive_edit_distance_encoded(lbio_size_t n, double* freq);
 
       
 void edit_distance_exhastive_with_info(lbio_size_t n);
+
+double
+exhaustive_edit_distance_improved(lbio_size_t n, std::vector<lbio_size_t>& freqs, lbio_size_t sigma = 4);
       
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //

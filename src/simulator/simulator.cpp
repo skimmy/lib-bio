@@ -619,14 +619,8 @@ shift_distance_recursive(const std::string& s1, const std::string& s2,
   return std::min(sd, srec_1 + srec_2);
 }
 
-void
-prototyping() {
-  // !!! WARNING: possibly don't remove next two lines !!!
-  std::string proto_task_msg = make_bold("Shift Distance");
-  logInfo("Working on " + proto_task_msg + " prototyping");
-  // -------------------------------------------------------
-  
-  for(lbio_size_t l = 4; l < 17; ++l) {
+void shift_distance_prototyping() {
+   for(lbio_size_t l = 4; l < 17; ++l) {
     lbio_size_t n = 1 << l;
       lbio_size_t k = 200; 
       std::string s1(n, 'N');
@@ -640,6 +634,26 @@ prototyping() {
       }
       std::cout << n << "\t" << ((double)sum_dist) / ((double)k*n) << "\n";
   }  
+}
+
+//--------------------------------------------------------------------------------
+
+
+void
+prototyping() {
+  // !!! WARNING: possibly don't remove next two lines !!!
+  std::string proto_task_msg = make_bold("Improved exhaustive");
+  logInfo("Working on " + proto_task_msg + " prototyping");
+  // -------------------------------------------------------
+  lbio_size_t n = 4;
+  std::vector<lbio_size_t> f(n+1,0);
+  double N = std::pow(4,n);
+  double eed = exhaustive_edit_distance_improved(n, f);
+  std::cout << "alpha(" << n << ") = " << eed << "\n";
+  for (lbio_size_t d = 0; d <= n; ++d) {
+    std::cout << d << "\t" << f[d] << "\t" << (double)f[d]/N << "\n";
+  }
+  
 }
 
 int main(int argc, char** argv) {   

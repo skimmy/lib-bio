@@ -1,5 +1,6 @@
 #include <include/common.hpp>
 
+#include <vector>
 #include <iostream>
 #include <fstream>
 #include <cmath>
@@ -97,3 +98,28 @@ void printVec(size_t* v, size_t n) {
   }
   std::cout << std::endl;
 }
+
+using Partition = std::vector<lbio_size_t>;
+using ListOfPartitions = std::vector<Partition>;
+
+ListOfPartitions
+recursive_int_partition(lbio_size_t n, lbio_size_t k) {
+  if (n == 0) {
+    return ListOfPartitions();
+  }
+  if (k == 1) {
+    Partition n_part(1,n);
+    return ListOfPartitions(1, n_part);
+  }
+  ListOfPartitions P, tmp ;
+  for (lbio_size_t p = 1; p <= n; p++) {
+    tmp = recursive_int_partition(n-p, k-1);
+    for (auto it_ = tmp.begin(); it_ != tmp.end(); it_++) {
+      Partition P_p(1,p);      
+      P_p.insert(P_p.end(), (*it_).begin(), (*it_).end());
+      P.push_back(P_p);
+    }
+  }
+  return P;     
+}
+

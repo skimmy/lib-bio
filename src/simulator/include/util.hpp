@@ -220,4 +220,16 @@ bool areElementwiseEqual(const T& v1, const T& v2, lbio_size_t n) {
   return true;
 }
 
+//////////////////////////////////////////////////////////////////////
+//
+//             COMBINATORICS AND PERMUTATIONS FUNCTIONS     
+//
+//////////////////////////////////////////////////////////////////////
+
+using Partition = std::vector<lbio_size_t>;
+using ListOfPartitions = std::vector<Partition>;
+
+ListOfPartitions
+recursive_int_partition(lbio_size_t n, lbio_size_t k);
+
 #endif

@@ -27,6 +27,7 @@
 #include <cstdlib>
 #include <ctime>
 
+#include <unordered_map>
 #include <iostream>
 #include <fstream>
 #include <algorithm>
@@ -671,14 +672,9 @@ minus_one_non_negative(V_& v, lbio_size_t v_n) {
   }
 }
 
-
 void
-prototyping() {
-  // !!! WARNING: possibly don't remove next two lines !!!
-  std::string proto_task_msg = make_bold("Improved exhaustive");
-  logInfo("Working on " + proto_task_msg + " prototyping");
-  // -------------------------------------------------------
-  lbio_size_t n = 4;
+prototype_partitions() {
+    lbio_size_t n = 4;
   std::vector<lbio_size_t> f(n+1,0);
   double N = std::pow(4,n);
   double eed = exhaustive_edit_distance_improved(n, f);
@@ -713,6 +709,118 @@ prototyping() {
   for (lbio_size_t i = 0; i < part.size(); ++i) {
     std::cout << X << "\n";
   }
+}
+
+
+
+// custom hash version
+//using ColumnStateSet = std::unordered_set<uint32_t, hash_32_bit, equal_high_bits>;
+template <typename _K, typename _V>
+class ColumnStateSpaceT {  
+  typedef typename std::unordered_map<_K, _V>   ColumnStateSet;
+  typedef typename ColumnStateSet::iterator     iterator;
+  typedef typename std::pair<_K, _V>            pair_type;
+  
+public:
+    
+private:
+  lbio_size_t _n;  
+  ColumnStateSet _set;  
+  
+public:		    
+  ColumnStateSpaceT(lbio_size_t n) : _n {n}, _set {} { }
+
+  // if the key exist add mult to the already existing value
+  void insert(_K key, _V mult) {
+    auto key_pos = _set.find(key);
+    if (key_pos != _set.end()) {
+      key_pos->second += mult;
+    }
+    else {
+      _set.insert({key, mult});
+    }
+  }
+
+  void erase(_K key) {
+    _set.erase(key);
+  }
+
+
+  lbio_size_t size() {
+    return _set.size();
+  }
+
+  iterator begin() {
+    return _set.begin();
+  }
+
+  iterator end() {
+    return _set.end();
+  }
+  
+};
+
+using ColumnStateSpace = ColumnStateSpaceT<uint32_t, uint32_t>;
+
+const uint32_t MinusOne = 0x0;
+const uint32_t Zero = 0x1;
+const uint32_t One = 0x2;
+
+uint32_t constant_column(lbio_size_t n, uint32_t value) {
+    uint32_t col = 0;
+    for (lbio_size_t i = 0; i < n; ++i) {
+      col |= value;
+      value <<= 2;
+    }
+    return col;
+  }
+
+
+// TODO: currently the Hamming mask is a double pointer matrix -> change
+ColumnStateSpace
+refresh_space(ColumnStateSpace& old_state, lbio_size_t j, lbio_size_t n,
+	      lbio_size_t ** h_mask , lbio_size_t sigma = 4) {
+  ColumnStateSpace new_state(n);
+  auto it_ = old_state.begin();
+  // TODO: use extract in the future
+  while(it_ != old_state.end()) {
+    it_++;
+    // for each mask...
+    for (lbio_size_t s_ = 0; s_ < sigma; ++s_) {
+      
+    }
+  }
+  return new_state;
+}
+
+void
+create_hamming_mask(const std::string& str_, const std::string& alphabet_, lbio_size_t** mask) {
+  lbio_size_t sigma = alphabet_.size();
+  lbio_size_t n = str_.size();
+  for (lbio_size_t s = 0; s < sigma; ++s) {
+    for (lbio_size_t i = 0; i < n; ++i) {
+      mask[i][s] = str_[i] == alphabet_[s] ? 0 : 1;
+    }
+  }
+}
+
+
+
+void
+prototyping() {
+  // !!! WARNING: possibly don't remove next two lines !!!
+  std::string proto_task_msg = make_bold("Improved exhaustive");
+  logInfo("Working on " + proto_task_msg + " prototyping");
+  // -------------------------------------------------------
+  prototype_partitions();
+  lbio_size_t n = 8;
+  lbio_size_t ** mask = allocMatrix<lbio_size_t>(n, 4);
+  create_hamming_mask("AAAAAAAA", "ACGT", mask);
+  ColumnStateSpace state_space(n);
+  state_space.insert(constant_column(n, One), 1);
+  std::cout << state_space.size() << "\n";
+  state_space = refresh_space(state_space, 1, n, mask);
+  freeMatrix(n,4,mask);
 }
 
 int main(int argc, char** argv) {   

@@ -757,6 +757,7 @@ public:
   iterator end() {
     return _set.end();
   }
+
   
 };
 
@@ -767,28 +768,63 @@ const uint32_t Zero = 0x1;
 const uint32_t One = 0x2;
 
 uint32_t constant_column(lbio_size_t n, uint32_t value) {
-    uint32_t col = 0;
-    for (lbio_size_t i = 0; i < n; ++i) {
-      col |= value;
-      value <<= 2;
-    }
-    return col;
+  uint32_t col = value & 0x3;
+  for (lbio_size_t i = 1; i < n; ++i) {
+    col <<= 2;
+    col += (0x3 & value);    
   }
+  return col;
+}
+
+std::string state_to_string(uint32_t state, lbio_size_t n) {
+  std::string out {""};
+  std::string decoded[] = {"-1", "0", "1", "*"};
+  for (lbio_size_t i = 0; i < n; ++i) {
+    out = decoded[(state & 0x3)] + ", " + out;
+    state >>= 2;
+  }
+  return "[" + out + "]";
+}
+
+void
+print_state(ColumnStateSpace& _set, lbio_size_t n) {
+  for (auto it_ = _set.begin(); it_ != _set.end(); it_++) {
+    std::cout << "(" << state_to_string(it_->first, n) << " [0x" << std::hex << it_->first << "], " <<  std::dec << it_->second << ")\n";
+  }
+}
+
 
 
 // TODO: currently the Hamming mask is a double pointer matrix -> change
 ColumnStateSpace
 refresh_space(ColumnStateSpace& old_state, lbio_size_t j, lbio_size_t n,
-	      lbio_size_t ** h_mask , lbio_size_t sigma = 4) {
+	      lbio_size_t ** h_mask , lbio_size_t sigma) {
   ColumnStateSpace new_state(n);
   auto it_ = old_state.begin();
-  // TODO: use extract in the future
+  lbio_size_t a,b,c,d;
   while(it_ != old_state.end()) {
-    it_++;
     // for each mask...
     for (lbio_size_t s_ = 0; s_ < sigma; ++s_) {
-      
+      uint32_t Mj = (*it_).first;
+      uint32_t Mj1 = 0x0;
+      // first element
+      a = j;
+      b = j+1;
+      c = a + (Mj>>2*(n-1) & 0x3) - 1;
+      d = std::min(std::min(b+1, c+1), a + h_mask[0][s_]);
+      Mj1 += 0x3 & (d-b+1);
+      for (lbio_size_t i = 1; i < n; ++i) {
+	Mj <<= 2;
+	Mj1 <<= 2;
+	a = c;
+	b = d;
+	c = a + (Mj>>2*(n-1-j) & 0x3) - 1;
+	d = std::min(std::min(b+1, c+1), a + h_mask[i][s_]);
+	Mj1 += 0x3 & (d-b+1);
+      }
+      new_state.insert(Mj1, (*it_).second);
     }
+    it_++;
   }
   return new_state;
 }
@@ -812,14 +848,24 @@ prototyping() {
   std::string proto_task_msg = make_bold("Improved exhaustive");
   logInfo("Working on " + proto_task_msg + " prototyping");
   // -------------------------------------------------------
-  prototype_partitions();
+  //prototype_partitions();
+  
   lbio_size_t n = 8;
   lbio_size_t ** mask = allocMatrix<lbio_size_t>(n, 4);
-  create_hamming_mask("AAAAAAAA", "ACGT", mask);
+  create_hamming_mask("GACGTAAT", "ACGT", mask);
+  //printMatrix(n,4,mask);
+  
   ColumnStateSpace state_space(n);
   state_space.insert(constant_column(n, One), 1);
-  std::cout << state_space.size() << "\n";
-  state_space = refresh_space(state_space, 1, n, mask);
+  std::cout << "j = 0\t\t" << state_space.size() << "\n"; 
+  print_state(state_space, n);
+  std::cout << "\n\n";
+  for (lbio_size_t j = 1; j <= n; ++j) {
+    state_space = refresh_space(state_space, j, n, mask, 4);
+    std::cout << "j = " << j << "\t\t" << state_space.size() << "\n";
+    print_state(state_space, n);
+    std::cout << "\n\n";
+  }
   freeMatrix(n,4,mask);
 }
 

@@ -7,6 +7,7 @@
 
 
 #include <memory>
+#include <unordered_map>
 #include <iostream>
 #include <algorithm>
 
@@ -26,6 +27,7 @@
 
 // edit distance subtasks
 #define EDIT_DISTANCE_SUBTASK_DEFUALT       0
+#define EDIT_DISTANCE_SUBTASK_ECCENTRICITY  4
 #define EDIT_DISTANCE_SUBTASK_SCRIPT_DIST   8
 #define EDIT_DISTANCE_SUBTASK_COMPARE_ALGS  32
 
@@ -79,6 +81,64 @@ optimal_bandwidth_exact(lbio_size_t n, double precision, lbio_size_t Tmin = 1);
 
 //////////////////////////////////////////////////////////////////////
 
+template <typename _K, typename _V>
+class ColumnStateSpaceT {
+public:
+  typedef typename std::unordered_map<_K, _V>   ColumnStateSet;
+  typedef typename ColumnStateSet::iterator     iterator;
+  typedef typename std::pair<_K, _V>            pair_type;
+    
+private:
+  lbio_size_t _n;  
+  ColumnStateSet _set;  
+  
+public:		    
+  ColumnStateSpaceT(lbio_size_t n) : _n {n}, _set {} { }
+
+  // if the key exist add mult to the already existing value
+  void insert(_K key, _V mult) {
+    auto key_pos = _set.find(key);
+    if (key_pos != _set.end()) {
+      key_pos->second += mult;
+    }
+    else {
+      _set.insert({key, mult});
+    }
+  }
+
+  lbio_size_t get_n() { return _n; }
+
+  void erase(_K key) { _set.erase(key); }
+
+  lbio_size_t size() { return _set.size();  }
+
+  iterator begin() { return _set.begin();  }
+
+  iterator end() { return _set.end(); }  
+};
+
+using ColumnStateSpace = ColumnStateSpaceT<uint32_t, uint32_t>;
+
+const uint32_t MinusOne = 0x0;
+const uint32_t Zero = 0x1;
+const uint32_t One = 0x2;
+
+uint32_t
+constant_column(lbio_size_t n, uint32_t value);
+
+std::string
+state_to_string(uint32_t state, lbio_size_t n);
+
+std::vector<lbio_size_t>
+state_to_column(uint32_t state, lbio_size_t j, lbio_size_t n);
+
+void
+print_state(ColumnStateSpace& _set, lbio_size_t n);
+
+ColumnStateSpace
+refresh_space(ColumnStateSpace& old_state, lbio_size_t j, lbio_size_t n,
+	      lbio_size_t ** h_mask , lbio_size_t sigma);
+
 
 /**
    \brief computes the edit distance between strings s1 and s2
@@ -96,8 +156,8 @@ test_exhaustive_edit_distance_encoded(lbio_size_t n, double* freq);
       
 void edit_distance_exhastive_with_info(lbio_size_t n);
 
-double
-exhaustive_edit_distance_improved(lbio_size_t n, std::vector<lbio_size_t>& freqs, lbio_size_t sigma = 4);
+void
+edit_distance_eccentricity(lbio_size_t n, std::ostream& os);
       
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //

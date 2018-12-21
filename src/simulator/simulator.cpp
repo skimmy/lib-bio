@@ -448,6 +448,15 @@ editDistanceOpMode() {
   }
   // Task Exhaustive 
   if (flags & EDIT_DISTANCE_ESTIMATE_EXHAUSTIVE) {
+
+    // subtask eccentricity
+    if (task == EDIT_DISTANCE_SUBTASK_ECCENTRICITY) { // -B 4
+      lbio_size_t n = Options::opts.N;      
+      edit_distance_eccentricity(n, std::cout);
+      return;
+    }
+						   
+    
     if (flags & EDIT_DISTANCE_INFO_PARTIAL) { // -f 5
       logWarning("only \033[1;37mqudratic algorithm\033[0m" 
 		 " available with exhaustive option");
@@ -639,262 +648,66 @@ void shift_distance_prototyping() {
 
 //--------------------------------------------------------------------------------
 
-template<typename V_>
-void
-decrement(V_& v, lbio_size_t k, const V_& def) {
-  lbio_size_t i = k-1;
-  while(v[i] == 0 and i > 0) {
-    v[i] = def[i];
-    i--;
-  }
-  if (i>0) {
-    v[i]--;
-  }
-}
-
-template<typename V_>
-void
-increment(V_& v, const V_& def, lbio_size_t n_v) {
-  lbio_size_t carry = 0;
-  lbio_size_t i = n_v-1;
-  do {
-    v[i] = (v[i]+1) % def[i];
-    carry = (v[i] != 0) ? 0 : 1;
-    i--;
-  } while (carry > 0 && i>=0);
-}
-
-template<typename V_>
-void
-minus_one_non_negative(V_& v, lbio_size_t v_n) {
-  for (lbio_size_t i = 0; i < v_n; ++i) {
-    v[i] = std::max<lbio_size_t>(0, v[i]-1);
-  }
-}
-
-void
-prototype_partitions() {
-    lbio_size_t n = 4;
-  std::vector<lbio_size_t> f(n+1,0);
-  double N = std::pow(4,n);
-  double eed = exhaustive_edit_distance_improved(n, f);
-  std::cout << "alpha(" << n << ") = " << eed << "\n";
-  for (lbio_size_t d = 0; d <= n; ++d) {
-    std::cout << d << "\t" << f[d] << "\t" << (double)f[d]/N << "\n";
-  }
-  std::cout << "\n\n";
-  std::string Sigma = "0123";
-  std::vector<lbio_size_t> part;
-  part.push_back(2);
-  part.push_back(1);
-  part.push_back(1);
-  part.push_back(1);
-  minus_one_non_negative(part, part.size());
-  std::vector<lbio_size_t> def(part.size(), 0); 
-  
-  lbio_size_t total_strings = 1;
-  lbio_size_t str_len = 0;
-  for (lbio_size_t s = 0; s<Sigma.size(); ++s) {
-    def[s] = std::pow(s+1, part[s]);
-    total_strings *= def[s];
-    str_len += part[s];
-  }
-
-  for (lbio_size_t i = 0; i<part.size(); ++i) {
-    std::cout << part[i] << "\t" << def[i] << "\n";
-  }
-  std::cout << total_strings << "\t" << str_len << "\n";
-
-  std::string X(str_len, 'N');
-  for (lbio_size_t i = 0; i < part.size(); ++i) {
-    std::cout << X << "\n";
-  }
-}
-
-
-
-// custom hash version
-//using ColumnStateSet = std::unordered_set<uint32_t, hash_32_bit, equal_high_bits>;
-template <typename _K, typename _V>
-class ColumnStateSpaceT {  
-  typedef typename std::unordered_map<_K, _V>   ColumnStateSet;
-  typedef typename ColumnStateSet::iterator     iterator;
-  typedef typename std::pair<_K, _V>            pair_type;
-  
-public:
-    
-private:
-  lbio_size_t _n;  
-  ColumnStateSet _set;  
-  
-public:		    
-  ColumnStateSpaceT(lbio_size_t n) : _n {n}, _set {} { }
-
-  // if the key exist add mult to the already existing value
-  void insert(_K key, _V mult) {
-    auto key_pos = _set.find(key);
-    if (key_pos != _set.end()) {
-      key_pos->second += mult;
-    }
-    else {
-      _set.insert({key, mult});
-    }
-  }
-
-  void erase(_K key) {
-    _set.erase(key);
-  }
-
-
-  lbio_size_t size() {
-    return _set.size();
-  }
-
-  iterator begin() {
-    return _set.begin();
-  }
-
-  iterator end() {
-    return _set.end();
-  }
-
-  
-};
-
-using ColumnStateSpace = ColumnStateSpaceT<uint32_t, uint32_t>;
-
-const uint32_t MinusOne = 0x0;
-const uint32_t Zero = 0x1;
-const uint32_t One = 0x2;
-
-uint32_t constant_column(lbio_size_t n, uint32_t value) {
-  uint32_t col = value & 0x3;
-  for (lbio_size_t i = 1; i < n; ++i) {
-    col <<= 2;
-    col += (0x3 & value);    
-  }
-  return col;
-}
-
-std::string state_to_string(uint32_t state, lbio_size_t n) {
-  std::string out {""};
-  std::string decoded[] = {"-1", "0", "1", "*"};
-  for (lbio_size_t i = 0; i < n; ++i) {
-    out = decoded[(state & 0x3)] + ", " + out;
-    state >>= 2;
-  }
-  return "[" + out + "]";
-}
-
-std::vector<lbio_size_t> state_to_column(uint32_t state, lbio_size_t j, lbio_size_t n) {
-  std::vector<lbio_size_t> column(n+1);
-  column[0] = j;
-  int vals[] {-1, 0, 1, 0xFF};
-  for (lbio_size_t i = 1; i <= n; ++i) {
-    lbio_size_t idx = (state >> 2*(n-i)) & 0x3;
-    column[i] = column[i-1] + vals[idx];
-  }
-  return column;
-}
-
-void
-print_state(ColumnStateSpace& _set, lbio_size_t n) {
-  for (auto it_ = _set.begin(); it_ != _set.end(); it_++) {
-    std::cout << "(" << state_to_string(it_->first, n) << " [0x" << std::hex << it_->first << "], " <<  std::dec << it_->second << ")\n";
-  }
-}
-
-
-
-// TODO: currently the Hamming mask is a double pointer matrix -> change
-ColumnStateSpace
-refresh_space(ColumnStateSpace& old_state, lbio_size_t j, lbio_size_t n,
-	      lbio_size_t ** h_mask , lbio_size_t sigma) {
-  ColumnStateSpace new_state(n);
-  auto it_ = old_state.begin();
-  lbio_size_t a,b,c,d;
-  while(it_ != old_state.end()) {
-    // for each mask...
-    for (lbio_size_t s_ = 0; s_ < sigma; ++s_) {
-      uint32_t Mj = (*it_).first;
-      uint32_t Mj1 = 0x0;
-      // first element
-      a = j;
-      b = j+1;
-      c = a + (Mj>>2*(n-1) & 0x3) - 1;
-      d = std::min(std::min(b+1, c+1), a + h_mask[0][s_]);
-      Mj1 += 0x3 & (d-b+1);
-      for (lbio_size_t i = 1; i < n; ++i) {
-	Mj1 <<= 2;
-	a = c;
-	b = d;
-	c = a + (Mj>>2*(n-1-i) & 0x3) - 1;
-	d = std::min(std::min(b+1, c+1), a + h_mask[i][s_]);
-	Mj1 += 0x3 & (d-b+1);
-      }
-      new_state.insert(Mj1, (*it_).second);
-    }
-    it_++;
-  }
-  return new_state;
-}
-
-void
-create_hamming_mask(const std::string& str_, const std::string& alphabet_, lbio_size_t** mask) {
-  lbio_size_t sigma = alphabet_.size();
-  lbio_size_t n = str_.size();
-  for (lbio_size_t s = 0; s < sigma; ++s) {
-    for (lbio_size_t i = 0; i < n; ++i) {
-      mask[i][s] = str_[i] == alphabet_[s] ? 0 : 1;
-    }
-  }
-}
-
-
-
 void
 prototyping() {
   // !!! WARNING: possibly don't remove next two lines !!!
   std::string proto_task_msg = make_bold("Improved exhaustive");
   logInfo("Working on " + proto_task_msg + " prototyping");
-  // -------------------------------------------------------
+  
+
+// -------------------------------------------------------
   //prototype_partitions();
 
-  for (lbio_size_t n = 2; n <= 16; ++n) {
-    lbio_size_t ** mask = allocMatrix<lbio_size_t>(n, 4);
-    //printMatrix(n,4,mask);
-    AlphabetIterator al(n);
-    double total_exp_ed = 0;
-    while(al != al.end()) {
-      ColumnStateSpace state_space(n);
-      create_hamming_mask(*al, "ACGT", mask);
-      state_space.insert(constant_column(n, One), 1);
-      //print_state(state_space, n);
-      for (lbio_size_t j = 0; j < n; ++j) {
-	state_space = refresh_space(state_space, j, n, mask, 4);
-	//std::cout << j << " -> " << j+1 << "\t\t" << state_space.size() << "\n";
-	//print_state(state_space, n);
-	//std::cout << "\n\n";
-      }
-
-      double total_strings = 0;
-      double total_dist = 0;
-      for (auto it_ = state_space.begin(); it_ != state_space.end(); it_++) {
-	std::vector<lbio_size_t> v = state_to_column(it_->first, n, n);
-	lbio_size_t d = v[n];
-	lbio_size_t mu = it_->second;
-	total_dist += d*mu;
-	total_strings += mu;
-      }
-      double exp_ed = total_dist/total_strings;
-      //std::cout << *al << "\t" << exp_ed  << "\t" << exp_ed/n << "\n";
-      total_exp_ed += exp_ed;
-      ++al;
-    }
+  // // CGTCTAGGGCTATCG
+  // std::vector<std::string> xx { "AAAAAAAAAAAAAAA", "CCCCCCCCCCCCCCC", "GGGGGGGGGGGGGGG", "TTTTTTTTTTTTTTT",
+  //     "AAAAAAAAAAAAAAA", "ACCCCCCCCCCCCCC", "AACCCCCCCCCCCCC", "AAACCCCCCCCCCCC", 
+  //     "AAAAAAACCCCCCCC", "AAACCCGGGTTTAAA", 
+  //     "CGTCTAGGGCTATCG", "AGTCTAGGGCTATCG", "GGTCTAGGGCTATCG", "TGTCTAGGGCTATCG",
+  //     "AAATCTAGGCATGGT", "CAATCTAGGCATGGT", "GAATCTAGGCATGGT", "TAATCTAGGCATGGT",
+  //     "AAAACCCCTTTTAAAA"};
+  // for (std::string x : xx) {
+  //   lbio_size_t ecc_x = eccentricity(x);
+  //   double ecc_x_dist = (double)ecc_x / (double)std::pow(4, x.size());
+  //   std::cout << x << "\t" << ecc_x << "\t" << ecc_x_dist << "\t" << ecc_x_dist/x.size() << "\n";
+  // }
   
-    std::cout << "alpha(" << n << ") = " << total_exp_ed / (n*(1 << 2*n)) << "\n";  
-    freeMatrix(n,4,mask);
-  }
+
+  // for (lbio_size_t n = 2; n <= 0; ++n) {
+  //   lbio_size_t ** mask = allocMatrix<lbio_size_t>(n, 4);
+
+  //   //printMatrix(n,4,mask);
+  //   AlphabetIterator al(n);
+  //   double total_exp_ed = 0;
+  //   while(al != al.end()) {
+  //     ColumnStateSpace state_space(n);
+  //     create_hamming_mask(*al, "ACGT", mask);
+  //     state_space.insert(constant_column(n, One), 1);
+  //     //print_state(state_space, n);
+  //     for (lbio_size_t j = 0; j < n; ++j) {
+  // 	state_space = refresh_space(state_space, j, n, mask, 4);
+  // 	//std::cout << j << " -> " << j+1 << "\t\t" << state_space.size() << "\n";
+  // 	//print_state(state_space, n);
+  // 	//std::cout << "\n\n";
+  //     }
+
+  //     double total_strings = 0;
+  //     double total_dist = 0;
+  //     for (auto it_ = state_space.begin(); it_ != state_space.end(); it_++) {
+  // 	std::vector<lbio_size_t> v = state_to_column(it_->first, n, n);
+  // 	lbio_size_t d = v[n];
+  // 	lbio_size_t mu = it_->second;
+  // 	total_dist += d*mu;
+  // 	total_strings += mu;
+  //     }
+  //     double exp_ed = total_dist/total_strings;
+  //     //std::cout << *al << "\t" << exp_ed  << "\t" << exp_ed/n << "\n";
+  //     total_exp_ed += exp_ed;
+  //     ++al;
+  //   }
+  
+  //   std::cout << "alpha(" << n << ") = " << total_exp_ed / (n*(1 << 2*n)) << "\n";  
+  //   freeMatrix(n,4,mask);
+  // }
 }
 
 int main(int argc, char** argv) {   

@@ -7,18 +7,35 @@
 extern double* power4_lookup;
 
 
-void initUtil(size_t m);
-void clearUtil();
+void
+initUtil(size_t m);
 
-void fatal_error(const std::string &msg, int exit_code);
+void
+clearUtil();
 
-uint64_t string2Encode(const std::string&s);
-std::string encoding2String(uint64_t e, size_t n);
+void
+fatal_error(const std::string &msg, int exit_code);
 
-size_t hammingDistance(const char* s1, const char* s2, size_t m);
-size_t hammingDistance(const std::string& s1, const std::string& s2, size_t m);
-size_t prefixSuffixHammingDistance(const std::string& s1, const std::string& s2, size_t k);
-size_t bestHammingOverlap(const std::string& s1, const std::string& s2);
+uint64_t
+string2Encode(const std::string&s);
+
+std::string
+encoding2String(uint64_t e, size_t n);
+
+size_t
+hammingDistance(const char* s1, const char* s2, size_t m);
+
+size_t
+hammingDistance(const std::string& s1, const std::string& s2, size_t m);
+
+size_t
+prefixSuffixHammingDistance(const std::string& s1, const std::string& s2, size_t k);
+
+size_t
+bestHammingOverlap(const std::string& s1, const std::string& s2);
+
+void
+create_hamming_mask(const std::string& str_, const std::string& alphabet_, lbio_size_t** mask);
 
 //////////////////////////////////////////////////////////////////////
 //

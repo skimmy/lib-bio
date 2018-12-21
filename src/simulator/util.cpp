@@ -91,6 +91,16 @@ size_t bestHammingOverlap(const std::string& s1, const std::string& s2) {
   return 0;
 }
 
+void
+create_hamming_mask(const std::string& str_, const std::string& alphabet_, lbio_size_t** mask) {
+  lbio_size_t sigma = alphabet_.size();
+  lbio_size_t n = str_.size();
+  for (lbio_size_t s = 0; s < sigma; ++s) {
+    for (lbio_size_t i = 0; i < n; ++i) {
+      mask[i][s] = str_[i] == alphabet_[s] ? 0 : 1;
+    }
+  }
+}
 
 void printVec(size_t* v, size_t n) {
   for (size_t i =0; i <n;i++){

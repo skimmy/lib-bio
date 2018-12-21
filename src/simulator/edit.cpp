@@ -10,6 +10,7 @@
 
 #include <fstream>
 #include <map>
+#include <unordered_map>
 #include <cmath>
 
 using namespace lbio::sim::generator;
@@ -571,42 +572,141 @@ test_exhaustive_edit_distance_encoded(lbio_size_t n, double* freq) {
   return ((double)ed) / ((double) (N*N));
 }
 
-double
-exhaustive_edit_distance_improved(lbio_size_t n, std::vector<lbio_size_t>& freqs, lbio_size_t sigma) {
+////////////////////////////////////////////////////////////////////////////////
+//                          COLUMN STATE EXHAUSTIVE
+////////////////////////////////////////////////////////////////////////////////
 
-  // DP matrix initialization
-  lbio_size_t** dpMatrix = allocMatrix<lbio_size_t>(n+1,n+1);  
-  for (lbio_size_t i = 0; i < n+1; ++i) {
-    dpMatrix[i][0] = i;
+uint32_t constant_column(lbio_size_t n, uint32_t value) {
+  uint32_t col = value & 0x3;
+  for (lbio_size_t i = 1; i < n; ++i) {
+    col <<= 2;
+    col += (0x3 & value);    
   }
-  for (lbio_size_t j = 0; j < n+1; ++j) {
-    dpMatrix[0][j] = j;
-  }
-
-  // cumulative counter to be returned
-  double expected_ed = 0;
-    
-  // Generate all the x representatives of permutations of the bases
-  // This is done generating all strings of the form
-  // 0*1{0,1}*2{0,1,2}* ...
-  
-  // First decide how many distinct bases appear in the string
-  for (lbio_size_t s = 1; s <= sigma; ++s) {    
-    // Second we partition the integer n-s into s integers >=0.  This
-    // represents the way blocks are sized in the n substrings. The
-    // substring j for j=0,...,s-1 can be any string in {0,...,j}^nj
-    // The generation of the partition is done by traversing a tree with 
-    ListOfPartitions parts = recursive_int_partition(n, s);
-    
-  }
-  return expected_ed;
+  return col;
 }
 
+std::string state_to_string(uint32_t state, lbio_size_t n) {
+  std::string out {""};
+  std::string decoded[] = {"-1", "0", "1", "*"};
+  for (lbio_size_t i = 0; i < n; ++i) {
+    out = decoded[(state & 0x3)] + ", " + out;
+    state >>= 2;
+  }
+  return "[" + out + "]";
+}
+
+std::vector<lbio_size_t> state_to_column(uint32_t state, lbio_size_t j, lbio_size_t n) {
+  std::vector<lbio_size_t> column(n+1);
+  column[0] = j;
+  int vals[] {-1, 0, 1, 0xFF};
+  for (lbio_size_t i = 1; i <= n; ++i) {
+    lbio_size_t idx = (state >> 2*(n-i)) & 0x3;
+    column[i] = column[i-1] + vals[idx];
+  }
+  return column;
+}
+
+void
+print_state(ColumnStateSpace& _set, lbio_size_t n) {
+  for (auto it_ = _set.begin(); it_ != _set.end(); it_++) {
+    std::cout << "(" << state_to_string(it_->first, n) << " [0x" << std::hex
+	      << it_->first << "], " <<  std::dec << it_->second << ")\n";
+  }
+}
+
+
+ColumnStateSpace
+refresh_space(ColumnStateSpace& old_state, lbio_size_t j, lbio_size_t n,
+	      lbio_size_t ** h_mask , lbio_size_t sigma) {
+  ColumnStateSpace new_state(n);
+  auto it_ = old_state.begin();
+  lbio_size_t a,b,c,d;
+  while(it_ != old_state.end()) {
+    // for each mask...
+    for (lbio_size_t s_ = 0; s_ < sigma; ++s_) {
+      uint32_t Mj = (*it_).first;
+      uint32_t Mj1 = 0x0;
+      // first element
+      a = j;
+      b = j+1;
+      c = a + (Mj>>2*(n-1) & 0x3) - 1;
+      d = std::min(std::min(b+1, c+1), a + h_mask[0][s_]);
+      Mj1 += 0x3 & (d-b+1);
+      for (lbio_size_t i = 1; i < n; ++i) {
+	Mj1 <<= 2;
+	a = c;
+	b = d;
+	c = a + (Mj>>2*(n-1-i) & 0x3) - 1;
+	d = std::min(std::min(b+1, c+1), a + h_mask[i][s_]);
+	Mj1 += 0x3 & (d-b+1);
+      }
+      new_state.insert(Mj1, (*it_).second);
+    }
+    it_++;
+  }
+  return new_state;
+}
+
+
+ColumnStateSpace
+state_space_compute(std::string x, std::string alphabet = "ACGT") {
+  lbio_size_t sigma = alphabet.size();
+  lbio_size_t ** mask = allocMatrix<lbio_size_t>(x.size(), sigma);
+  create_hamming_mask(x, alphabet, mask);
+  ColumnStateSpace states(x.size());
+  states.insert(constant_column(x.size(), One), 1);
+  for (lbio_size_t j = 0; j < x.size(); ++j) {
+    states = refresh_space(states, j, x.size(), mask, sigma);
+  }
+  freeMatrix(x.size(), sigma, mask);  
+  return states;
+}
+
+template <typename _Iter, typename _Call>
+void
+state_space_compute(_Iter beg_, _Iter end_, _Call action) {
+  while(beg_ != end_) {
+    ColumnStateSpace states = state_space_compute(*beg_);
+    action(*beg_, states);
+    ++beg_;
+  }
+}
+
+std::vector<lbio_size_t>
+state_space_to_distribution(ColumnStateSpace& states) {
+  lbio_size_t n = states.get_n();
+  std::vector<lbio_size_t> v(n+1, 0);
+  for (auto it_ = states.begin(); it_ != states.end(); it_++) {
+    
+    v[state_to_column(it_->first, n, n)[n]] += it_->second;
+  }
+  return v;
+}
+
+std::string
+distribution_to_string(const std::vector<lbio_size_t> v) {
+  std::string s {""};
+  for(auto it = v.begin(); it != v.end(); it++) {
+    s += std::to_string(*it) + ", ";
+  }
+  return s;
+}
+
+void
+edit_distance_eccentricity(lbio_size_t n, std::ostream& os) {
+  // iterator for all the strings
+  AlphabetIterator it(n);
+  // for each string compute eccentricoty and write distribution on 'os'
+  state_space_compute(it, it.end(), [&os] (std::string x, ColumnStateSpace& space) {
+      os << x << ", " << distribution_to_string(state_space_to_distribution(space)) << "\n";
+  });
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 // Useful alias used throughout the code
 using ExactAlg    = EditDistanceWF<lbio_size_t, std::string>;
 using BandApprAlg = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
-
 
 void
 compare_edit_distance_algorithms(lbio_size_t n, lbio_size_t m,

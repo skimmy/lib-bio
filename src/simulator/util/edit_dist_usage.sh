@@ -3,6 +3,33 @@
 
 # !!! WORK IN PROGRESS !!!
 
+################## EXHASUTIVE ####################
+
+# Computes exact expected edit distance
+
+# FLAGS
+
+# -O 6 -->  Edit Distance Task
+# -f 1 -->  Exhaustive calculation
+
+./simulator.out -O 6 -f 1 -N 4
+
+
+# Computes distribution of eccentricity for all strings
+
+# FLAGS
+
+# -O 6 -->  Edit Distance Task
+# -B 4 -->  Subtask
+# -f 1 -->  Flags
+
+./simulator.out -O 6 -B 4 -f 1 -N 4
+
+# PARAMETERS
+
+# -N   length of the strings
+
+
 #################### SAMPLING ####################
 
 

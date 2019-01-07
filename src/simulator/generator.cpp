@@ -137,4 +137,57 @@ void complementBases(char* S, size_t n) {
   }
 }
 
+
+std::vector<std::string>
+all_strings(lbio_size_t n, std::string alphabet) {
+  if (n == 0) {
+    return {""};
+  }
+  SigmaNIterator alpha_it(n, alphabet);
+  SigmaNIterator end;
+  std::vector<std::string> v;
+  while(alpha_it != end) {
+    v.push_back(*alpha_it);
+    ++alpha_it;
+  }
+  return v;
+}
+
+std::vector<std::pair<std::string, lbio_size_t>>
+all_invariant_strings_for_partition(Partition& p, std::string alphabet) {
+  std::vector<std::pair<std::string, lbio_size_t>> v;
+  v.push_back(std::make_pair<std::string,lbio_size_t>("", 0));
+  lbio_size_t mu = 1;
+  // temporary container for swapping
+  std::vector<std::pair<std::string, lbio_size_t>> v_prime;
+ 
+  for (lbio_size_t j = 0; j < p.size(); ++j) {
+    v_prime.clear();
+    mu *= alphabet.size() - j;
+    std::vector<std::string> T = all_strings(p[j]-1, alphabet.substr(0,j+1));
+    for (auto t : T) {
+      for (auto x_mu : v) {
+	std::string x_prime = x_mu.first + alphabet[j] + t;
+	v_prime.push_back(std::make_pair(x_prime, mu));
+      }
+    }
+    v = std::move(v_prime);
+  }
+
+  return v;
+}
+
+std::vector<std::pair<std::string, lbio_size_t>>
+permutation_invariant_strings_with_multiplicity(lbio_size_t n, std::string alphabet) {
+  std::vector<std::pair<std::string, lbio_size_t>> str_v;
+  for (lbio_size_t k = 1; k <= alphabet.size(); ++k) {
+    ListOfPartitions lop = recursive_int_partition(n,k);
+    for (auto p : lop) {
+      auto v = all_invariant_strings_for_partition(p, alphabet);
+      str_v.insert(str_v.end(), v.begin(), v.end());
+    }
+  }
+    return str_v;
+}
+
 } } } // namespaces

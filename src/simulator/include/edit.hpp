@@ -156,66 +156,16 @@ test_exhaustive_edit_distance_encoded(lbio_size_t n, double* freq);
       
 void edit_distance_exhastive_with_info(lbio_size_t n);
 
+double
+eccentricity_for_string(std::string x);
+
 void
 edit_distance_eccentricity(lbio_size_t n, std::ostream& os);
-      
-//////////////////////////////////////////////////////////////////////////////
-//                                                                          //
-//                           ALPHABET ITERATOR                              //
-//                                                                          //
-//////////////////////////////////////////////////////////////////////////////
 
-// TODO: templetize for different alphabet sizes
-class AlphabetIterator {
-private:
-  using numeric_type = int;
-  using string_type = std::string;
-  const lbio_size_t AlphabetSize = 4;
+double
+eccentricity_with_symmetries(lbio_size_t n, std::string alphabet = "ACGT");
 
-  lbio_size_t size;
-  numeric_type max_value;
-  numeric_type current;  
-  bool end_iter;  
-  
-public:
-  AlphabetIterator(lbio_size_t n)
-    : size {n},
-      max_value { static_cast<numeric_type>(std::pow(AlphabetSize, n)) },
-      current {0}, end_iter{false} { }
 
-  AlphabetIterator& operator++() {
-    end_iter = (++current >= max_value);
-    return *this;
-  }
-
-  string_type operator*() {
-    string_type Sigma {"ACGT"};
-    string_type out {""};
-    numeric_type current_copy {current};
-    for (lbio_size_t i = 0; i < size; ++i) {
-      out = Sigma[current_copy & 0x3] + out;
-      current_copy >>= 2;
-    }
-    return out;
-  }
-
-  bool operator==(const AlphabetIterator& other) {
-    return ( end_iter && other.end_iter )
-      || ( !end_iter && !other.end_iter && current == other.current);
-      
-  }
-
-  bool operator!=(const AlphabetIterator& other) {
-    return !(*this == other);
-  }
-
-  AlphabetIterator end() const {
-    static AlphabetIterator _end(size);
-    _end.end_iter = true;
-    return _end;
-  }
-  
-};
 
 } } } //namespaces
 

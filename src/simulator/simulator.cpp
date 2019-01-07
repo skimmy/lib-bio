@@ -455,9 +455,14 @@ editDistanceOpMode() {
       edit_distance_eccentricity(n, std::cout);
       return;
     }
+
+    
+    lbio_size_t n = Options::opts.N;
+    double e = eccentricity_with_symmetries(n);
+    std::cout << n << "\t" << e/n << "\n";
 						   
     
-    if (flags & EDIT_DISTANCE_INFO_PARTIAL) { // -f 5
+/*    if (flags & EDIT_DISTANCE_INFO_PARTIAL) { // -f 5
       logWarning("only \033[1;37mqudratic algorithm\033[0m" 
 		 " available with exhaustive option");
       logInfo("Exhaustive edit distance with min-max info");
@@ -470,7 +475,7 @@ editDistanceOpMode() {
       logInfo("Exhaustive edit distance");
       double avgDist = test_exhaustive_edit_distance_encoded(n, edOut->distPDF);
       std::cout << avgDist << std::endl;
-    }
+      }*/
   }
   
   else { // Not exhaustive
@@ -648,66 +653,13 @@ void shift_distance_prototyping() {
 
 //--------------------------------------------------------------------------------
 
+
 void
 prototyping() {
   // !!! WARNING: possibly don't remove next two lines !!!
   std::string proto_task_msg = make_bold("Improved exhaustive");
   logInfo("Working on " + proto_task_msg + " prototyping");
   
-
-// -------------------------------------------------------
-  //prototype_partitions();
-
-  // // CGTCTAGGGCTATCG
-  // std::vector<std::string> xx { "AAAAAAAAAAAAAAA", "CCCCCCCCCCCCCCC", "GGGGGGGGGGGGGGG", "TTTTTTTTTTTTTTT",
-  //     "AAAAAAAAAAAAAAA", "ACCCCCCCCCCCCCC", "AACCCCCCCCCCCCC", "AAACCCCCCCCCCCC", 
-  //     "AAAAAAACCCCCCCC", "AAACCCGGGTTTAAA", 
-  //     "CGTCTAGGGCTATCG", "AGTCTAGGGCTATCG", "GGTCTAGGGCTATCG", "TGTCTAGGGCTATCG",
-  //     "AAATCTAGGCATGGT", "CAATCTAGGCATGGT", "GAATCTAGGCATGGT", "TAATCTAGGCATGGT",
-  //     "AAAACCCCTTTTAAAA"};
-  // for (std::string x : xx) {
-  //   lbio_size_t ecc_x = eccentricity(x);
-  //   double ecc_x_dist = (double)ecc_x / (double)std::pow(4, x.size());
-  //   std::cout << x << "\t" << ecc_x << "\t" << ecc_x_dist << "\t" << ecc_x_dist/x.size() << "\n";
-  // }
-  
-
-  // for (lbio_size_t n = 2; n <= 0; ++n) {
-  //   lbio_size_t ** mask = allocMatrix<lbio_size_t>(n, 4);
-
-  //   //printMatrix(n,4,mask);
-  //   AlphabetIterator al(n);
-  //   double total_exp_ed = 0;
-  //   while(al != al.end()) {
-  //     ColumnStateSpace state_space(n);
-  //     create_hamming_mask(*al, "ACGT", mask);
-  //     state_space.insert(constant_column(n, One), 1);
-  //     //print_state(state_space, n);
-  //     for (lbio_size_t j = 0; j < n; ++j) {
-  // 	state_space = refresh_space(state_space, j, n, mask, 4);
-  // 	//std::cout << j << " -> " << j+1 << "\t\t" << state_space.size() << "\n";
-  // 	//print_state(state_space, n);
-  // 	//std::cout << "\n\n";
-  //     }
-
-  //     double total_strings = 0;
-  //     double total_dist = 0;
-  //     for (auto it_ = state_space.begin(); it_ != state_space.end(); it_++) {
-  // 	std::vector<lbio_size_t> v = state_to_column(it_->first, n, n);
-  // 	lbio_size_t d = v[n];
-  // 	lbio_size_t mu = it_->second;
-  // 	total_dist += d*mu;
-  // 	total_strings += mu;
-  //     }
-  //     double exp_ed = total_dist/total_strings;
-  //     //std::cout << *al << "\t" << exp_ed  << "\t" << exp_ed/n << "\n";
-  //     total_exp_ed += exp_ed;
-  //     ++al;
-  //   }
-  
-  //   std::cout << "alpha(" << n << ") = " << total_exp_ed / (n*(1 << 2*n)) << "\n";  
-  //   freeMatrix(n,4,mask);
-  // }
 }
 
 int main(int argc, char** argv) {   

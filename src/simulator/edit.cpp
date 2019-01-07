@@ -664,7 +664,7 @@ state_space_compute(std::string x, std::string alphabet = "ACGT") {
 
 template <typename _Iter, typename _Call>
 void
-state_space_compute(_Iter beg_, _Iter end_, _Call action) {
+state_space_compute_iter(_Iter beg_, _Iter end_, _Call action) {
   while(beg_ != end_) {
     ColumnStateSpace states = state_space_compute(*beg_);
     action(*beg_, states);
@@ -676,8 +676,7 @@ std::vector<lbio_size_t>
 state_space_to_distribution(ColumnStateSpace& states) {
   lbio_size_t n = states.get_n();
   std::vector<lbio_size_t> v(n+1, 0);
-  for (auto it_ = states.begin(); it_ != states.end(); it_++) {
-    
+  for (auto it_ = states.begin(); it_ != states.end(); it_++) {    
     v[state_to_column(it_->first, n, n)[n]] += it_->second;
   }
   return v;
@@ -697,10 +696,43 @@ edit_distance_eccentricity(lbio_size_t n, std::ostream& os) {
   // iterator for all the strings
   AlphabetIterator it(n);
   // for each string compute eccentricoty and write distribution on 'os'
-  state_space_compute(it, it.end(), [&os] (std::string x, ColumnStateSpace& space) {
+  state_space_compute_iter(it, it.end(), [&os] (std::string x, ColumnStateSpace& space) {
       os << x << ", " << distribution_to_string(state_space_to_distribution(space)) << "\n";
   });
 }
+
+double
+eccentricity_for_string(std::string x) {
+  ColumnStateSpace states = state_space_compute(x);
+  double sum = 0;
+  auto v = state_space_to_distribution(states);
+  for (lbio_size_t i = 1; i < v.size(); ++i) {
+    sum += i*v[i];
+  }  
+  return sum/(std::pow(4,x.size())*x.size());
+}
+
+double
+eccentricity_with_symmetries(lbio_size_t n, std::string alphabet) {
+  auto invariant_strings = permutation_invariant_strings_with_multiplicity(n, alphabet);
+  double sum = 0;
+  double total_strings = 0;
+  for (auto s_mu_pair : invariant_strings) {
+    ColumnStateSpace states = state_space_compute(s_mu_pair.first);
+    auto dist = state_space_to_distribution(states);
+    double dist_sum = 0;
+    for (lbio_size_t i = 1; i < dist.size(); ++i) {
+      dist_sum += i*dist[i];
+    }  
+    double ecc = dist_sum / std::pow(alphabet.size(), n);
+    sum += ecc*s_mu_pair.second;
+    total_strings += s_mu_pair.second;    
+
+  }
+  return sum / std::pow(alphabet.size(), n);
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 

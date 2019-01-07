@@ -1,8 +1,11 @@
 #ifndef GENERATOR_H
 #define GENERATOR_H
 
+#include <cmath>
 #include <string>
 #include <queue>
+
+#include <include/util.hpp>
 
 namespace lbio { namespace sim { namespace generator {
 
@@ -66,6 +69,120 @@ private:
   std::string s1;
   std::string s2;
 };
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                           ALPHABET ITERATOR                              //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+class AlphabetIterator {
+private:
+  using numeric_type = int;
+  using string_type = std::string;
+  
+
+  lbio_size_t size;
+  string_type alphabet;
+  numeric_type max_value;
+  numeric_type current;  
+  bool end_iter;  
+  
+public:
+  AlphabetIterator(lbio_size_t n, std::string al = "ACGT")
+    : size {n}, alphabet {al},
+      max_value { static_cast<numeric_type>(std::pow(al.size(), n)) },
+      current {0}, end_iter{false} { }
+
+  AlphabetIterator& operator++() {
+    end_iter = (++current >= max_value);
+    return *this;
+  }
+
+  string_type operator*() {
+    string_type out {""};
+    numeric_type current_copy {current};
+    for (lbio_size_t i = 0; i < size; ++i) {
+      out = alphabet[current_copy & 0x3] + out;
+      current_copy >>= 2;
+    }
+    return out;
+  }
+
+  bool operator==(const AlphabetIterator& other) {
+    return ( end_iter && other.end_iter )
+      || ( !end_iter && !other.end_iter && current == other.current);
+      
+  }
+
+  bool operator!=(const AlphabetIterator& other) {
+    return !(*this == other);
+  }
+
+  AlphabetIterator end() const {
+    static AlphabetIterator _end(size);
+    _end.end_iter = true;
+    return _end;
+  }
+  
+};
+
+class SigmaNIterator {
+private:
+  std::vector<uint8_t> x;
+  std::string alphabet;
+  bool end;
+  
+public:
+  SigmaNIterator(lbio_size_t n, std::string Sigma) :
+    x(n, 0), alphabet {Sigma}, end {false}
+    { }
+
+  SigmaNIterator() : end {true} { }
+
+  SigmaNIterator& operator++() {
+    if (!end) {
+      int j = x.size()-1;
+      while(j>=0 and x[j] == (alphabet.size()-1)) {
+	x[j] = 0;
+	j--;
+      }
+      if (j>=0) {
+	x[j]++;
+      }
+      else {
+	end = true;	
+      }
+    }
+    return *this;
+  }
+
+  std::string operator*() {
+    std::string s {""};
+    for (auto it = x.begin(); it != x.end(); ++it) {
+      s += alphabet[*it];
+    }
+    return s;
+  }
+
+  bool operator==(const SigmaNIterator& other) {
+    return (end == other.end);
+  }
+
+  bool operator!=(const SigmaNIterator& other) {
+    return !(*this == other);
+  }
+  
+};
+
+std::vector<std::string>
+all_strings(lbio_size_t n, std::string alphabet = "ACGT");
+
+std::vector<std::pair<std::string, lbio_size_t>>
+all_invariant_strings_for_partition(Partition& p, std::string alphabet = "ACGT");
+
+std::vector<std::pair<std::string, lbio_size_t>>
+permutation_invariant_strings_with_multiplicity(lbio_size_t n, std::string alphabet = "ACGT");
       
 } } } // namespaces
 

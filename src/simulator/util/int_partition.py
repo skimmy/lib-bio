@@ -30,6 +30,7 @@ if __name__ == "__main__":
     cumsum = 0
     totdistinct = 0
     out_file = open("./int_part_" + str(n) + ".txt", "w")
+    out_file_str = open("./part_strings_" + str(n) + ".txt", "w")
     for sigma in range(1,sigma_max+1):        
         parts = rec_part(n,sigma)        
         for P in parts:
@@ -41,9 +42,10 @@ if __name__ == "__main__":
                 S += Sigma[i]*P[i]
             B = np.prod(SigmaR[:sigma])
             M = np.power(BaseChoices, (np.array(P)-1).clip(min=0)).prod()
-            
+            out_file_str.write(S + "\n")
             cumsum += B * M
             print("{0}\t{1}x{2}\t{3}".format(P, B, M, S))
     print(cumsum)
     print(np.power(sigma_max, n))
     out_file.close()
+    out_file_str.close()

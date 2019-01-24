@@ -742,7 +742,6 @@ eccentricity_with_symmetries_multithread(lbio_size_t n, std::string alphabet, lb
   using PairVectorStrMult = std::vector<std::pair<std::string, lbio_size_t>>;
   using IterType = std::vector<std::pair<std::string, lbio_size_t>>::iterator;
   PairVectorStrMult invariant_strings = permutation_invariant_strings_with_multiplicity(n, alphabet);
-  std::cout << "---> MT " << threads_ << "\n";
   std::vector<std::future<double>> v_futures;
   lbio_size_t M = invariant_strings.size();
   lbio_size_t m = static_cast<lbio_size_t>(std::ceil((double)M / (double)threads_));
@@ -1008,12 +1007,8 @@ optimal_bandwidth(lbio_size_t n, double precision, lbio_size_t k, lbio_size_t Tm
       auto strings = gen();
       lbio_size_t ed_T = alg_T.calculate(strings.first, strings.second);
       lbio_size_t ed_T_2 = alg_T_2.calculate(strings.first, strings.second);
-      //     std::cout << (ed_T_2 - ed_T) << " ";
       avg += static_cast<double>(ed_T_2 - ed_T) / static_cast<double>(ed_T_2);
     }
-    // std::cout << "\nT:    " << T
-    // 	      << "\nAvg:  " << avg << "\n";
-
     avg /= static_cast<double>(k);
     if (avg < precision) {
       return T_2;

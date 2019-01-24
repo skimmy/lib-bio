@@ -462,22 +462,7 @@ editDistanceOpMode() {
     lbio_size_t t = Options::opts.n_threads;
     double e = eccentricity_with_symmetries(n, alphabet, t);
     std::cout << n << "\t" << e/n << "\n";
-						   
-    
-/*    if (flags & EDIT_DISTANCE_INFO_PARTIAL) { // -f 5
-      logWarning("only \033[1;37mqudratic algorithm\033[0m" 
-		 " available with exhaustive option");
-      logInfo("Exhaustive edit distance with min-max info");
-      edit_distance_exhastive_with_info(n);
-    }
-    else {
-      // Exhasutve (only quadratic)
-      logWarning("only \033[1;37mqudratic algorithm\033[0m" 
-		 " available with exhaustive option");
-      logInfo("Exhaustive edit distance");
-      double avgDist = test_exhaustive_edit_distance_encoded(n, edOut->distPDF);
-      std::cout << avgDist << std::endl;
-      }*/
+	
   }
   
   else { // Not exhaustive

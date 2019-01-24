@@ -12,7 +12,7 @@
 # -O 6 -->  Edit Distance Task
 # -f 1 -->  Exhaustive calculation
 
-./simulator.out -O 6 -f 1 -N 4
+./simulator.out -O 6 -f 1 -N 4 -t 2
 
 
 # Computes distribution of eccentricity for all strings
@@ -22,6 +22,8 @@
 # -O 6 -->  Edit Distance Task
 # -B 4 -->  Subtask
 # -f 1 -->  Flags
+# -t t -->  Number of threads used
+
 
 ./simulator.out -O 6 -B 4 -f 1 -N 4
 

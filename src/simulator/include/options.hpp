@@ -38,6 +38,8 @@ struct Options {
 
   int k; // -k
 
+  size_t n_threads; // -t, --threads
+
   static  Options opts;
 }
 ;

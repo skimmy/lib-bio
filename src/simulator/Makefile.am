@@ -4,7 +4,7 @@
 basic_src= options.cpp generator.cpp online.cpp chain.cpp \
 	util.cpp io.cpp prob.cpp align.cpp edit.cpp log.cpp
 # libraries
-common_libs = -lboost_program_options -lhts
+common_libs = -lboost_program_options -lhts -lpthread
 
 bin_PROGRAMS = simulator.out test.out
 

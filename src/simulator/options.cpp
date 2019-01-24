@@ -48,6 +48,7 @@ void printUsage() {
   std::cout << "\t-O <op_mode>  Set operation mode of the simulator [0,4] (run -h for details)\n";
   std::cout << "\t-B <sub_task> Defines the sub task for a given mode\n";
   std::cout << "\t-f <flags>    Flags code to be activated (operation mode and subtask dependent\n";
+  std::cout << "\t-t <nthr>     The number of threads to be used (not suppoerted by all tasks)\n";
   std::cout << "\t-p            Outputs on standard out for pipelining\n";
   std::cout << "\t-h            Shows extended help\n";
   std::cout << "\t-v            Activate verbose mode\n";
@@ -176,7 +177,7 @@ void parseArguments(int argc, char** argv) {
   setDefualtParams();
   
   char c;
-  while ((c = getopt(argc, argv, "N:m:M:e:P:c:d:k:i:S:D:C:A:O:B:f:phv")) != -1) {
+  while ((c = getopt(argc, argv, "N:m:M:e:P:c:d:k:i:S:D:C:A:O:B:f:t:phv")) != -1) {
     switch(c) {
     case 'N':
       Options::opts.N = atoi(optarg);
@@ -231,7 +232,9 @@ void parseArguments(int argc, char** argv) {
       break;
     case 'v':
       Options::opts.verbose = true;
-      break;     
+      break;
+    case 't':
+      Options::opts.n_threads = atoi(optarg);
     case 'h':
       printUsage();
       printOperationModeDescription();
@@ -307,6 +310,9 @@ parseArgumentsBoost(int argc, char** argv) {
     ("pipeline,p", "If set will run in pipeline") // -p, --pipeline
 
     ("verbose,v", "If set will run in verbose output") // -v, --verbose
+
+    ("threads,t", po::value<size_t>(&Options::opts.n_threads),
+     "Specify the number of threads to be used")
     
     ; 
   
@@ -333,7 +339,7 @@ parseArgumentsBoost(int argc, char** argv) {
     std::string arg = vm["task"].as<std::string>();
     try {
       Options::opts.task= static_cast<Task>(std::stoi(arg));
-    } catch(std::invalid_argument) {
+    } catch(std::invalid_argument&) {
       logInfo("OpMode String");
       Options::opts.task =
 	parse_opmode_string(vm["task"].as<std::string>());

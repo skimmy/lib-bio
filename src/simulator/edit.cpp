@@ -11,7 +11,10 @@
 #include <fstream>
 #include <map>
 #include <unordered_map>
+#include <future>
+#include <thread>
 #include <cmath>
+
 
 using namespace lbio::sim::generator;
 
@@ -356,8 +359,11 @@ editDistanceErrorBoundedEstimates(size_t n, double precision,
     cumulative_quad_sum += (sample * sample);
     mean_k = cumulative_sum / ((double)k);
     var_k = ( cumulative_quad_sum - k*(mean_k*mean_k)  ) / ((double)(k-1));
-    if  ( (var_k * ( z_delta*z_delta ) < ((double)k) * ( precision * precision ))
-	  && (k > k_min) ){
+    // if  ( (var_k * ( z_delta*z_delta ) < ((double)k) * ( precision * precision ))
+    // 	  && (k > k_min) ){
+    //   break;
+    // }
+    if  (var_k * ( z_delta*z_delta ) < ((double)k) * ( precision * precision )) {
       break;
     }
   }
@@ -712,23 +718,57 @@ eccentricity_for_string(std::string x) {
   return sum/(std::pow(4,x.size())*x.size());
 }
 
+template <typename _It>
 double
-eccentricity_with_symmetries(lbio_size_t n, std::string alphabet) {
-  auto invariant_strings = permutation_invariant_strings_with_multiplicity(n, alphabet);
+eccentricity_with_symmetries_iterator(_It begin, _It end, lbio_size_t n, std::string alphabet) {
   double sum = 0;
-  double total_strings = 0;
-  for (auto s_mu_pair : invariant_strings) {
-    ColumnStateSpace states = state_space_compute(s_mu_pair.first);
+  while(begin != end) {
+    ColumnStateSpace states = state_space_compute(begin->first);
     auto dist = state_space_to_distribution(states);
     double dist_sum = 0;
     for (lbio_size_t i = 1; i < dist.size(); ++i) {
       dist_sum += i*dist[i];
     }  
     double ecc = dist_sum / std::pow(alphabet.size(), n);
-    sum += ecc*s_mu_pair.second;
-    total_strings += s_mu_pair.second;    
-
+    sum += ecc*begin->second;
+    ++begin;
   }
+  return sum;
+}
+
+double
+eccentricity_with_symmetries_multithread(lbio_size_t n, std::string alphabet, lbio_size_t threads_) {
+  double sum = 0;
+  using PairVectorStrMult = std::vector<std::pair<std::string, lbio_size_t>>;
+  using IterType = std::vector<std::pair<std::string, lbio_size_t>>::iterator;
+  PairVectorStrMult invariant_strings = permutation_invariant_strings_with_multiplicity(n, alphabet);
+  std::cout << "---> MT " << threads_ << "\n";
+  std::vector<std::future<double>> v_futures;
+  lbio_size_t M = invariant_strings.size();
+  lbio_size_t m = static_cast<lbio_size_t>(std::ceil((double)M / (double)threads_));
+  for (lbio_size_t i = 0; i < threads_-1; ++i) {
+    auto it_begin = invariant_strings.begin() + m*i;
+    auto it_end = invariant_strings.begin() + m*(i+1);
+    v_futures.push_back(
+      std::future<double>(std::async(
+			    eccentricity_with_symmetries_iterator<IterType>, it_begin, it_end, n, alphabet)));
+  }
+  sum += eccentricity_with_symmetries_iterator(invariant_strings.begin() + m*(threads_-1),
+					       invariant_strings.end(), n, alphabet);
+  for (auto it = v_futures.begin(); it != v_futures.end(); ++it) {
+    sum += it->get();
+  }
+  return sum / std::pow(alphabet.size(), n);
+}
+
+double
+eccentricity_with_symmetries(lbio_size_t n, std::string alphabet, lbio_size_t threads_) {
+  if (threads_ > 1) {
+    return eccentricity_with_symmetries_multithread(n, alphabet, threads_);
+  }
+  auto invariant_strings = permutation_invariant_strings_with_multiplicity(n, alphabet);
+  double sum = eccentricity_with_symmetries_iterator(invariant_strings.begin(), invariant_strings.end(),
+						     n, alphabet);
   return sum / std::pow(alphabet.size(), n);
 }
 

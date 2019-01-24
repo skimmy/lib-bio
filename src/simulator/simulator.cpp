@@ -458,7 +458,9 @@ editDistanceOpMode() {
 
     
     lbio_size_t n = Options::opts.N;
-    double e = eccentricity_with_symmetries(n);
+    std::string alphabet = "ACGT";
+    lbio_size_t t = Options::opts.n_threads;
+    double e = eccentricity_with_symmetries(n, alphabet, t);
     std::cout << n << "\t" << e/n << "\n";
 						   
     
@@ -657,7 +659,7 @@ void shift_distance_prototyping() {
 void
 prototyping() {
   // !!! WARNING: possibly don't remove next two lines !!!
-  std::string proto_task_msg = make_bold("Improved exhaustive");
+  std::string proto_task_msg = make_bold("Multithread exhaustive");
   logInfo("Working on " + proto_task_msg + " prototyping");
   
 }

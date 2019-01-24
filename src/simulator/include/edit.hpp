@@ -163,7 +163,7 @@ void
 edit_distance_eccentricity(lbio_size_t n, std::ostream& os);
 
 double
-eccentricity_with_symmetries(lbio_size_t n, std::string alphabet = "ACGT");
+eccentricity_with_symmetries(lbio_size_t n, std::string alphabet = "ACGT", lbio_size_t threads_ = 1);
 
 
 

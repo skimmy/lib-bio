@@ -452,13 +452,13 @@ editDistanceOpMode() {
     // subtask eccentricity
     if (task == EDIT_DISTANCE_SUBTASK_ECCENTRICITY) { // -B 4
       lbio_size_t n = Options::opts.N;      
-      edit_distance_eccentricity(n, std::cout);
+      edit_distance_eccentricity(n, std::cout, Options::opts.alphabet);
       return;
     }
 
     
     lbio_size_t n = Options::opts.N;
-    std::string alphabet = "ACGT";
+    std::string alphabet = Options::opts.alphabet;
     lbio_size_t t = Options::opts.n_threads;
     double e = eccentricity_with_symmetries(n, alphabet, t);
     std::cout << n << "\t" << e/n << "\n";
@@ -646,6 +646,11 @@ prototyping() {
   // !!! WARNING: possibly don't remove next two lines !!!
   std::string proto_task_msg = make_bold("Multithread exhaustive");
   logInfo("Working on " + proto_task_msg + " prototyping");
+
+  std::cout << "Sigma: " << Options::opts.alphabet << "\n";
+  double e = eccentricity_with_symmetries(6, Options::opts.alphabet, 1);
+  std::cout << "e(6) = " << e << "\n";
+  std::cout << "e(6)/6 = " << e/6 << "\n";
   
 }
 

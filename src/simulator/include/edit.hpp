@@ -157,13 +157,13 @@ test_exhaustive_edit_distance_encoded(lbio_size_t n, double* freq);
 void edit_distance_exhastive_with_info(lbio_size_t n);
 
 double
-eccentricity_for_string(std::string x);
+eccentricity_for_string(std::string x, std::string alphabet);
 
 void
-edit_distance_eccentricity(lbio_size_t n, std::ostream& os);
+edit_distance_eccentricity(lbio_size_t n, std::ostream& os, std::string alphabet);
 
 double
-eccentricity_with_symmetries(lbio_size_t n, std::string alphabet = "ACGT", lbio_size_t threads_ = 1);
+eccentricity_with_symmetries(lbio_size_t n, std::string alphabet, lbio_size_t threads_ = 1);
 
 
 

@@ -90,6 +90,8 @@ setDefualtParams() {
   
   Options::opts.empiricalDistributionStep = 100;
 
+  Options::opts.alphabet = "ACGT";
+    
   Options::opts.inputReference = "";
   Options::opts.inputSAM = "";
   Options::opts.outputDistribution = "";
@@ -106,6 +108,7 @@ setDefualtParams() {
   Options::opts.pipeline = false;
   Options::opts.verbose = false;
 
+  Options::opts.n_threads = 1;
 }
 
 // ----------------------------------------------------------------------
@@ -177,7 +180,7 @@ void parseArguments(int argc, char** argv) {
   setDefualtParams();
   
   char c;
-  while ((c = getopt(argc, argv, "N:m:M:e:P:c:d:k:i:S:D:C:A:O:B:f:t:phv")) != -1) {
+  while ((c = getopt(argc, argv, "N:m:M:e:P:c:d:k:a:i:S:D:C:A:O:B:f:t:phv")) != -1) {
     switch(c) {
     case 'N':
       Options::opts.N = atoi(optarg);
@@ -203,6 +206,8 @@ void parseArguments(int argc, char** argv) {
     case 'k':
       Options::opts.k = atoi(optarg);
       break;
+    case 'a':
+      Options::opts.alphabet = optarg;
     case 'i':
       Options::opts.inputReference = optarg;
       break;
@@ -283,6 +288,9 @@ parseArgumentsBoost(int argc, char** argv) {
 
     ("iterations,k", po::value<int>(&Options::opts.k), // -k, --iterations
      "Number of iterations or samples")
+
+    ("alphabet,a", po::value<std::string>(&Options::opts.alphabet), // -a, --alphabet
+     "String of characters of the alphabet to use")
 
     ("input-reference,i",po::value<std::string>(&Options::opts.inputReference), // -i, --input-reference
      "Reference DNA/RNA input file (fasta format)")

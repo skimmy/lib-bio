@@ -18,6 +18,8 @@ struct Options {
   double confidence;  // -c
   double oscillation; // -d
 
+  std::string alphabet; // -a
+
   std::string inputReference; // -i
   std::string inputSAM; // -S
   std::string outputDistribution; // -D

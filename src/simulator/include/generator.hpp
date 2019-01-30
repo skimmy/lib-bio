@@ -89,7 +89,7 @@ private:
   bool end_iter;  
   
 public:
-  AlphabetIterator(lbio_size_t n, std::string al = "ACGT")
+  AlphabetIterator(lbio_size_t n, std::string al)
     : size {n}, alphabet {al},
       max_value { static_cast<numeric_type>(std::pow(al.size(), n)) },
       current {0}, end_iter{false} { }
@@ -120,7 +120,7 @@ public:
   }
 
   AlphabetIterator end() const {
-    static AlphabetIterator _end(size);
+    static AlphabetIterator _end(size, alphabet);
     _end.end_iter = true;
     return _end;
   }
@@ -176,13 +176,13 @@ public:
 };
 
 std::vector<std::string>
-all_strings(lbio_size_t n, std::string alphabet = "ACGT");
+all_strings(lbio_size_t n, std::string alphabet);
 
 std::vector<std::pair<std::string, lbio_size_t>>
-all_invariant_strings_for_partition(Partition& p, std::string alphabet = "ACGT");
+all_invariant_strings_for_partition(Partition& p, std::string alphabet);
 
 std::vector<std::pair<std::string, lbio_size_t>>
-permutation_invariant_strings_with_multiplicity(lbio_size_t n, std::string alphabet = "ACGT");
+permutation_invariant_strings_with_multiplicity(lbio_size_t n, std::string alphabet);
       
 } } } // namespaces
 

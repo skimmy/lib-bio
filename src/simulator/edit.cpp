@@ -655,7 +655,7 @@ refresh_space(ColumnStateSpace& old_state, lbio_size_t j, lbio_size_t n,
 
 
 ColumnStateSpace
-state_space_compute(std::string x, std::string alphabet = "ACGT") {
+state_space_compute(std::string x, std::string alphabet) {
   lbio_size_t sigma = alphabet.size();
   lbio_size_t ** mask = allocMatrix<lbio_size_t>(x.size(), sigma);
   create_hamming_mask(x, alphabet, mask);
@@ -670,9 +670,9 @@ state_space_compute(std::string x, std::string alphabet = "ACGT") {
 
 template <typename _Iter, typename _Call>
 void
-state_space_compute_iter(_Iter beg_, _Iter end_, _Call action) {
+state_space_compute_iter(_Iter beg_, _Iter end_, _Call action, std::string alphabet) {
   while(beg_ != end_) {
-    ColumnStateSpace states = state_space_compute(*beg_);
+    ColumnStateSpace states = state_space_compute(*beg_, alphabet);
     action(*beg_, states);
     ++beg_;
   }
@@ -698,18 +698,18 @@ distribution_to_string(const std::vector<lbio_size_t> v) {
 }
 
 void
-edit_distance_eccentricity(lbio_size_t n, std::ostream& os) {
+edit_distance_eccentricity(lbio_size_t n, std::ostream& os, std::string alphabet) {
   // iterator for all the strings
-  AlphabetIterator it(n);
+  AlphabetIterator it(n, alphabet);
   // for each string compute eccentricoty and write distribution on 'os'
   state_space_compute_iter(it, it.end(), [&os] (std::string x, ColumnStateSpace& space) {
       os << x << ", " << distribution_to_string(state_space_to_distribution(space)) << "\n";
-  });
+					 }, alphabet);
 }
 
 double
-eccentricity_for_string(std::string x) {
-  ColumnStateSpace states = state_space_compute(x);
+eccentricity_for_string(std::string x, std::string alphabet) {
+  ColumnStateSpace states = state_space_compute(x, alphabet);
   double sum = 0;
   auto v = state_space_to_distribution(states);
   for (lbio_size_t i = 1; i < v.size(); ++i) {
@@ -723,7 +723,7 @@ double
 eccentricity_with_symmetries_iterator(_It begin, _It end, lbio_size_t n, std::string alphabet) {
   double sum = 0;
   while(begin != end) {
-    ColumnStateSpace states = state_space_compute(begin->first);
+    ColumnStateSpace states = state_space_compute(begin->first, alphabet);
     auto dist = state_space_to_distribution(states);
     double dist_sum = 0;
     for (lbio_size_t i = 1; i < dist.size(); ++i) {

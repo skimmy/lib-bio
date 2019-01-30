@@ -39,8 +39,9 @@ namespace lbio { namespace sim { namespace edit {
 template <class Algorithm>
 void
 generate_scripts(lbio_size_t n, lbio_size_t m, lbio_size_t k,
-		 std::vector<std::string>& scripts, Algorithm& alg) {
-  EditDistanceSample<Algorithm> generator {n, m};
+		 std::vector<std::string>& scripts,
+		 Algorithm& alg, std::string alphabet) {
+  EditDistanceSample<Algorithm> generator {n, m, alphabet};
   for (; k>0; --k) {
     generator(alg);
     scripts.push_back(alg.backtrack().edit_script);
@@ -63,13 +64,13 @@ generate_scripts(lbio_size_t n, lbio_size_t m, lbio_size_t k,
  */
 template<class Algorithm>
 std::unique_ptr<size_t[]>
-edit_distance_samples(size_t n, size_t k_samples, Algorithm& alg) {
+edit_distance_samples(size_t n, size_t k_samples, Algorithm& alg, std::string alphabet) {
   std::unique_ptr<size_t[]> v(new size_t[k_samples]);
   std::string s1(n,'N');
   std::string s2(n,'N');
   for (size_t k = 0; k < k_samples; ++k) {
-    generator::generateIIDString(s1);
-    generator::generateIIDString(s2);
+    generator::generateIIDString(s1, alphabet);
+    generator::generateIIDString(s2, alphabet);
     v[k] = alg.calculate(s1, s2);
   }
   return v;
@@ -97,11 +98,11 @@ edit_distance_samples(size_t n, size_t k_samples, Algorithm& alg) {
 template<class Algorithm, typename Func>
 std::vector<SampleEstimates> 
 difference_estimate(size_t n, double precision, double z_delta,
-		   size_t k_max, Algorithm& alg, Func callback) {
+		    size_t k_max, Algorithm& alg, Func callback, std::string alphabet) {
   
   // Generators
-  EditDistanceSample<Algorithm> generator_n(n, n);
-  EditDistanceSample<Algorithm> generator_n_2(n >> 1, n >> 1);
+  EditDistanceSample<Algorithm> generator_n(n, n, alphabet);
+  EditDistanceSample<Algorithm> generator_n_2(n >> 1, n >> 1, alphabet);
   
   lbio_size_t k = 1;
   // create sampling process structures (one for 'n' and one for 'n/2' )
@@ -171,7 +172,7 @@ difference_estimate(size_t n, double precision, double z_delta,
 template <typename _Func>
 std::vector<SampleEstimates>
 difference_estimate_adaptive(lbio_size_t n, double precision, double z_delta,
-			     lbio_size_t kmax, _Func callback) {
+			     lbio_size_t kmax, _Func callback, std::string alphabet) {
   using BandApprAlg = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
   lbio_size_t n_2 = static_cast<lbio_size_t>(std::floor(n/2.0));
 
@@ -184,8 +185,8 @@ difference_estimate_adaptive(lbio_size_t n, double precision, double z_delta,
   BandApprAlg ed_alg {n, n, n_2, {1,1,1}};
   lbio_size_t ed_T, ed_2T = 0;  
 
-  lbio::sim::generator::IidPairGenerator gen_n {n, n};
-  lbio::sim::generator::IidPairGenerator gen_n_2 {n_2, n_2};
+  lbio::sim::generator::IidPairGenerator gen_n {n, n, alphabet};
+  lbio::sim::generator::IidPairGenerator gen_n_2 {n_2, n_2, alphabet};
   
   lbio::prob::SamplingEstimationProcess est_n {n};
   lbio::prob::SamplingEstimationProcess est_n_2 {n_2};

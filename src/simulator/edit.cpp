@@ -292,7 +292,7 @@ editDistanceBandwiseApprox(const std::string& s1, const std::string& s2,
 
 
 std::unique_ptr<EditDistanceInfo[]>
-editDistSamplesInfoLinSpace(size_t n, size_t k_samples,
+editDistSamplesInfoLinSpace(size_t n, size_t k_samples, std::string alphabet,
 			    EditDistanceInfo** sampleMat) {
   std::unique_ptr<EditDistanceInfo[]> samples(new EditDistanceInfo[k_samples]);
   std::string s1(n, 'N');
@@ -302,8 +302,8 @@ editDistSamplesInfoLinSpace(size_t n, size_t k_samples,
   EditDistanceInfo* v1 = new EditDistanceInfo[n+1];
 
   for (size_t k = 0; k < k_samples; ++k) {
-    generateIIDString(s1);
-    generateIIDString(s2);
+    generateIIDString(s1, alphabet);
+    generateIIDString(s2, alphabet);
     samples[k] = editDistanceLinSpaceInfo(s1,s2, v0, v1, sampleMat);
   }
 
@@ -314,7 +314,7 @@ editDistSamplesInfoLinSpace(size_t n, size_t k_samples,
 }
 
 std::vector<size_t>
-edit_samples_fixed_string(size_t n, size_t k_samples, const std::string& s2) {
+edit_samples_fixed_string(size_t n, size_t k_samples, const std::string& s2, std::string alphabet) {
   std::vector<size_t> samples;
   std::string s1(n, 'N');
 
@@ -322,7 +322,7 @@ edit_samples_fixed_string(size_t n, size_t k_samples, const std::string& s2) {
   size_t* v1 = new size_t[n+1];
 
   for (size_t k = 0; k < k_samples; ++k) {
-    generateIIDString(s1);
+    generateIIDString(s1, alphabet);
     samples.push_back(editDistanceLinSpace(s1,s2, v0, v1));
   }
 
@@ -337,11 +337,11 @@ edit_samples_fixed_string(size_t n, size_t k_samples, const std::string& s2) {
 // ----------------------------------------------------------------------
 
 SampleEstimates
-editDistanceErrorBoundedEstimates(size_t n, double precision,
+editDistanceErrorBoundedEstimates(size_t n, std::string alphabet, double precision,
 				  double z_delta, size_t k_min) {
   using BandApprox = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
   BandApprox alg(n, n, std::floor(n/2.0), {1,1,1});
-  EditDistanceSample<BandApprox> gen(n, n);
+  EditDistanceSample<BandApprox> gen(n, n, alphabet);
   
   size_t k = 1;
   size_t k_max = Options::opts.k;
@@ -377,12 +377,12 @@ editDistanceErrorBoundedEstimates(size_t n, double precision,
 }
 
 SampleEstimates
-editDistanceRelativeErrorEstimates(size_t n, double e_model,
+editDistanceRelativeErrorEstimates(size_t n, std::string alphabet, double e_model,
 				   double precision, double z_delta) {
 
   using BandApprox = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
   BandApprox alg(n, n, std::floor(n/2.0), {1,1,1});
-  EditDistanceSample<BandApprox> gen(n, n);
+  EditDistanceSample<BandApprox> gen(n, n, alphabet);
 
   
   size_t k = 1;
@@ -780,8 +780,8 @@ using ExactAlg    = EditDistanceWF<lbio_size_t, std::string>;
 using BandApprAlg = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
 
 void
-compare_edit_distance_algorithms(lbio_size_t n, lbio_size_t m,
-				 lbio_size_t k, std::ostream& os) {
+compare_edit_distance_algorithms(lbio_size_t n, lbio_size_t m, lbio_size_t k,
+				 std::string alphabet, std::ostream& os) {
   lbio_size_t T_max = n / 2;
   lbio_size_t T_min = 1;
 
@@ -802,8 +802,8 @@ compare_edit_distance_algorithms(lbio_size_t n, lbio_size_t m,
   for (size_t l = 0; l < k; ++l) {
     std::shared_ptr<AlgorithmComparisonResult> res =
       std::make_shared<AlgorithmComparisonResult>();
-    generateIIDString(s1);
-    generateIIDString(s2);
+    generateIIDString(s1, alphabet);
+    generateIIDString(s2, alphabet);
 
     EditDistanceInfo tmp {};
     
@@ -967,11 +967,11 @@ closest_to_diagonal_backtrack(size_t n, size_t m, size_t** dpMatrix,
 
       
 lbio_size_t
-optimal_bandwidth_exact(lbio_size_t n, double precision, lbio_size_t Tmin) {
+optimal_bandwidth_exact(lbio_size_t n, std::string alphabet, double precision, lbio_size_t Tmin) {
   lbio_size_t T = Tmin;
   lbio_size_t T_2 = static_cast<lbio_size_t>(std::floor(n / 2));
   BandApprAlg exactAlg {n, n, T_2 ,{1,1,1}};
-  IidPairGenerator gen(n, n);
+  IidPairGenerator gen(n, n, alphabet);
   lbio_size_t k_min = 5;
   while (T < n / 2) {
     double avg = 0;
@@ -993,13 +993,13 @@ optimal_bandwidth_exact(lbio_size_t n, double precision, lbio_size_t Tmin) {
 }
 
 lbio_size_t
-optimal_bandwidth(lbio_size_t n, double precision, lbio_size_t k, lbio_size_t Tmin) {
+optimal_bandwidth(lbio_size_t n, std::string alphabet, double precision, lbio_size_t k, lbio_size_t Tmin) {
   lbio_size_t T_2 = Tmin;
   lbio_size_t T = 2 * T_2;
   
   BandApprAlg alg_T_2(n, n, T_2, {1,1,1});
   BandApprAlg alg_T(n, n, T, {1,1,1});
-  IidPairGenerator gen(n,n);
+  IidPairGenerator gen(n,n,alphabet);
 
   while (T < static_cast<lbio_size_t>(std::floor(n/2.0))) {
     double avg = 0;

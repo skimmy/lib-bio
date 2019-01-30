@@ -34,6 +34,8 @@
 
 #################### SAMPLING ####################
 
+./simulator.out -O 6 -f 0 -N 10 -k 100
+
 
 #################### ESTIMATE ####################
 # Estimate of ~g(n) through bandiwdth algorithm

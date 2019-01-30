@@ -19,7 +19,7 @@ struct Read {
 };
 
 void
-initRandomGenerator();
+initRandomGenerator(lbio_size_t sigma);
 
 void
 simpleIIDErrors(std::string& s, double pe);
@@ -27,7 +27,7 @@ simpleIIDErrors(std::string& s, double pe);
 void
 generateIIDGenome(size_t N, char* S);
 void
-generateIIDString(std::string& s);
+generateIIDString(std::string& s, std::string alphabet);
 void
 generateConstantGenome(size_t N, char* S, char b);
 
@@ -53,11 +53,11 @@ public:
 
   typedef typename std::pair< std::string, std::string > StringPair;
   
-  IidPairGenerator(size_t n_, size_t m_) :
-    n {n_}, m {m_}, s1(n_, 'N'), s2(m, 'N') { }
+  IidPairGenerator(size_t n_, size_t m_, std::string a) :
+    n {n_}, m {m_}, s1(n_, 'N'), s2(m, 'N'), alphabet {a} { }
   StringPair operator()() {
-    generateIIDString(s1);
-    generateIIDString(s2);
+    generateIIDString(s1, alphabet);
+    generateIIDString(s2, alphabet);
     return StringPair {s1, s2};    
   }
   StringPair last_pair() {
@@ -68,6 +68,7 @@ private:
   size_t m;
   std::string s1;
   std::string s2;
+  std::string alphabet;
 };
 
 //////////////////////////////////////////////////////////////////////////////

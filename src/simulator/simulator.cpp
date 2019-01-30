@@ -72,7 +72,7 @@ EditDistanceSimOutput* edOut;
 
 void initSimulator() {
   initUtil(Options::opts.m);
-  initRandomGenerator();
+  initRandomGenerator(Options::opts.alphabet.size());
   initProbabilities();
   initChainMatrix();
     
@@ -371,7 +371,7 @@ editDistanceOpMode() {
 
     AlgorithmExact alg {n, n, {1,1,1}};
     std::vector<std::string> allScripts {};    
-    generate_scripts(n, n, Options::opts.k, allScripts, alg);
+    generate_scripts(n, n, Options::opts.k, allScripts, alg, Options::opts.alphabet);
 
     // if file is given save there otherwise use std out
     if (!Options::opts.outputDistribution.empty()) {
@@ -392,7 +392,7 @@ editDistanceOpMode() {
   // TASK - Algorithms comparison (32)
   if (task == EDIT_DISTANCE_SUBTASK_COMPARE_ALGS) {
     logInfo("Task 'Algorithms comparison'");
-    compare_edit_distance_algorithms(n, n, Options::opts.k);
+    compare_edit_distance_algorithms(n, n, Options::opts.k, Options::opts.alphabet);
     return;
   }
 
@@ -416,7 +416,7 @@ editDistanceOpMode() {
       if (flags & EDIT_DISTANCE_BANDWIDTH_ESTIMATE) {	
 	logInfo("Estimation of optimal bandwidth...");
 	Tmin = std::max(1, Options::opts.approxLevel);
-	T = optimal_bandwidth(n, precision / 2, 16, Tmin);
+	T = optimal_bandwidth(n, Options::opts.alphabet, precision / 2, 16, Tmin);
 	logDebug(debug_string("[Band Estimate]\t",  "~T*: " + std::to_string(T)));
       } else {
 	T = Options::opts.approxLevel;
@@ -425,14 +425,14 @@ editDistanceOpMode() {
       logInfo("Estimation...");
       std::vector<SampleEstimates> est =
         edit::difference_estimate(n, precision, z_confidence,
-				  k_max, alg, print_cb );
+				  k_max, alg, print_cb , Options::opts.alphabet);
     } // -A 1
 
     if (Options::opts.approxLevel == 2) { // -A 2 Adaptive T
       logInfo("Adaptive Estimation...");
       std::vector<SampleEstimates> est =
 	edit::difference_estimate_adaptive(n, precision, z_confidence,
-					 k_max, print_cb );     
+					   k_max, print_cb, Options::opts.alphabet );     
     }
     return;
   }
@@ -441,7 +441,7 @@ editDistanceOpMode() {
     double precision = Options::opts.precision;
     double z_confidence = Options::opts.confidence;
     SampleEstimates beEst =
-      editDistanceErrorBoundedEstimates(n, precision, z_confidence);
+      editDistanceErrorBoundedEstimates(n, Options::opts.alphabet, precision, z_confidence);
     std::cout << beEst.sampleSize << "\t" << beEst.sampleMean << "\t"
 	      << beEst.sampleVariance << "\n";
     return;
@@ -476,7 +476,7 @@ editDistanceOpMode() {
 	if (flags & EDIT_DISTANCE_INFO_SCRIPT) { // -f 14
 	  logInfo("Sample quadratic algorithms info");
 	  AlgorithmExact algExact {n, n, {1,1,1}};
-	  EditDistanceSample<AlgorithmExact> generator {n, n};
+	  EditDistanceSample<AlgorithmExact> generator {n, n, Options::opts.alphabet};
 	  for (size_t i = 0; i < k; ++i) {
 	    generator(algExact);
 	    auto info = algExact.backtrack();
@@ -498,7 +498,7 @@ editDistanceOpMode() {
 	// PARTIAL INFO + Sample + Linear
 	logWarning("Partial info for linear under developement");
 	std::unique_ptr<EditDistanceInfo[]> samples =
-	  editDistSamplesInfoLinSpace(n,k);
+	  editDistSamplesInfoLinSpace(n,k,Options::opts.alphabet);
 	
 	// auto -> std::unique_ptr<double[]>
 	auto subSamples = extractSubstitutionArray(samples.get(), k);
@@ -532,13 +532,13 @@ editDistanceOpMode() {
 	for (lbio_size_t i = 0; i<n; ++i) {
 	  s[i] = bases[i%4];
 	}
-	std::vector<size_t> v = edit_samples_fixed_string(n, k, s);
+	std::vector<size_t> v = edit_samples_fixed_string(n, k, s, Options::opts.alphabet);
 	auto est = estimatesFromSamples(v.cbegin(), v.cend(), k);
 	std::cout << "ACGT*\t" << est << "\n";
 
 	// sampling  e("A*", Y)
 	s = std::string(n, 'A');
-	v = edit_samples_fixed_string(n, k, s);
+	v = edit_samples_fixed_string(n, k, s, Options::opts.alphabet);
 	est = estimatesFromSamples(v.cbegin(), v.cend(), k);
 	std::cout << "A*\t" << est << "\n";
 	std::cout << std::endl;	
@@ -549,7 +549,7 @@ editDistanceOpMode() {
 	// MINIMAL INFO (mean + var) + Sample + Linear
 	logInfo("Basic sampling");
 	AlgorithmBand alg(n, n, std::ceil(n/2.0), {1,1,1});
-	auto samples = edit::edit_distance_samples(n,k, alg);
+	auto samples = edit::edit_distance_samples(n,k, alg, Options::opts.alphabet);
 	auto estimators = estimatesFromSamples<size_t>(samples.get(), k);
 	std::cout << estimators.sampleMean << std::endl;
 	std::cout << estimators.sampleVariance << std::endl;
@@ -629,8 +629,8 @@ void shift_distance_prototyping() {
       std::string s2(n, 'N');
       lbio_size_t sum_dist = 0;
       for (lbio_size_t i = 0; i < k; ++i) {
-	generator::generateIIDString(s1);
-	generator::generateIIDString(s2);
+	generator::generateIIDString(s1, "ACGT");
+	generator::generateIIDString(s2, "ACGT");
 	lbio_size_t d = shift_distance_recursive(s1, s2, 0, 0, n);	
 	sum_dist += d;
       }

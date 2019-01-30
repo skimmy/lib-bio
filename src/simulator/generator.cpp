@@ -9,9 +9,9 @@ namespace lbio { namespace sim { namespace  generator {
 struct RandGen
 {
   std::mt19937 gen;
-  RandGen(std::mt19937 g) {
+  RandGen(std::mt19937 g, lbio_size_t sigma) {
     gen = g;
-    basesIdx = new std::uniform_int_distribution<>(0,3);
+    basesIdx = new std::uniform_int_distribution<>(0,sigma-1);
   }
   
   std::uniform_int_distribution<>* basesIdx;
@@ -23,11 +23,11 @@ struct RandGen
 RandGen* randGen;
 
 void
-initRandomGenerator() {
+initRandomGenerator(lbio_size_t sigma) {
   srand(time(NULL));
   std::random_device rd;
   std::mt19937 gen(rd());  
-  randGen = new RandGen(gen);
+  randGen = new RandGen(gen, sigma);
 }
 
 int randomBaseIndex() {
@@ -73,9 +73,10 @@ void generateIIDGenome(size_t N, char* S) {
   }		
 }
 
-void generateIIDString(std::string& s) {
+void generateIIDString(std::string& s, std::string alphabet) {
   for (size_t i = 0; i < s.size(); ++i) {
-    s[i] = bases[randomBaseIndex()];
+//    s[i] = bases[randomBaseIndex()];
+    s[i] = alphabet[randomBaseIndex()];
   }
 }
 

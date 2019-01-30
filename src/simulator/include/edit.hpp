@@ -60,7 +60,8 @@ closest_to_diagonal_backtrack(size_t n, size_t m, size_t** dpMatrix,
 //////////////////////////////////////////////////////////////////////
 
 void
-compare_edit_distance_algorithms(size_t n, size_t m, size_t k, std::ostream& os = std::cout);
+compare_edit_distance_algorithms(size_t n, size_t m, size_t k, std::string alphabet,
+				 std::ostream& os = std::cout);
 
 
 /**
@@ -69,7 +70,7 @@ compare_edit_distance_algorithms(size_t n, size_t m, size_t k, std::ostream& os 
    below the given precision.
  */
 lbio_size_t
-optimal_bandwidth(lbio_size_t n, double precision,
+optimal_bandwidth(lbio_size_t n, std::string alphabet, double precision,
 		  lbio_size_t k, lbio_size_t Tmin = 1);
 
 /**
@@ -77,7 +78,7 @@ optimal_bandwidth(lbio_size_t n, double precision,
    band T approximation and exact is below the given precision.
  */
 lbio_size_t
-optimal_bandwidth_exact(lbio_size_t n, double precision, lbio_size_t Tmin = 1);
+optimal_bandwidth_exact(lbio_size_t n, std::string alphabet, double precision,  lbio_size_t Tmin = 1);
 
 //////////////////////////////////////////////////////////////////////
 
@@ -497,7 +498,7 @@ editDistanceLinSpaceInfo(const std::string& s1, const std::string& s2,
 			 EditDistanceInfo** sampleMat = NULL);
 
 std::vector<size_t>
-edit_samples_fixed_string(size_t n, size_t k_samples, const std::string& s2);
+edit_samples_fixed_string(size_t n, size_t k_samples, const std::string& s2, std::string alphabet);
 
 size_t
 editDistanceBandwiseApprox(const std::string& s1,
@@ -511,11 +512,11 @@ editDistanceBandwiseApprox(const std::string& s1,
 
 
 SampleEstimates
-editDistanceErrorBoundedEstimates(size_t n, double precision, double z_delta,
+editDistanceErrorBoundedEstimates(size_t n, std::string alphabet, double precision, double z_delta,
 				  size_t k_min = 16);
 
 SampleEstimates
-editDistanceRelativeErrorEstimates(size_t n, double e_model, double precision,
+editDistanceRelativeErrorEstimates(size_t n, std::string alphabet, double e_model, double precision,
 				   double z_delta);
 
 /**
@@ -537,7 +538,7 @@ std::unique_ptr<EditDistanceInfo[]>
 editDistSamplesInfo(size_t n, size_t k_samples);
 
 std::unique_ptr<EditDistanceInfo[]>
-editDistSamplesInfoLinSpace(size_t n, size_t k_samples,
+editDistSamplesInfoLinSpace(size_t n, size_t k_samples, std::string alphabet,
 			    EditDistanceInfo** sampleMat = NULL);
 
 /**
@@ -562,8 +563,8 @@ private:
   lbio::sim::generator::IidPairGenerator gen;
   
 public:
-  EditDistanceSample(lbio_size_t n, lbio_size_t m)
-    : gen(n,m) {  }
+  EditDistanceSample(lbio_size_t n, lbio_size_t m, std::string alphabet)
+    : gen(n,m, alphabet) {  }
   
   lbio_size_t operator()(EDAlg_& algorithm) {
     auto next = gen();

@@ -582,8 +582,8 @@ test_exhaustive_edit_distance_encoded(lbio_size_t n, double* freq) {
 //                          COLUMN STATE EXHAUSTIVE
 ////////////////////////////////////////////////////////////////////////////////
 
-uint32_t constant_column(lbio_size_t n, uint32_t value) {
-  uint32_t col = value & 0x3;
+uint64_t constant_column(lbio_size_t n, uint32_t value) {
+  uint64_t col = value & 0x3;
   for (lbio_size_t i = 1; i < n; ++i) {
     col <<= 2;
     col += (0x3 & value);    
@@ -591,7 +591,7 @@ uint32_t constant_column(lbio_size_t n, uint32_t value) {
   return col;
 }
 
-std::string state_to_string(uint32_t state, lbio_size_t n) {
+std::string state_to_string(uint64_t state, lbio_size_t n) {
   std::string out {""};
   std::string decoded[] = {"-1", "0", "1", "*"};
   for (lbio_size_t i = 0; i < n; ++i) {
@@ -601,7 +601,7 @@ std::string state_to_string(uint32_t state, lbio_size_t n) {
   return "[" + out + "]";
 }
 
-std::vector<lbio_size_t> state_to_column(uint32_t state, lbio_size_t j, lbio_size_t n) {
+std::vector<lbio_size_t> state_to_column(uint64_t state, lbio_size_t j, lbio_size_t n) {
   std::vector<lbio_size_t> column(n+1);
   column[0] = j;
   int vals[] {-1, 0, 1, 0xFF};
@@ -630,8 +630,8 @@ refresh_space(ColumnStateSpace& old_state, lbio_size_t j, lbio_size_t n,
   while(it_ != old_state.end()) {
     // for each mask...
     for (lbio_size_t s_ = 0; s_ < sigma; ++s_) {
-      uint32_t Mj = (*it_).first;
-      uint32_t Mj1 = 0x0;
+      uint64_t Mj = (*it_).first;
+      uint64_t Mj1 = 0x0;
       // first element
       a = j;
       b = j+1;

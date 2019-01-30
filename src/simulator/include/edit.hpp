@@ -117,20 +117,20 @@ public:
   iterator end() { return _set.end(); }  
 };
 
-using ColumnStateSpace = ColumnStateSpaceT<uint32_t, uint32_t>;
+using ColumnStateSpace = ColumnStateSpaceT<uint64_t, uint32_t>;
 
-const uint32_t MinusOne = 0x0;
-const uint32_t Zero = 0x1;
-const uint32_t One = 0x2;
+const uint64_t MinusOne = 0x0;
+const uint64_t Zero = 0x1;
+const uint64_t One = 0x2;
 
-uint32_t
+uint64_t
 constant_column(lbio_size_t n, uint32_t value);
 
 std::string
-state_to_string(uint32_t state, lbio_size_t n);
+state_to_string(uint64_t state, lbio_size_t n);
 
 std::vector<lbio_size_t>
-state_to_column(uint32_t state, lbio_size_t j, lbio_size_t n);
+state_to_column(uint64_t state, lbio_size_t j, lbio_size_t n);
 
 void
 print_state(ColumnStateSpace& _set, lbio_size_t n);

@@ -78,7 +78,7 @@ private:
 
 class AlphabetIterator {
 private:
-  using numeric_type = int;
+  using numeric_type = uint64_t;
   using string_type = std::string;
   
 

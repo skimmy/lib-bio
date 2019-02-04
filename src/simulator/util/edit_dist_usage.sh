@@ -34,7 +34,19 @@
 
 #################### SAMPLING ####################
 
-./simulator.out -O 6 -f 0 -N 10 -k 100
+./simulator.out -O 6 -N 10 -k 100 -a ACGT
+
+# Computes sample statistics of edit distance
+
+# FLAGS
+
+# -O 6 -->  Edit Distance Task
+# -B 0 -->  Sample (optional: default=0)
+# -f 0 -->  Flags (optional: defualt=0)
+# -a S -->  Alphabet (string)
+# -k k -->  Number of samples
+
+# OUTPUT
 
 
 #################### ESTIMATE ####################

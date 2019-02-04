@@ -551,14 +551,14 @@ editDistanceOpMode() {
 	AlgorithmBand alg(n, n, std::ceil(n/2.0), {1,1,1});
 	auto samples = edit::edit_distance_samples(n,k, alg, Options::opts.alphabet);
 	auto estimators = estimatesFromSamples<size_t>(samples.get(), k);
-	std::cout << estimators.sampleMean << std::endl;
+	std::cout << estimators.sampleMean << ",";
 	std::cout << estimators.sampleVariance << std::endl;
       }
     }
   }
 }
 
-template <typename _IterT>
+/*template <typename _IterT>
 lbio_size_t
 hamming_distance(_IterT s1_b, _IterT s1_e, _IterT s2_b) {
   lbio_size_t hd = 0;
@@ -609,9 +609,6 @@ small_ed(const std::string& s1, const std::string& s2,
 lbio_size_t
 shift_distance_recursive(const std::string& s1, const std::string& s2,
 			 lbio_size_t i1, lbio_size_t i2, lbio_size_t n) {
-  /*if (n == 1) {
-    return static_cast<lbio_size_t>(s1[i1] != s2[i2]);
-    }*/
   if (n <= 8) {
     return small_ed(s1, s2, i1, i2, n);
   }
@@ -636,7 +633,7 @@ void shift_distance_prototyping() {
       }
       std::cout << n << "\t" << ((double)sum_dist) / ((double)k*n) << "\n";
   }  
-}
+}*/
 
 //--------------------------------------------------------------------------------
 
@@ -645,12 +642,8 @@ void
 prototyping() {
   // !!! WARNING: possibly don't remove next two lines !!!
   std::string proto_task_msg = make_bold("Multithread exhaustive");
-  logInfo("Working on " + proto_task_msg + " prototyping");
+  logInfo("Working on " + proto_task_msg + "[]");
 
-  std::cout << "Sigma: " << Options::opts.alphabet << "\n";
-  double e = eccentricity_with_symmetries(6, Options::opts.alphabet, 1);
-  std::cout << "e(6) = " << e << "\n";
-  std::cout << "e(6)/6 = " << e/6 << "\n";
   
 }
 

@@ -28,6 +28,7 @@
 #include <ctime>
 
 #include <unordered_map>
+#include <map>
 #include <iostream>
 #include <fstream>
 #include <algorithm>
@@ -461,7 +462,7 @@ editDistanceOpMode() {
     std::string alphabet = Options::opts.alphabet;
     lbio_size_t t = Options::opts.n_threads;
     double e = eccentricity_with_symmetries(n, alphabet, t);
-    std::cout << n << "\t" << e/n << "\n";
+    std::cout << n << "\t" << e << "\t" << e/n << "\n";
 	
   }
   
@@ -558,92 +559,11 @@ editDistanceOpMode() {
   }
 }
 
-/*template <typename _IterT>
-lbio_size_t
-hamming_distance(_IterT s1_b, _IterT s1_e, _IterT s2_b) {
-  lbio_size_t hd = 0;
-  for (; s1_b != s1_e; ++s1_b, ++s2_b) {
-    hd += static_cast<lbio_size_t>(*s1_b != *s2_b);
-  }
-  return hd;
-}
-
-template <typename _IterT>
-lbio_size_t
-shift_distance(_IterT s1_b, _IterT s1_e, _IterT s2_b, _IterT s2_e, lbio_size_t n) {
-  lbio_size_t sd = hamming_distance(s1_b, s1_e, s2_b);
-  lbio_size_t n_2 = n >> 1;
-  _IterT s1_m = s1_b;
-  _IterT s2_m = s2_b;
-  for (lbio_size_t t = 1; t <=n_2; ++t) {
-    s1_m++;
-    s2_m++;
-    lbio_size_t sl = 2*t + hamming_distance(s1_m, s1_e, s2_b);
-    lbio_size_t sr = 2*t + hamming_distance(s2_m, s2_e, s1_b);
-
-    sd = std::min(sd, std::min(sl, sr));
-  }
-  return sd;
-}
-
-const lbio_size_t n0_ = 64;
-lbio_size_t small_dp_m[n0_][n0_];
-
-lbio_size_t
-small_ed(const std::string& s1, const std::string& s2,
-	 lbio_size_t i1, lbio_size_t i2, lbio_size_t n) {
-  for (lbio_size_t i = 0; i <= n; ++i) {
-    small_dp_m[0][i] = i;
-    small_dp_m[i][0] = i;
-  }
-  for (lbio_size_t i = 1; i <= n; ++i) {
-    for (lbio_size_t j = 1; j <= n; ++j) {
-      lbio_size_t delta = (s1[i1+i-1] == s2[i2+j-1]) ? 0 : 1;
-      small_dp_m[i][j] = std::min(std::min(small_dp_m[i-1][j] + 1, small_dp_m[i][j-1] + 1),
-				  small_dp_m[i-1][j-1] + delta);
-    }
-  }
-  return small_dp_m[n][n];
-}
-
-lbio_size_t
-shift_distance_recursive(const std::string& s1, const std::string& s2,
-			 lbio_size_t i1, lbio_size_t i2, lbio_size_t n) {
-  if (n <= 8) {
-    return small_ed(s1, s2, i1, i2, n);
-  }
-  lbio_size_t sd = shift_distance(s1.begin()+i1, s1.begin()+i1+n, s2.begin()+i2, s2.begin()+i2+n, n);
-  lbio_size_t srec_1 = shift_distance_recursive(s1, s2, i1, i2, n >> 1);
-  lbio_size_t srec_2 = shift_distance_recursive(s1, s2, i1 + (n >> 1), i2 + (n >> 1), n >> 1);
-  return std::min(sd, srec_1 + srec_2);
-}
-
-void shift_distance_prototyping() {
-   for(lbio_size_t l = 4; l < 17; ++l) {
-    lbio_size_t n = 1 << l;
-      lbio_size_t k = 200; 
-      std::string s1(n, 'N');
-      std::string s2(n, 'N');
-      lbio_size_t sum_dist = 0;
-      for (lbio_size_t i = 0; i < k; ++i) {
-	generator::generateIIDString(s1, "ACGT");
-	generator::generateIIDString(s2, "ACGT");
-	lbio_size_t d = shift_distance_recursive(s1, s2, 0, 0, n);	
-	sum_dist += d;
-      }
-      std::cout << n << "\t" << ((double)sum_dist) / ((double)k*n) << "\n";
-  }  
-}*/
-
-//--------------------------------------------------------------------------------
-
-
 void
 prototyping() {
   // !!! WARNING: possibly don't remove next two lines !!!
-  std::string proto_task_msg = make_bold("Multithread exhaustive");
-  logInfo("Working on " + proto_task_msg + "[]");
-
+  std::string proto_task_msg = make_bold("");
+  logInfo("Working on " + proto_task_msg);
   
 }
 

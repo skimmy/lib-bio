@@ -167,7 +167,6 @@ double
 eccentricity_with_symmetries(lbio_size_t n, std::string alphabet, lbio_size_t threads_ = 1);
 
 
-
 } } } //namespaces
 
 /**

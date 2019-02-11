@@ -697,6 +697,47 @@ distribution_to_string(const std::vector<lbio_size_t> v) {
   return s;
 }
 
+std::string get_permutation_invariant_form(std::string s, std::string alphabet) {
+  std::string out(s.size(), 'N');
+  lbio_size_t i, m = 0;
+  std::unordered_map<char, char> map_;
+  while(i < s.size()) {
+    if (map_.count(s[i]) <= 0) {
+      map_[s[i]] = alphabet[m++];
+    }
+    out[i] = map_[s[i]];
+    i += 1;
+  }
+  return out;
+}
+
+template <typename It_>
+std::vector<std::pair<std::string, lbio_size_t>>
+remove_symmetry_invariant(It_ begin, It_ end, std::string alphabet) {
+  std::map<std::string, lbio_size_t> pair_map(begin, end);
+  for (; begin != end; ++begin) {
+    std::string s = begin->first;
+    std::string rev(s.rbegin(), s.rend());
+    // CASE 1 - Palindrome strings: nothing todo
+    if (s == rev) {
+      continue;
+    }    
+    std::string p_rev = get_permutation_invariant_form(rev, alphabet);
+    // CASE 2 - s and its invariant reverse are equal: same as palindrome
+    if (s == p_rev) {
+      continue;
+    }
+    // CASE 3 - s and its invariant reverse are different: keep only
+    // one and sum multiplicities
+    auto itm_ = pair_map.find(p_rev);
+    if (itm_ != pair_map.end()) {
+      itm_->second += begin->second;
+      pair_map.erase(s);
+    }
+  }
+  return std::vector<std::pair<std::string, lbio_size_t>>(pair_map.begin(), pair_map.end());
+} 
+
 void
 edit_distance_eccentricity(lbio_size_t n, std::ostream& os, std::string alphabet) {
   // iterator for all the strings
@@ -741,7 +782,8 @@ eccentricity_with_symmetries_multithread(lbio_size_t n, std::string alphabet, lb
   double sum = 0;
   using PairVectorStrMult = std::vector<std::pair<std::string, lbio_size_t>>;
   using IterType = std::vector<std::pair<std::string, lbio_size_t>>::iterator;
-  PairVectorStrMult invariant_strings = permutation_invariant_strings_with_multiplicity(n, alphabet);
+  PairVectorStrMult tmp = permutation_invariant_strings_with_multiplicity(n, alphabet);
+  PairVectorStrMult invariant_strings = remove_symmetry_invariant(tmp.begin(), tmp.end(), alphabet);
   std::vector<std::future<double>> v_futures;
   lbio_size_t M = invariant_strings.size();
   lbio_size_t m = static_cast<lbio_size_t>(std::ceil((double)M / (double)threads_));
@@ -765,7 +807,8 @@ eccentricity_with_symmetries(lbio_size_t n, std::string alphabet, lbio_size_t th
   if (threads_ > 1) {
     return eccentricity_with_symmetries_multithread(n, alphabet, threads_);
   }
-  auto invariant_strings = permutation_invariant_strings_with_multiplicity(n, alphabet);
+  auto tmp = permutation_invariant_strings_with_multiplicity(n, alphabet);
+  auto invariant_strings = remove_symmetry_invariant(tmp.begin(), tmp.end(), alphabet);
   double sum = eccentricity_with_symmetries_iterator(invariant_strings.begin(), invariant_strings.end(),
 						     n, alphabet);
   return sum / std::pow(alphabet.size(), n);

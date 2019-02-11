@@ -23,6 +23,10 @@
 #define EDIT_DISTANCE_DIFF_BOUNDED_ERROR  0x40 // 64
 #define EDIT_DISTANCE_BANDWIDTH_ESTIMATE  0x80 // 128
 
+// Eccentricy flags
+#define EDIT_DISTANCE_FLAG_ECCENTRICITY_ALL  0x1
+#define EDIT_DISTANCE_FLAG_ECCENTRICITY_FILE 0x2
+
 // Approx ~g(n) --> 64+128 = 192 --> -f 192
 
 // edit distance subtasks
@@ -133,6 +137,12 @@ state_to_string(uint64_t state, lbio_size_t n);
 std::vector<lbio_size_t>
 state_to_column(uint64_t state, lbio_size_t j, lbio_size_t n);
 
+std::vector<lbio_size_t>
+state_space_to_distribution(ColumnStateSpace& states);
+
+std::string
+distribution_to_string(const std::vector<lbio_size_t> v);
+
 void
 print_state(ColumnStateSpace& _set, lbio_size_t n);
 
@@ -160,8 +170,27 @@ void edit_distance_exhastive_with_info(lbio_size_t n);
 double
 eccentricity_for_string(std::string x, std::string alphabet);
 
+ColumnStateSpace
+state_space_compute(std::string x, std::string alphabet);
+
+template <typename _Iter, typename _Call>
 void
-edit_distance_eccentricity(lbio_size_t n, std::ostream& os, std::string alphabet);
+state_space_compute_iter(_Iter beg_, _Iter end_, _Call action, std::string alphabet) {
+  while(beg_ != end_) {
+    ColumnStateSpace states = state_space_compute(*beg_, alphabet);
+    action(*beg_, states);
+    ++beg_;
+  }
+}
+
+template <typename It_>
+void
+edit_distance_eccentricity(It_ begin, It_ end, std::ostream& os, std::string alphabet) {
+  // for each string compute eccentricoty and write distribution on 'os'
+  state_space_compute_iter(begin, end, [&os] (std::string x, ColumnStateSpace& space) {
+      os << x << ", " << distribution_to_string(state_space_to_distribution(space)) << "\n";
+					 }, alphabet);
+}
 
 double
 eccentricity_with_symmetries(lbio_size_t n, std::string alphabet, lbio_size_t threads_ = 1);

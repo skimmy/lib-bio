@@ -252,6 +252,15 @@ print_content(_C& c_, std::string delim = "\t") {
   std::cout << "\n";
 }
 
+template <typename _InsIt>
+void
+insert_from_stream(_InsIt it, std::istream& is, char sep='\n') {
+  std::string tmp;
+  while(std::getline(is, tmp)) {
+    it = tmp;
+  }
+}
+
 //////////////////////////////////////////////////////////////////////
 //
 //             COMBINATORICS AND PERMUTATIONS FUNCTIONS     

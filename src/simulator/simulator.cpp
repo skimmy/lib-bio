@@ -447,17 +447,32 @@ editDistanceOpMode() {
 	      << beEst.sampleVariance << "\n";
     return;
   }
-  // Task Exhaustive 
-  if (flags & EDIT_DISTANCE_ESTIMATE_EXHAUSTIVE) {
 
-    // subtask eccentricity
-    if (task == EDIT_DISTANCE_SUBTASK_ECCENTRICITY) { // -B 4
-      lbio_size_t n = Options::opts.N;      
-      edit_distance_eccentricity(n, std::cout, Options::opts.alphabet);
+
+  // subtask eccentricity
+  if (task == EDIT_DISTANCE_SUBTASK_ECCENTRICITY) { // -B 4
+    
+    if (flags & EDIT_DISTANCE_FLAG_ECCENTRICITY_ALL) { // -f 1
+      logInfo("Eccentricity all strings");
+      lbio_size_t n = Options::opts.N;
+      // iterator for all the strings
+      AlphabetIterator it(n, Options::opts.alphabet);
+      edit_distance_eccentricity(it, it.end(), std::cout, Options::opts.alphabet);
       return;
     }
-
-    
+    if (flags & EDIT_DISTANCE_FLAG_ECCENTRICITY_FILE) { // -f 3
+      logInfo("Eccentricity strings from file");
+      std::vector<std::string> v;
+      std::ifstream ifs(Options::opts.inputReference);
+      insert_from_stream(std::inserter(v, v.begin()), ifs);
+      edit_distance_eccentricity(v.begin(), v.end(), std::cout, Options::opts.alphabet);
+      return;
+    }
+  }
+  
+  
+  // Task Exhaustive 
+  if (flags & EDIT_DISTANCE_ESTIMATE_EXHAUSTIVE) {    
     lbio_size_t n = Options::opts.N;
     std::string alphabet = Options::opts.alphabet;
     lbio_size_t t = Options::opts.n_threads;

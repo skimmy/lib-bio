@@ -668,16 +668,6 @@ state_space_compute(std::string x, std::string alphabet) {
   return states;
 }
 
-template <typename _Iter, typename _Call>
-void
-state_space_compute_iter(_Iter beg_, _Iter end_, _Call action, std::string alphabet) {
-  while(beg_ != end_) {
-    ColumnStateSpace states = state_space_compute(*beg_, alphabet);
-    action(*beg_, states);
-    ++beg_;
-  }
-}
-
 std::vector<lbio_size_t>
 state_space_to_distribution(ColumnStateSpace& states) {
   lbio_size_t n = states.get_n();
@@ -737,16 +727,6 @@ remove_symmetry_invariant(It_ begin, It_ end, std::string alphabet) {
   }
   return std::vector<std::pair<std::string, lbio_size_t>>(pair_map.begin(), pair_map.end());
 } 
-
-void
-edit_distance_eccentricity(lbio_size_t n, std::ostream& os, std::string alphabet) {
-  // iterator for all the strings
-  AlphabetIterator it(n, alphabet);
-  // for each string compute eccentricoty and write distribution on 'os'
-  state_space_compute_iter(it, it.end(), [&os] (std::string x, ColumnStateSpace& space) {
-      os << x << ", " << distribution_to_string(state_space_to_distribution(space)) << "\n";
-					 }, alphabet);
-}
 
 double
 eccentricity_for_string(std::string x, std::string alphabet) {

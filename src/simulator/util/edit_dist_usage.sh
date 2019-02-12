@@ -47,7 +47,7 @@
 # PARAMETERES
 
 
-./simulator.out -O 6-B 4 -f 2 -i strings.txt
+./simulator.out -O 6 -B 4 -f 2 -i strings.txt
 
 # OUTPUT
 

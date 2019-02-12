@@ -122,7 +122,8 @@ public:
   iterator end() { return _set.end(); }  
 };
 
-using ColumnStateSpace = ColumnStateSpaceT<uint64_t, uint32_t>;
+//using ColumnStateSpace = ColumnStateSpaceT<uint64_t, uint32_t>;
+using ColumnStateSpace = ColumnStateSpaceT<uint64_t, double>;
 
 const uint64_t MinusOne = 0x0;
 const uint64_t Zero = 0x1;
@@ -137,11 +138,11 @@ state_to_string(uint64_t state, lbio_size_t n);
 std::vector<lbio_size_t>
 state_to_column(uint64_t state, lbio_size_t j, lbio_size_t n);
 
-std::vector<lbio_size_t>
+std::vector<double>
 state_space_to_distribution(ColumnStateSpace& states);
 
 std::string
-distribution_to_string(const std::vector<lbio_size_t> v);
+distribution_to_string(const std::vector<double> v);
 
 void
 print_state(ColumnStateSpace& _set, lbio_size_t n);

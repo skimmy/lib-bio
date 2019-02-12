@@ -579,7 +579,7 @@ prototyping() {
   // !!! WARNING: possibly don't remove next two lines !!!
   std::string proto_task_msg = make_bold("");
   logInfo("Working on " + proto_task_msg);
-  
+  std::cout << sizeof(lbio_size_t) << "\n";
 }
 
 int main(int argc, char** argv) {   

@@ -668,10 +668,10 @@ state_space_compute(std::string x, std::string alphabet) {
   return states;
 }
 
-std::vector<lbio_size_t>
+std::vector<double>
 state_space_to_distribution(ColumnStateSpace& states) {
   lbio_size_t n = states.get_n();
-  std::vector<lbio_size_t> v(n+1, 0);
+  std::vector<double> v(n+1, 0);
   for (auto it_ = states.begin(); it_ != states.end(); it_++) {    
     v[state_to_column(it_->first, n, n)[n]] += it_->second;
   }
@@ -679,7 +679,7 @@ state_space_to_distribution(ColumnStateSpace& states) {
 }
 
 std::string
-distribution_to_string(const std::vector<lbio_size_t> v) {
+distribution_to_string(const std::vector<double> v) {
   std::string s {""};
   for(auto it = v.begin(); it != v.end(); it++) {
     s += std::to_string(*it) + ", ";

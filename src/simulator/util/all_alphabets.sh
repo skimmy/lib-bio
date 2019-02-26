@@ -2,10 +2,10 @@
 
 #declare -a sigmas=("01" "012")
 
-declare -a sigmas=("01" "012" "01234" "012345" "01234567"
+declare -a sigmas=("01" "012" "0123" "01234" "012345" "01234567"
 		   "0123456789ABCDEF" "0123456789ABCDEFabcdefghijklmnop")
 
-declare -a Ns=(1024 2048 4096 8192 16384)
+declare -a Ns=(16 32 64 128 256 512 1024 2048 4096 8192 16384)
 
 k=5000
 printf "sigma,N,s_mean,s_var\n"

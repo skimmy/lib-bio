@@ -193,7 +193,13 @@ edit_distance_eccentricity(It_ begin, It_ end, std::ostream& os, std::string alp
 					 }, alphabet);
 }
 
-double
+// This 5-tuple is returned when computing eccentricity with iterators.
+// It contains:
+// <eccentricity, pointer_to_min_ecc, min_ecc, pointer_to_max_ecc, max_ecc>
+using EccentricityResult = std::tuple<double, std::string, double, std::string, double>;
+
+
+EccentricityResult
 eccentricity_with_symmetries(lbio_size_t n, std::string alphabet, lbio_size_t threads_ = 1);
 
 

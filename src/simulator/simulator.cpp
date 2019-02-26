@@ -476,9 +476,14 @@ editDistanceOpMode() {
     lbio_size_t n = Options::opts.N;
     std::string alphabet = Options::opts.alphabet;
     lbio_size_t t = Options::opts.n_threads;
-    double e = eccentricity_with_symmetries(n, alphabet, t);
-    std::cout << n << "\t" << e << "\t" << e/n << "\n";
-	
+    EccentricityResult res = eccentricity_with_symmetries(n, alphabet, t);
+    double e = std::get<0>(res);
+    std::cout << n << "," << e << "," << e/n;
+    if (Options::opts.verbose) {
+      std::cout << "," << std::get<1>(res) << "," << std::get<2>(res)
+		<< "," << std::get<3>(res) << "," << std::get<4>(res);
+    }
+    std::cout << "\n";
   }
   
   else { // Not exhaustive

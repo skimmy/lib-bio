@@ -739,10 +739,15 @@ eccentricity_for_string(std::string x, std::string alphabet) {
   return sum/(std::pow(4,x.size())*x.size());
 }
 
+
 template <typename _It>
-double
+EccentricityResult
 eccentricity_with_symmetries_iterator(_It begin, _It end, lbio_size_t n, std::string alphabet) {
   double sum = 0;
+  double max_ecc = 0;
+  double min_ecc = n;
+  std::string s_min_ecc = begin->first;
+  std::string s_max_ecc = begin->first;
   while(begin != end) {
     ColumnStateSpace states = state_space_compute(begin->first, alphabet);
     auto dist = state_space_to_distribution(states);
@@ -752,46 +757,72 @@ eccentricity_with_symmetries_iterator(_It begin, _It end, lbio_size_t n, std::st
     }  
     double ecc = dist_sum / std::pow(alphabet.size(), n);
     sum += ecc*begin->second;
+    if (max_ecc < ecc) {
+      max_ecc = ecc;
+      s_max_ecc = begin->first;
+    }
+    if (min_ecc > ecc) {
+      min_ecc = ecc;
+      s_min_ecc = begin->first;
+    }
     ++begin;
   }
-  return sum;
+  return std::make_tuple(sum, s_min_ecc, min_ecc, s_max_ecc, max_ecc);
 }
 
-double
+using PairVectorStrMult = std::vector<std::pair<std::string, lbio_size_t>>;
+using IterType = std::vector<std::pair<std::string, lbio_size_t>>::iterator;
+
+EccentricityResult
 eccentricity_with_symmetries_multithread(lbio_size_t n, std::string alphabet, lbio_size_t threads_) {
-  double sum = 0;
-  using PairVectorStrMult = std::vector<std::pair<std::string, lbio_size_t>>;
-  using IterType = std::vector<std::pair<std::string, lbio_size_t>>::iterator;
   PairVectorStrMult tmp = permutation_invariant_strings_with_multiplicity(n, alphabet);
   PairVectorStrMult invariant_strings = remove_symmetry_invariant(tmp.begin(), tmp.end(), alphabet);
-  std::vector<std::future<double>> v_futures;
+  std::vector<std::future<EccentricityResult>> v_futures;
   lbio_size_t M = invariant_strings.size();
   lbio_size_t m = static_cast<lbio_size_t>(std::ceil((double)M / (double)threads_));
   for (lbio_size_t i = 0; i < threads_-1; ++i) {
     auto it_begin = invariant_strings.begin() + m*i;
     auto it_end = invariant_strings.begin() + m*(i+1);
     v_futures.push_back(
-      std::future<double>(std::async(
+      std::future<EccentricityResult>(std::async(
 			    eccentricity_with_symmetries_iterator<IterType>, it_begin, it_end, n, alphabet)));
   }
-  sum += eccentricity_with_symmetries_iterator(invariant_strings.begin() + m*(threads_-1),
+  EccentricityResult res = eccentricity_with_symmetries_iterator(invariant_strings.begin() + m*(threads_-1),
 					       invariant_strings.end(), n, alphabet);
+  // Each thread computed eccentricy, min and max on its own subset of the pairs
+  // We gather all results: sum all eccentricities, find global min and max
   for (auto it = v_futures.begin(); it != v_futures.end(); ++it) {
-    sum += it->get();
+    EccentricityResult f_res = it->get();
+    std::get<0>(res) += std::get<0>(f_res);
+    if (std::get<2>(res) > std::get<2>(f_res)) { // refresh min
+      std::get<2>(res) = std::get<2>(f_res);
+      std::get<1>(res) = std::get<1>(f_res);
+    }
+    if (std::get<4>(res) < std::get<4>(f_res)) { // refresh max
+      std::get<4>(res) = std::get<4>(f_res);
+      std::get<3>(res) = std::get<3>(f_res);
+    }
   }
-  return sum / std::pow(alphabet.size(), n);
+  // normalize
+  std::get<0>(res) /= std::pow(alphabet.size(), n);
+  std::get<2>(res) /= static_cast<double>(n);
+  std::get<4>(res) /= static_cast<double>(n);
+  return res;
 }
 
-double
+EccentricityResult
 eccentricity_with_symmetries(lbio_size_t n, std::string alphabet, lbio_size_t threads_) {
   if (threads_ > 1) {
     return eccentricity_with_symmetries_multithread(n, alphabet, threads_);
   }
   auto tmp = permutation_invariant_strings_with_multiplicity(n, alphabet);
   auto invariant_strings = remove_symmetry_invariant(tmp.begin(), tmp.end(), alphabet);
-  double sum = eccentricity_with_symmetries_iterator(invariant_strings.begin(), invariant_strings.end(),
+  EccentricityResult res = eccentricity_with_symmetries_iterator(invariant_strings.begin(), invariant_strings.end(),
 						     n, alphabet);
-  return sum / std::pow(alphabet.size(), n);
+  std::get<0>(res) /= std::pow(alphabet.size(), n);
+  std::get<2>(res) /= static_cast<double>(n);
+  std::get<4>(res) /= static_cast<double>(n);  
+  return res;
 }
 
 

@@ -63,7 +63,7 @@
 
 #################### SAMPLING ####################
 
-./simulator.out -O 6 -N 10 -k 100 -a ACGT
+./simulator.out -O 6 -N 10 -k 100 -A 1 -a ACGT
 
 # Computes sample statistics of edit distance
 
@@ -74,6 +74,7 @@
 # -f 0 -->  Flags (optional: defualt=0)
 # -a S -->  Alphabet (string)
 # -k k -->  Number of samples
+# -A 1 -->  Approximation level: bandwidth (default=-1 -> no approx, 1->n sqrt(n) 2->nlog(n))
 
 # OUTPUT
 

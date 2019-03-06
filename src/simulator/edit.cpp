@@ -736,7 +736,7 @@ eccentricity_for_string(std::string x, std::string alphabet) {
   for (lbio_size_t i = 1; i < v.size(); ++i) {
     sum += i*v[i];
   }  
-  return sum/(std::pow(4,x.size())*x.size());
+  return sum/(alphabet.size()*std::pow(alphabet.size(),x.size()));
 }
 
 
@@ -744,8 +744,8 @@ template <typename _It>
 EccentricityResult
 eccentricity_with_symmetries_iterator(_It begin, _It end, lbio_size_t n, std::string alphabet) {
   double sum = 0;
-  double max_ecc = 0;
-  double min_ecc = n;
+  double max_ecc = -std::numeric_limits<double>::infinity();
+  double min_ecc = std::numeric_limits<double>::infinity();
   std::string s_min_ecc = begin->first;
   std::string s_max_ecc = begin->first;
   while(begin != end) {

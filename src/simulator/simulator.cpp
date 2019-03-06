@@ -466,6 +466,9 @@ editDistanceOpMode() {
       std::ifstream ifs(Options::opts.inputReference);
       insert_from_stream(std::inserter(v, v.begin()), ifs);
       edit_distance_eccentricity(v.begin(), v.end(), std::cout, Options::opts.alphabet);
+      for (auto it = v.begin(); it!=v.end(); ++it) {
+	std::cout << eccentricity_for_string(*it, Options::opts.alphabet) << "\n";
+      }
       return;
     }
   }
@@ -569,7 +572,14 @@ editDistanceOpMode() {
       else { // -f 0
 	// MINIMAL INFO (mean + var) + Sample + Linear
 	logInfo("Basic sampling");
-	AlgorithmBand alg(n, n, std::ceil(n/2.0), {1,1,1});
+	lbio_size_t bandwidth = std::ceil(n/2.0);
+	if (Options::opts.approxLevel == 1) { // -A 1 bandwise with sqrt(n) bandwidth
+	  bandwidth = std::ceil(std::sqrt(n)/2.0);
+	}
+	if (Options::opts.approxLevel == 2) { // -A 2 bandwise with log(n) bandwidth
+	  bandwidth = std::ceil(std::log2(n)/2.0);
+	}
+	AlgorithmBand alg(n, n, bandwidth, {1,1,1});
 	auto samples = edit::edit_distance_samples(n,k, alg, Options::opts.alphabet);
 	auto estimators = estimatesFromSamples<size_t>(samples.get(), k);
 	std::cout << estimators.sampleMean << ",";

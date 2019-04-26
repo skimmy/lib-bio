@@ -36,7 +36,8 @@ struct Options {
   bool pipeline;
   bool online; // -v 
 
-  bool verbose; // -v
+  int verbose; // -v
+  std::string verboseOutput; // -V
 
   int k; // -k
 

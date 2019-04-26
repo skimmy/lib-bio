@@ -49,9 +49,10 @@ void printUsage() {
   std::cout << "\t-B <sub_task> Defines the sub task for a given mode\n";
   std::cout << "\t-f <flags>    Flags code to be activated (operation mode and subtask dependent\n";
   std::cout << "\t-t <nthr>     The number of threads to be used (not suppoerted by all tasks)\n";
+  std::cout << "\t-v <vlev>     Sets the verbosity level (default=0 is no verbosity)\n";
+  std::cout << "\t-V <vout>     Name of file to write verbose outupt\n";    
   std::cout << "\t-p            Outputs on standard out for pipelining\n";
   std::cout << "\t-h            Shows extended help\n";
-  std::cout << "\t-v            Activate verbose mode\n";
   std::cout << std::endl;
 }
 
@@ -106,7 +107,8 @@ setDefualtParams() {
   Options::opts.optFlags = 0;
   Options::opts.online = false;
   Options::opts.pipeline = false;
-  Options::opts.verbose = false;
+  Options::opts.verbose = 0;
+  Options::opts.verboseOutput = "";
 
   Options::opts.n_threads = 1;
 }
@@ -180,7 +182,7 @@ void parseArguments(int argc, char** argv) {
   setDefualtParams();
   
   char c;
-  while ((c = getopt(argc, argv, "N:m:M:e:P:c:d:k:a:i:S:D:C:A:O:B:f:t:phv")) != -1) {
+  while ((c = getopt(argc, argv, "N:m:M:e:P:c:d:k:a:i:S:D:C:A:O:B:f:t:v:V:ph")) != -1) {
     switch(c) {
     case 'N':
       Options::opts.N = atoi(optarg);
@@ -236,7 +238,10 @@ void parseArguments(int argc, char** argv) {
       Options::opts.pipeline = true;
       break;
     case 'v':
-      Options::opts.verbose = true;
+      Options::opts.verbose = atoi(optarg);
+      break;
+    case 'V':
+      Options::opts.verboseOutput = optarg;
       break;
     case 't':
       Options::opts.n_threads = atoi(optarg);
@@ -317,10 +322,16 @@ parseArgumentsBoost(int argc, char** argv) {
 
     ("pipeline,p", "If set will run in pipeline") // -p, --pipeline
 
-    ("verbose,v", "If set will run in verbose output") // -v, --verbose
+    ("verbose,v", po::value<int>(&Options::opts.verbose),
+     "Sets the level of verbosity for output") // -v, --verbose
+
+    ("verbose-ouput,V", po::value<std::string>(&Options::opts.verboseOutput), // -V --verbose-output
+     "File for the verbose output")
 
     ("threads,t", po::value<size_t>(&Options::opts.n_threads),
      "Specify the number of threads to be used")
+
+    
     
     ; 
   

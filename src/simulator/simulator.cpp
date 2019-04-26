@@ -580,8 +580,22 @@ editDistanceOpMode() {
 	  bandwidth = std::ceil(std::log2(n)/2.0);
 	}
 	AlgorithmBand alg(n, n, bandwidth, {1,1,1});
-	auto samples = edit::edit_distance_samples(n,k, alg, Options::opts.alphabet);
-	auto estimators = estimatesFromSamples<size_t>(samples.get(), k);
+
+	std::vector<size_t> v;
+	auto ins_ = std::inserter(v, v.begin());
+	edit::edit_distance_samples(n,k, ins_, alg, Options::opts.alphabet);
+	// save all the info
+	if (Options::opts.verbose > 0) {
+	  // if file is not indicated print on cerr
+	  std::string file_name = Options::opts.verboseOutput;
+	  if (file_name == "") {	    
+	    std::copy(v.begin(), v.end(), std::ostream_iterator<size_t>(std::cerr, "\n"));
+	  } else {
+	    std::ofstream os(file_name);
+	    std::copy(v.begin(), v.end(), std::ostream_iterator<size_t>(os, "\n"));
+	  }
+	}
+	auto estimators = estimatesFromSamples(v.begin(), v.end(), k);
 	std::cout << estimators.sampleMean << ",";
 	std::cout << estimators.sampleVariance << std::endl;
       }

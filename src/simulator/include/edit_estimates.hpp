@@ -62,18 +62,16 @@ generate_scripts(lbio_size_t n, lbio_size_t m, lbio_size_t k,
   
    \return a  Pointer to an array containing all the distances
  */
-template<class Algorithm>
-std::unique_ptr<size_t[]>
-edit_distance_samples(size_t n, size_t k_samples, Algorithm& alg, std::string alphabet) {
-  std::unique_ptr<size_t[]> v(new size_t[k_samples]);
+template<class Algorithm, class Ins_>
+void
+edit_distance_samples(size_t n, size_t k_samples, Ins_ it_, Algorithm& alg, std::string alphabet) {
   std::string s1(n,'N');
   std::string s2(n,'N');
   for (size_t k = 0; k < k_samples; ++k) {
     generator::generateIIDString(s1, alphabet);
     generator::generateIIDString(s2, alphabet);
-    v[k] = alg.calculate(s1, s2);
+    it_ = alg.calculate(s1, s2);
   }
-  return v;
 }
 
 

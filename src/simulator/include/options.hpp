@@ -28,6 +28,7 @@ struct Options {
   int approxLevel; // -A
 
   size_t floatPrecision; // TODO
+  unsigned int seed; // -s
 
   Task task; // --task (will substituted mode in -O)
   int subTask;  // -B

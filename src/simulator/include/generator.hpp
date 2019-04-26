@@ -19,7 +19,7 @@ struct Read {
 };
 
 void
-initRandomGenerator(lbio_size_t sigma);
+initRandomGenerator(lbio_size_t sigma, unsigned int seed);
 
 void
 simpleIIDErrors(std::string& s, double pe);

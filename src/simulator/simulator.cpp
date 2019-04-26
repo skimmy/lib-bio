@@ -73,7 +73,7 @@ EditDistanceSimOutput* edOut;
 
 void initSimulator() {
   initUtil(Options::opts.m);
-  initRandomGenerator(Options::opts.alphabet.size());
+  initRandomGenerator(Options::opts.alphabet.size(), Options::opts.seed);
   initProbabilities();
   initChainMatrix();
     

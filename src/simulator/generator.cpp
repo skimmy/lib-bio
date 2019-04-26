@@ -23,10 +23,9 @@ struct RandGen
 RandGen* randGen;
 
 void
-initRandomGenerator(lbio_size_t sigma) {
-  srand(time(NULL));
-  std::random_device rd;
-  std::mt19937 gen(rd());  
+initRandomGenerator(lbio_size_t sigma, unsigned int seed) {
+  srand(seed);
+  std::mt19937 gen(seed);  
   randGen = new RandGen(gen, sigma);
 }
 

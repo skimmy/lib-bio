@@ -7,6 +7,7 @@
 #include <iostream>
 #include <limits>
 #include <map>
+#include <random>
 
 #ifdef HAVE_BOOST_PROGRAM_OPTIONS
 
@@ -50,7 +51,8 @@ void printUsage() {
   std::cout << "\t-f <flags>    Flags code to be activated (operation mode and subtask dependent\n";
   std::cout << "\t-t <nthr>     The number of threads to be used (not suppoerted by all tasks)\n";
   std::cout << "\t-v <vlev>     Sets the verbosity level (default=0 is no verbosity)\n";
-  std::cout << "\t-V <vout>     Name of file to write verbose outupt\n";    
+  std::cout << "\t-V <vout>     Name of file to write verbose outupt\n";
+  std::cout << "\t-s <seed>     Positive integer used as random seed\n";    
   std::cout << "\t-p            Outputs on standard out for pipelining\n";
   std::cout << "\t-h            Shows extended help\n";
   std::cout << std::endl;
@@ -100,7 +102,8 @@ setDefualtParams() {
   Options::opts.approxLevel = -1;
 
   Options::opts.floatPrecision = std::numeric_limits< double >::max_digits10;
-  
+  std::random_device rd;
+  Options::opts.seed = rd();//time(NULL);
 
   Options::opts.task = Task::Test;
   Options::opts.subTask = 0;
@@ -182,7 +185,7 @@ void parseArguments(int argc, char** argv) {
   setDefualtParams();
   
   char c;
-  while ((c = getopt(argc, argv, "N:m:M:e:P:c:d:k:a:i:S:D:C:A:O:B:f:t:v:V:ph")) != -1) {
+  while ((c = getopt(argc, argv, "N:m:M:e:P:c:d:k:a:i:S:D:C:A:O:B:f:t:v:V:s:ph")) != -1) {
     switch(c) {
     case 'N':
       Options::opts.N = atoi(optarg);
@@ -242,6 +245,9 @@ void parseArguments(int argc, char** argv) {
       break;
     case 'V':
       Options::opts.verboseOutput = optarg;
+      break;
+    case 's':
+      Options::opts.seed = atoi(optarg);
       break;
     case 't':
       Options::opts.n_threads = atoi(optarg);
@@ -327,6 +333,9 @@ parseArgumentsBoost(int argc, char** argv) {
 
     ("verbose-ouput,V", po::value<std::string>(&Options::opts.verboseOutput), // -V --verbose-output
      "File for the verbose output")
+
+    ("seed,s", po::value<unsigned int>(&Options::opts.seed), // -s --seed
+     "Positive integer value used as random seed")
 
     ("threads,t", po::value<size_t>(&Options::opts.n_threads),
      "Specify the number of threads to be used")

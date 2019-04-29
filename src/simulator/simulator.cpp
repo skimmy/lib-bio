@@ -353,7 +353,9 @@ editDistanceOpMode() {
     
 
   using AlgorithmBand  = EditDistanceBandApproxLinSpace<lbio_size_t, std::string>;
-  using AlgorithmExact = EditDistanceWF<lbio_size_t, std::string>; 
+  using AlgorithmExact = EditDistanceWF<lbio_size_t, std::string>;
+
+
   // The default edit distance mode is
   // Sample
   // Linear Alg
@@ -366,11 +368,16 @@ editDistanceOpMode() {
   edOut->distPDF = new double[n+1];
   std::fill_n(edOut->distPDF, n+1, 0);
 
+  std::vector<lbio_size_t> weights = {1,1,1};
+  if (Options::opts.weight_scheme == 1) {
+    weights = {2*(n+1),1,1};
+  }
+
   // TASK - Scripts Generation (8)
   if (task == EDIT_DISTANCE_SUBTASK_SCRIPT_DIST) { // -B 8
     logInfo("Task 'Script Distribution'");
 
-    AlgorithmExact alg {n, n, {1,1,1}};
+    AlgorithmExact alg {n, n, weights};
     std::vector<std::string> allScripts {};    
     generate_scripts(n, n, Options::opts.k, allScripts, alg, Options::opts.alphabet);
 
@@ -422,7 +429,7 @@ editDistanceOpMode() {
       } else {
 	T = Options::opts.approxLevel;
       }      
-      AlgorithmBand alg(n, n, T, {1,1,1});
+      AlgorithmBand alg(n, n, T, weights);
       logInfo("Estimation...");
       std::vector<SampleEstimates> est =
         edit::difference_estimate(n, precision, z_confidence,
@@ -579,7 +586,7 @@ editDistanceOpMode() {
 	if (Options::opts.approxLevel == 2) { // -A 2 bandwise with log(n) bandwidth
 	  bandwidth = std::ceil(std::log2(n)/2.0);
 	}
-	AlgorithmBand alg(n, n, bandwidth, {1,1,1});
+	AlgorithmBand alg(n, n, bandwidth, weights);
 
 	std::vector<size_t> v;
 	auto ins_ = std::inserter(v, v.begin());

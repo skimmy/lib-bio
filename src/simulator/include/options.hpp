@@ -33,6 +33,7 @@ struct Options {
   Task task; // --task (will substituted mode in -O)
   int subTask;  // -B
   int optFlags; // -f
+  int weight_scheme; // -W
 
   bool pipeline;
   bool online; // -v 

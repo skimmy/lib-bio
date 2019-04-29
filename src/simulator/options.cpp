@@ -49,6 +49,7 @@ void printUsage() {
   std::cout << "\t-O <op_mode>  Set operation mode of the simulator [0,4] (run -h for details)\n";
   std::cout << "\t-B <sub_task> Defines the sub task for a given mode\n";
   std::cout << "\t-f <flags>    Flags code to be activated (operation mode and subtask dependent\n";
+  std::cout << "\t-W <weights>  Defines the weighting scheme of DP (default=0 -> ED, 1->n-LCS)\n";
   std::cout << "\t-t <nthr>     The number of threads to be used (not suppoerted by all tasks)\n";
   std::cout << "\t-v <vlev>     Sets the verbosity level (default=0 is no verbosity)\n";
   std::cout << "\t-V <vout>     Name of file to write verbose outupt\n";
@@ -108,8 +109,12 @@ setDefualtParams() {
   Options::opts.task = Task::Test;
   Options::opts.subTask = 0;
   Options::opts.optFlags = 0;
+
+  Options::opts.weight_scheme = 0;
+
   Options::opts.online = false;
   Options::opts.pipeline = false;
+
   Options::opts.verbose = 0;
   Options::opts.verboseOutput = "";
 
@@ -185,7 +190,7 @@ void parseArguments(int argc, char** argv) {
   setDefualtParams();
   
   char c;
-  while ((c = getopt(argc, argv, "N:m:M:e:P:c:d:k:a:i:S:D:C:A:O:B:f:t:v:V:s:ph")) != -1) {
+  while ((c = getopt(argc, argv, "N:m:M:e:P:c:d:k:a:i:S:D:C:A:O:B:f:W:t:v:V:s:ph")) != -1) {
     switch(c) {
     case 'N':
       Options::opts.N = atoi(optarg);
@@ -236,6 +241,9 @@ void parseArguments(int argc, char** argv) {
       break;
     case 'f':
       Options::opts.optFlags = atoi(optarg);
+      break;
+    case 'W':
+      Options::opts.weight_scheme = atoi(optarg);
       break;
     case 'p':
       Options::opts.pipeline = true;
@@ -325,6 +333,9 @@ parseArgumentsBoost(int argc, char** argv) {
 
     ("flags,f", po::value<int>(&Options::opts.optFlags), // -f, --flads
      "Sets flags to define behavior of mode / subtask")
+
+    ("weight-scheme,W", po::value<int>(&Options::opts.weight_scheme), // -W --weight-scheme
+     "Sets the weighting scheme (0 -> ED, 1 -> n-LCS) default=0") 
 
     ("pipeline,p", "If set will run in pipeline") // -p, --pipeline
 

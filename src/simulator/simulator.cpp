@@ -378,22 +378,43 @@ editDistanceOpMode() {
     logInfo("Task 'Script Distribution'");
 
     AlgorithmExact alg {n, n, weights};
-    std::vector<std::string> allScripts {};    
-    generate_scripts(n, n, Options::opts.k, allScripts, alg, Options::opts.alphabet);
+    std::vector<std::string> allScripts {};
+    std::vector<std::pair<std::string, std::string>> allStrings {};
 
-    // if file is given save there otherwise use std out
-    if (!Options::opts.outputDistribution.empty()) {
-      std::ofstream ofs(Options::opts.outputDistribution, std::ofstream::out);
-      for (std::string script : allScripts) {
-	ofs << script << "\n";
+    // verbose > 0 --> more info
+    if (Options::opts.verbose > 0) {      
+      generate_scripts_with_strings(n, n, Options::opts.k, allScripts,
+				    allStrings, alg, Options::opts.alphabet);
+      // TODO save to file
+
+      // Or on the standard out
+      std::cout << "x,y,s,d,d1,d2\n";
+      for (lbio_size_t i = 0; i < Options::opts.k; ++i) {
+	std::string x = allStrings[i].first;
+	std::string y = allStrings[i].second;
+	std::string s = allScripts[i];
+	// first and second half distances
+	lbio_size_t d = alg.calculate(x,y);
+	lbio_size_t d1 = alg.calculate(x.substr(0,n/2), y.substr(0,n/2));
+	lbio_size_t d2 = alg.calculate(x.substr(n/2,n/2), y.substr(n/2,n/2));
+	std::cout << x  << "," << y  << "," << s << "," << d << "," << d1 << "," << d2 << "\n";
       }
-      ofs.close();
+    } else { // verbose = 0 --> only scripts
+      generate_scripts(n, n, Options::opts.k, allScripts, alg, Options::opts.alphabet);
+      // if file is given save there otherwise use std out
+      if (!Options::opts.outputDistribution.empty()) {
+	std::ofstream ofs(Options::opts.outputDistribution, std::ofstream::out);
+	for (std::string script : allScripts) {
+	  ofs << script << "\n";
+	}
+	ofs.close();
+      }
+      else {
+	for (std::string script : allScripts) {
+	  std::cout << script << "\n";
+	}
+      }
     }
-    else {
-      for (std::string script : allScripts) {
-	std::cout << script << "\n";
-      }
-    }     
     return;
   } 
 

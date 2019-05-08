@@ -48,6 +48,20 @@ generate_scripts(lbio_size_t n, lbio_size_t m, lbio_size_t k,
   }
 }
 
+template <class Algorithm>
+void
+generate_scripts_with_strings(lbio_size_t n, lbio_size_t m, lbio_size_t k,
+			      std::vector<std::string>& scripts,
+			      std::vector<std::pair<std::string,std::string>>& strings,
+			      Algorithm& alg, std::string alphabet) {
+  EditDistanceSample<Algorithm> generator {n, m, alphabet};
+  for (; k>0; --k) {
+    generator(alg);
+    scripts.push_back(alg.backtrack().edit_script);
+    strings.push_back(generator.latest_strings());
+  }
+}
+
 
 
 /*!

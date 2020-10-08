@@ -40,7 +40,9 @@ class EditDistanceInfo;
 
 
 // These namespace will eventually contain all functions and classes
-namespace lbio { namespace sim { namespace edit {
+namespace lbio {
+namespace sim {
+namespace edit {
 
 
 /**
@@ -54,8 +56,8 @@ namespace lbio { namespace sim { namespace edit {
    \param info      The object used to put output
  */
 void
-closest_to_diagonal_backtrack(size_t n, size_t m, size_t** dpMatrix,
-			      EditDistanceInfo& info);
+closest_to_diagonal_backtrack(size_t n, size_t m, size_t **dpMatrix,
+                              EditDistanceInfo &info);
 
 
 
@@ -65,7 +67,7 @@ closest_to_diagonal_backtrack(size_t n, size_t m, size_t** dpMatrix,
 
 void
 compare_edit_distance_algorithms(size_t n, size_t m, size_t k, std::string alphabet,
-				 std::ostream& os = std::cout);
+                                 std::ostream &os = std::cout);
 
 
 /**
@@ -75,51 +77,50 @@ compare_edit_distance_algorithms(size_t n, size_t m, size_t k, std::string alpha
  */
 lbio_size_t
 optimal_bandwidth(lbio_size_t n, std::string alphabet, double precision,
-		  lbio_size_t k, lbio_size_t Tmin = 1);
+                  lbio_size_t k, lbio_size_t Tmin = 1);
 
 /**
    \brief Computes the first value T such that the difference between
    band T approximation and exact is below the given precision.
  */
 lbio_size_t
-optimal_bandwidth_exact(lbio_size_t n, std::string alphabet, double precision,  lbio_size_t Tmin = 1);
+optimal_bandwidth_exact(lbio_size_t n, std::string alphabet, double precision, lbio_size_t Tmin = 1);
 
 //////////////////////////////////////////////////////////////////////
 
-template <typename _K, typename _V>
+template<typename _K, typename _V>
 class ColumnStateSpaceT {
 public:
-  typedef typename std::unordered_map<_K, _V>   ColumnStateSet;
-  typedef typename ColumnStateSet::iterator     iterator;
-  typedef typename std::pair<_K, _V>            pair_type;
-    
+    typedef typename std::unordered_map<_K, _V> ColumnStateSet;
+    typedef typename ColumnStateSet::iterator iterator;
+    typedef typename std::pair<_K, _V> pair_type;
+
 private:
-  lbio_size_t _n;  
-  ColumnStateSet _set;  
-  
-public:		    
-  ColumnStateSpaceT(lbio_size_t n) : _n {n}, _set {} { }
+    lbio_size_t _n;
+    ColumnStateSet _set;
 
-  // if the key exist add mult to the already existing value
-  void insert(_K key, _V mult) {
-    auto key_pos = _set.find(key);
-    if (key_pos != _set.end()) {
-      key_pos->second += mult;
+public:
+    ColumnStateSpaceT(lbio_size_t n) : _n{n}, _set{} {}
+
+    // if the key exist add mult to the already existing value
+    void insert(_K key, _V mult) {
+        auto key_pos = _set.find(key);
+        if (key_pos != _set.end()) {
+            key_pos->second += mult;
+        } else {
+            _set.insert({key, mult});
+        }
     }
-    else {
-      _set.insert({key, mult});
-    }
-  }
 
-  lbio_size_t get_n() { return _n; }
+    lbio_size_t get_n() { return _n; }
 
-  void erase(_K key) { _set.erase(key); }
+    void erase(_K key) { _set.erase(key); }
 
-  lbio_size_t size() { return _set.size();  }
+    lbio_size_t size() { return _set.size(); }
 
-  iterator begin() { return _set.begin();  }
+    iterator begin() { return _set.begin(); }
 
-  iterator end() { return _set.end(); }  
+    iterator end() { return _set.end(); }
 };
 
 //using ColumnStateSpace = ColumnStateSpaceT<uint64_t, uint32_t>;
@@ -139,33 +140,33 @@ std::vector<lbio_size_t>
 state_to_column(uint64_t state, lbio_size_t j, lbio_size_t n);
 
 std::vector<double>
-state_space_to_distribution(ColumnStateSpace& states);
+state_space_to_distribution(ColumnStateSpace &states);
 
 std::string
 distribution_to_string(const std::vector<double> v);
 
 void
-print_state(ColumnStateSpace& _set, lbio_size_t n);
+print_state(ColumnStateSpace &_set, lbio_size_t n);
 
 ColumnStateSpace
-refresh_space(ColumnStateSpace& old_state, lbio_size_t j, lbio_size_t n,
-	      lbio_size_t ** h_mask , lbio_size_t sigma);
+refresh_space(ColumnStateSpace &old_state, lbio_size_t j, lbio_size_t n,
+              lbio_size_t **h_mask, lbio_size_t sigma);
 
 
 /**
    \brief computes the edit distance between strings s1 and s2
  */
 size_t edit_distance_encoded(uint64_t s1, lbio_size_t n1, uint64_t s2,
-			     lbio_size_t n2, size_t** dpMatrix);
+                             lbio_size_t n2, size_t **dpMatrix);
 
 /**
    \brief Computes the exact average edit distance and corresponding
    distribution by enumeratin all possible pairs.
  */
 double
-test_exhaustive_edit_distance_encoded(lbio_size_t n, double* freq);
+test_exhaustive_edit_distance_encoded(lbio_size_t n, double *freq);
 
-      
+
 void edit_distance_exhastive_with_info(lbio_size_t n);
 
 double
@@ -174,23 +175,23 @@ eccentricity_for_string(std::string x, std::string alphabet);
 ColumnStateSpace
 state_space_compute(std::string x, std::string alphabet);
 
-template <typename _Iter, typename _Call>
+template<typename _Iter, typename _Call>
 void
 state_space_compute_iter(_Iter beg_, _Iter end_, _Call action, std::string alphabet) {
-  while(beg_ != end_) {
-    ColumnStateSpace states = state_space_compute(*beg_, alphabet);
-    action(*beg_, states);
-    ++beg_;
-  }
+    while (beg_ != end_) {
+        ColumnStateSpace states = state_space_compute(*beg_, alphabet);
+        action(*beg_, states);
+        ++beg_;
+    }
 }
 
-template <typename It_>
+template<typename It_>
 void
-edit_distance_eccentricity(It_ begin, It_ end, std::ostream& os, std::string alphabet) {
-  // for each string compute eccentricoty and write distribution on 'os'
-  state_space_compute_iter(begin, end, [&os] (std::string x, ColumnStateSpace& space) {
-      os << x << ", " << distribution_to_string(state_space_to_distribution(space)) << "\n";
-					 }, alphabet);
+edit_distance_eccentricity(It_ begin, It_ end, std::ostream &os, std::string alphabet) {
+    // for each string compute eccentricoty and write distribution on 'os'
+    state_space_compute_iter(begin, end, [&os](std::string x, ColumnStateSpace &space) {
+        os << x << ", " << distribution_to_string(state_space_to_distribution(space)) << "\n";
+    }, alphabet);
 }
 
 // This 5-tuple is returned when computing eccentricity with iterators.
@@ -203,7 +204,9 @@ EccentricityResult
 eccentricity_with_symmetries(lbio_size_t n, std::string alphabet, lbio_size_t threads_ = 1);
 
 
-} } } //namespaces
+}
+}
+} //namespaces
 
 /**
  * \brief This is a class to store information about how edit distance
@@ -212,52 +215,53 @@ eccentricity_with_symmetries(lbio_size_t n, std::string alphabet, lbio_size_t th
  * The members are kept public since they are often accessed and this
  * used to be a struct.
  */
-class EditDistanceInfo
-{
+class EditDistanceInfo {
 public:
-  lbio_size_t n_sub;
-  lbio_size_t n_del;
-  lbio_size_t n_ins;
-  std::string edit_script;
+    lbio_size_t n_sub;
+    lbio_size_t n_del;
+    lbio_size_t n_ins;
+    std::string edit_script;
 
-  EditDistanceInfo();
-  EditDistanceInfo(lbio_size_t s, lbio_size_t d, lbio_size_t i);
-  EditDistanceInfo(lbio_size_t c);
+    EditDistanceInfo();
 
-  size_t
-  distance() const;
-  
-  void
-  reset();
+    EditDistanceInfo(lbio_size_t s, lbio_size_t d, lbio_size_t i);
 
-  bool
-  operator<(const EditDistanceInfo& i) const;
-  
-  bool
-  operator==(const EditDistanceInfo& i) const;
+    EditDistanceInfo(lbio_size_t c);
 
-  bool
-  operator!=(const EditDistanceInfo& i) const;
-  
-  EditDistanceInfo&
-  operator+=(const EditDistanceInfo& rhs);
+    size_t
+    distance() const;
 
-  friend EditDistanceInfo
-  operator+(EditDistanceInfo lhs, const EditDistanceInfo& rhs);
+    void
+    reset();
 
-  EditDistanceInfo&
-  operator*=(lbio_size_t scalar);
+    bool
+    operator<(const EditDistanceInfo &i) const;
 
-  friend EditDistanceInfo
-  operator*(EditDistanceInfo lhs, lbio_size_t rhs);
- 
-  friend std::ostream&
-  operator<<(std::ostream& out, const EditDistanceInfo& info);
+    bool
+    operator==(const EditDistanceInfo &i) const;
+
+    bool
+    operator!=(const EditDistanceInfo &i) const;
+
+    EditDistanceInfo &
+    operator+=(const EditDistanceInfo &rhs);
+
+    friend EditDistanceInfo
+    operator+(EditDistanceInfo lhs, const EditDistanceInfo &rhs);
+
+    EditDistanceInfo &
+    operator*=(lbio_size_t scalar);
+
+    friend EditDistanceInfo
+    operator*(EditDistanceInfo lhs, lbio_size_t rhs);
+
+    friend std::ostream &
+    operator<<(std::ostream &out, const EditDistanceInfo &info);
 };
 
-const EditDistanceInfo InfoUnitSub {1,0,0};
-const EditDistanceInfo InfoUnitDel {0,1,0};
-const EditDistanceInfo InfoUnitIns {0,0,1};
+const EditDistanceInfo InfoUnitSub{1, 0, 0};
+const EditDistanceInfo InfoUnitDel{0, 1, 0};
+const EditDistanceInfo InfoUnitIns{0, 0, 1};
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -289,34 +293,33 @@ const EditDistanceInfo InfoUnitIns {0,0,1};
 */
 template<typename T>
 struct DynamicProgramming {
-  
-  T** dp_matrix;
-  lbio_size_t n;
-  lbio_size_t m;
 
-  DynamicProgramming(lbio_size_t n_, lbio_size_t m_)
-    : n(n_), m(m_)
-  {
-    dp_matrix = allocMatrix<T>(n+1,m+1);
-  }
+    T **dp_matrix;
+    lbio_size_t n;
+    lbio_size_t m;
 
-  ~DynamicProgramming() { freeMatrix<T>(n, m, dp_matrix); }
+    DynamicProgramming(lbio_size_t n_, lbio_size_t m_)
+            : n(n_), m(m_) {
+        dp_matrix = allocMatrix<T>(n + 1, m + 1);
+    }
 
-  /**
-   * \brief This operator allows accessing (read and write) elements
-   * of the dynamic programming matrix.
-   */
-  T& operator()(lbio_size_t i, lbio_size_t j) {
-    return dp_matrix[i][j];
-  }
+    ~DynamicProgramming() { freeMatrix<T>(n, m, dp_matrix); }
 
-  void swap_rows(lbio_size_t i1, lbio_size_t i2) {
-    std::swap<T*>(dp_matrix[0], dp_matrix[1]); 
-  }
+    /**
+     * \brief This operator allows accessing (read and write) elements
+     * of the dynamic programming matrix.
+     */
+    T &operator()(lbio_size_t i, lbio_size_t j) {
+        return dp_matrix[i][j];
+    }
 
-  void print_matrix() {
-    printMatrix<T>(n+1, m+1, dp_matrix);
-  }
+    void swap_rows(lbio_size_t i1, lbio_size_t i2) {
+        std::swap<T *>(dp_matrix[0], dp_matrix[1]);
+    }
+
+    void print_matrix() {
+        printMatrix<T>(n + 1, m + 1, dp_matrix);
+    }
 }; // DynamicProgramming D
 
 
@@ -331,168 +334,166 @@ public:
     typedef std::vector<CostType> CostVector;
 
 private:
-  DynamicProgramming<CostType> dp_struct;
-  // costs are in vector [W_S, W_D, W_I]
-  // (i.e., [0] -> Sub, [1] -> Del, [2] -> Ins).
-  // We should consider a better design for costs possible alternatives are
-  // - a custom struct with fields for the csos
-  // - a caller that is invoked when costs are needed (should be constexpr)
-  CostVector costs_vector;
-  
-public:  
+    DynamicProgramming<CostType> dp_struct;
+    // costs are in vector [W_S, W_D, W_I]
+    // (i.e., [0] -> Sub, [1] -> Del, [2] -> Ins).
+    // We should consider a better design for costs possible alternatives are
+    // - a custom struct with fields for the csos
+    // - a caller that is invoked when costs are needed (should be constexpr)
+    CostVector costs_vector;
 
-  EditDistanceWF(lbio_size_t n, lbio_size_t m, const CostVector& costs)
-    : dp_struct{n, m}, costs_vector {costs}
-  {
-    init();
-  }
+public:
 
-  
-  void
-  init() {
-    dp_struct(0, 0) = 0;
-    for (lbio_size_t i = 1; i <= dp_struct.n; ++i) {
-      dp_struct(i, 0)
-	= dp_struct(i-1, 0) + costs_vector[iD_];
+    EditDistanceWF(lbio_size_t n, lbio_size_t m, const CostVector &costs)
+            : dp_struct{n, m}, costs_vector{costs} {
+        init();
     }
-    for (lbio_size_t j = 1; j <= dp_struct.m; ++j) {
-      dp_struct(0, j)
-	= dp_struct(0, j-1) + costs_vector[iI_];
+
+
+    void
+    init() {
+        dp_struct(0, 0) = 0;
+        for (lbio_size_t i = 1; i <= dp_struct.n; ++i) {
+            dp_struct(i, 0)
+                    = dp_struct(i - 1, 0) + costs_vector[iD_];
+        }
+        for (lbio_size_t j = 1; j <= dp_struct.m; ++j) {
+            dp_struct(0, j)
+                    = dp_struct(0, j - 1) + costs_vector[iI_];
+        }
     }
-  }
 
-  CostType
-  calculate(const IndexedType& s1, const IndexedType& s2) {
-    lbio_size_t n = s1.size();
-    lbio_size_t m = s2.size();
-    for (lbio_size_t i = 1; i <= n; ++i) {
-      for(lbio_size_t j = 1; j <= m; ++j) {
-	CostType delta = ( s1[i-1] == s2[j-1] ) ? 0 : costs_vector[iS_];
-	CostType A_ = dp_struct(i-1, j-1) + delta; 
-	CostType B_ = dp_struct(i-1, j)   + costs_vector[iD_];
-	CostType C_ = dp_struct(i, j-1)   + costs_vector[iI_];
-	dp_struct(i, j) = std::min(A_,std::min(B_, C_ ));
-      }
+    CostType
+    calculate(const IndexedType &s1, const IndexedType &s2) {
+        lbio_size_t n = s1.size();
+        lbio_size_t m = s2.size();
+        for (lbio_size_t i = 1; i <= n; ++i) {
+            for (lbio_size_t j = 1; j <= m; ++j) {
+                CostType delta = (s1[i - 1] == s2[j - 1]) ? 0 : costs_vector[iS_];
+                CostType A_ = dp_struct(i - 1, j - 1) + delta;
+                CostType B_ = dp_struct(i - 1, j) + costs_vector[iD_];
+                CostType C_ = dp_struct(i, j - 1) + costs_vector[iI_];
+                dp_struct(i, j) = std::min(A_, std::min(B_, C_));
+            }
+        }
+        return dp_struct(n, m);
     }
-    return dp_struct(n, m);
-  }
 
-  EditDistanceInfo
-  backtrack() {
-    EditDistanceInfo info;
-    // following uses an 'old' functions that accepts size_t** as DP matrix
-    // it should be changed to accept a dp_struct
-    lbio::sim::edit::closest_to_diagonal_backtrack(dp_struct.n, dp_struct.m,
-						   dp_struct.dp_matrix, info);
-    return info;
-  }
+    EditDistanceInfo
+    backtrack() {
+        EditDistanceInfo info;
+        // following uses an 'old' functions that accepts size_t** as DP matrix
+        // it should be changed to accept a dp_struct
+        lbio::sim::edit::closest_to_diagonal_backtrack(dp_struct.n, dp_struct.m,
+                                                       dp_struct.dp_matrix, info);
+        return info;
+    }
 
-  void
-  print_dp_matrix() {
-    dp_struct.print_matrix();
-  }
+    void
+    print_dp_matrix() {
+        dp_struct.print_matrix();
+    }
 }; // EditDistanceWF
 
 template<typename CostType, typename IndexedType>
 class EditDistanceBandApproxLinSpace {
 public:
-  typedef std::vector<CostType> CostVector;
-  
+    typedef std::vector<CostType> CostVector;
+
 private:
-  DynamicProgramming<CostType> dp_struct;
-  CostVector costs;
-  lbio_size_t bandwidth;
-  lbio_size_t n;
-  lbio_size_t m;
-  const CostType Inf;
+    DynamicProgramming<CostType> dp_struct;
+    CostVector costs;
+    lbio_size_t bandwidth;
+    lbio_size_t n;
+    lbio_size_t m;
+    const CostType Inf;
 
 public:
-  EditDistanceBandApproxLinSpace(lbio_size_t n_, lbio_size_t m_,
-				 lbio_size_t T, const CostVector& costV)
-    : dp_struct {2, std::max(n_,m_)}, costs {costV}, bandwidth {T},
-      n {n_}, m {m_},
-      Inf {(*std::max_element(costs.begin(), costs.end())) * 2*(n_+m_+1)}
-  { }
+    EditDistanceBandApproxLinSpace(lbio_size_t n_, lbio_size_t m_,
+                                   lbio_size_t T, const CostVector &costV)
+            : dp_struct{2, std::max(n_, m_)}, costs{costV}, bandwidth{T},
+              n{n_}, m{m_},
+              Inf{(*std::max_element(costs.begin(), costs.end())) * 2 * (n_ + m_ + 1)} {}
 
-  void init() {    
-    dp_struct(0, 0) = 0;
-    for (lbio_size_t j = 1; j <= bandwidth; ++j) {
-      dp_struct(0, j) = dp_struct(0, j-1) + costs[iI_];
+    void init() {
+        dp_struct(0, 0) = 0;
+        for (lbio_size_t j = 1; j <= bandwidth; ++j) {
+            dp_struct(0, j) = dp_struct(0, j - 1) + costs[iI_];
+        }
     }
-  }
 
-  CostType calculate(const IndexedType& s1, const IndexedType& s2) {
-    n = s1.size();
-    m = s2.size();    
-    
-    // initialization is done here rather than in the constructor
-    // because needed at each calculation (i.e., vectors will contain
-    // values from older calculations if any)
-    init();
-    
-    for (lbio_size_t i = 1; i <= n; ++i) {
-      // initialization of 'border' and 'diagonals'
-      dp_struct(1, 0) = (i <= bandwidth) ?
-	dp_struct(0, 0) + costs[iD_] : Inf;
-      if (i <= m - bandwidth) {
-	dp_struct(0, i+bandwidth) = Inf;
-      }
-      if (i >= bandwidth+1) {
-	dp_struct(1, i-(bandwidth+1) ) = Inf;	
-      }
-	
-      // casts are necessary to cope with negative 
-      lbio_size_t j_min = std::max<int>(1, static_cast<int>(i - bandwidth));
-      lbio_size_t j_max = std::min<int>(m, i + bandwidth);
-      for (lbio_size_t j = j_min; j <= j_max; ++j) {
-	CostType delta { (s1[i-1] == s2[j-1]) ? 0 : costs[iS_] };
-	dp_struct(1, j)
-	  = std::min<CostType>(delta + dp_struct(0, j-1),
-			       std::min(dp_struct(0, j) + costs[iD_],
-					dp_struct(1, j-1) + costs[iI_]));
-      }      
-      // swap the two vectors
-      dp_struct.swap_rows(0, 1);      
-    }    
-    return dp_struct(0, m);
-  }
+    CostType calculate(const IndexedType &s1, const IndexedType &s2) {
+        n = s1.size();
+        m = s2.size();
 
-  CostType calculate(const IndexedType& s1, const IndexedType& s2,
-		     lbio_size_t band) {
-    lbio_size_t old_band = bandwidth;
-    change_bandwidth(band);
-    CostType result = calculate(s1, s2);
-    change_bandwidth(old_band);
-    return result;
-  }
+        // initialization is done here rather than in the constructor
+        // because needed at each calculation (i.e., vectors will contain
+        // values from older calculations if any)
+        init();
 
-  /**
-     \brief Changes the bandwidth \e without reallocating the internal
-     structure. It the new bandwidth cannot be accomodated the old
-     value is kept and \c false is returned.
+        for (lbio_size_t i = 1; i <= n; ++i) {
+            // initialization of 'border' and 'diagonals'
+            dp_struct(1, 0) = (i <= bandwidth) ?
+                              dp_struct(0, 0) + costs[iD_] : Inf;
+            if (i <= m - bandwidth) {
+                dp_struct(0, i + bandwidth) = Inf;
+            }
+            if (i >= bandwidth + 1) {
+                dp_struct(1, i - (bandwidth + 1)) = Inf;
+            }
 
-     \param new_band The new bandwidth
-     \return \c true if value is changed \c false otherwise
-
-     \note This is supplied for performance reasons, that is it can be
-     used to perform the algorithm for any fitting value of the
-     bandwidth without the necessity of more instances or without
-     resizing.
-   */
-  bool
-  change_bandwidth(lbio_size_t new_band) {
-    if (new_band > std::min(dp_struct.n, dp_struct.m)) {      
-      return false;
+            // casts are necessary to cope with negative
+            lbio_size_t j_min = std::max<int>(1, static_cast<int>(i - bandwidth));
+            lbio_size_t j_max = std::min<int>(m, i + bandwidth);
+            for (lbio_size_t j = j_min; j <= j_max; ++j) {
+                CostType delta{(s1[i - 1] == s2[j - 1]) ? 0 : costs[iS_]};
+                dp_struct(1, j)
+                        = std::min<CostType>(delta + dp_struct(0, j - 1),
+                                             std::min(dp_struct(0, j) + costs[iD_],
+                                                      dp_struct(1, j - 1) + costs[iI_]));
+            }
+            // swap the two vectors
+            dp_struct.swap_rows(0, 1);
+        }
+        return dp_struct(0, m);
     }
-    bandwidth = new_band;
-    return true;
-  }
 
-  
-  void print_dp_matrix() const {
-    dp_struct.print_matrix();
-  }
-			       
+    CostType calculate(const IndexedType &s1, const IndexedType &s2,
+                       lbio_size_t band) {
+        lbio_size_t old_band = bandwidth;
+        change_bandwidth(band);
+        CostType result = calculate(s1, s2);
+        change_bandwidth(old_band);
+        return result;
+    }
+
+    /**
+       \brief Changes the bandwidth \e without reallocating the internal
+       structure. It the new bandwidth cannot be accomodated the old
+       value is kept and \c false is returned.
+
+       \param new_band The new bandwidth
+       \return \c true if value is changed \c false otherwise
+
+       \note This is supplied for performance reasons, that is it can be
+       used to perform the algorithm for any fitting value of the
+       bandwidth without the necessity of more instances or without
+       resizing.
+     */
+    bool
+    change_bandwidth(lbio_size_t new_band) {
+        if (new_band > std::min(dp_struct.n, dp_struct.m)) {
+            return false;
+        }
+        bandwidth = new_band;
+        return true;
+    }
+
+
+    void print_dp_matrix() const {
+        dp_struct.print_matrix();
+    }
+
 }; // EditDistanceBandApproxLinSpace
 
 
@@ -505,39 +506,39 @@ public:
  * \brief Extracts the substitutions array from an array of EditDistanceInfo
  */
 std::unique_ptr<double[]>
-extractSubstitutionArray(const EditDistanceInfo* v, size_t k);
+extractSubstitutionArray(const EditDistanceInfo *v, size_t k);
 
 /**
  * \brief Extracts the deletions array from an array of EditDistanceInfo
  */
 std::unique_ptr<double[]>
-extractDeletionArray(const EditDistanceInfo* v, size_t k);
+extractDeletionArray(const EditDistanceInfo *v, size_t k);
 
 /**
  * \brief Extracts the insertions array from an array of EditDistanceInfo
  */
 std::unique_ptr<double[]>
-extractInsertionArray(const EditDistanceInfo* v, size_t k);
+extractInsertionArray(const EditDistanceInfo *v, size_t k);
 
 //////////////////////////////////////////////////////////////////////
 //              EDIT DISTANCE CALCULATION FUNCTION
 //////////////////////////////////////////////////////////////////////
 
 size_t
-editDistanceLinSpace(const std::string& s1, const std::string& s2,
-		     size_t* v0, size_t* v1);
+editDistanceLinSpace(const std::string &s1, const std::string &s2,
+                     size_t *v0, size_t *v1);
 
 EditDistanceInfo
-editDistanceLinSpaceInfo(const std::string& s1, const std::string& s2,
-			 EditDistanceInfo* v0, EditDistanceInfo* v1,
-			 EditDistanceInfo** sampleMat = NULL);
+editDistanceLinSpaceInfo(const std::string &s1, const std::string &s2,
+                         EditDistanceInfo *v0, EditDistanceInfo *v1,
+                         EditDistanceInfo **sampleMat = NULL);
 
 std::vector<size_t>
-edit_samples_fixed_string(size_t n, size_t k_samples, const std::string& s2, std::string alphabet);
+edit_samples_fixed_string(size_t n, size_t k_samples, const std::string &s2, std::string alphabet);
 
 size_t
-editDistanceBandwiseApprox(const std::string& s1,
-			   const std::string& s2, size_t T);
+editDistanceBandwiseApprox(const std::string &s1,
+                           const std::string &s2, size_t T);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -548,11 +549,11 @@ editDistanceBandwiseApprox(const std::string& s1,
 
 SampleEstimates
 editDistanceErrorBoundedEstimates(size_t n, std::string alphabet, double precision, double z_delta,
-				  size_t k_min = 16);
+                                  size_t k_min = 16);
 
 SampleEstimates
 editDistanceRelativeErrorEstimates(size_t n, std::string alphabet, double e_model, double precision,
-				   double z_delta);
+                                   double z_delta);
 
 /**
  * Computes a matrix containing in (i,j) the number of times a
@@ -567,14 +568,14 @@ editDistanceRelativeErrorEstimates(size_t n, std::string alphabet, double e_mode
  */
 void
 scriptDistributionMatrix(size_t n, size_t m, size_t k,
-			 std::vector<std::string>& scripts);
+                         std::vector<std::string> &scripts);
 
 std::unique_ptr<EditDistanceInfo[]>
 editDistSamplesInfo(size_t n, size_t k_samples);
 
 std::unique_ptr<EditDistanceInfo[]>
 editDistSamplesInfoLinSpace(size_t n, size_t k_samples, std::string alphabet,
-			    EditDistanceInfo** sampleMat = NULL);
+                            EditDistanceInfo **sampleMat = NULL);
 
 /**
  * \brief This class is a generator of edit distances, it can be used
@@ -595,21 +596,21 @@ editDistSamplesInfoLinSpace(size_t n, size_t k_samples, std::string alphabet,
 template<typename EDAlg_>
 class EditDistanceSample {
 private:
-  lbio::sim::generator::IidPairGenerator gen;
-  
-public:
-  EditDistanceSample(lbio_size_t n, lbio_size_t m, std::string alphabet)
-    : gen(n,m, alphabet) {  }
-  
-  lbio_size_t operator()(EDAlg_& algorithm) {
-    auto next = gen();
-    return algorithm.calculate(next.first, next.second);
-  }
+    lbio::sim::generator::IidPairGenerator gen;
 
-  std::pair<std::string, std::string> latest_strings() {
-    return gen.last_pair();
-  }
-  
+public:
+    EditDistanceSample(lbio_size_t n, lbio_size_t m, std::string alphabet)
+            : gen(n, m, alphabet) {}
+
+    lbio_size_t operator()(EDAlg_ &algorithm) {
+        auto next = gen();
+        return algorithm.calculate(next.first, next.second);
+    }
+
+    std::pair<std::string, std::string> latest_strings() {
+        return gen.last_pair();
+    }
+
 };
 
 
@@ -618,12 +619,12 @@ public:
  * should be changed.
  */
 struct EditDistanceSimOutput {
-  double* distPDF = NULL;
-  
-  ~EditDistanceSimOutput() {
-    delete[] this->distPDF;
-    this->distPDF = NULL;
-  }
+    double *distPDF = NULL;
+
+    ~EditDistanceSimOutput() {
+        delete[] this->distPDF;
+        this->distPDF = NULL;
+    }
 };
 
 #endif

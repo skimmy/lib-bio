@@ -19,4 +19,4 @@ test_out_SOURCES = ${test_main} ${basic_src}
 test_out_LDADD = ${common_libs}
 
 # AutoMake (AM) compiler flags
-AM_CXXFLAGS = -Wall
+AM_CXXFLAGS = -Wall -std=c++11

@@ -2,6 +2,7 @@ AC_INIT([libbio], [1.0], [])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_PROG_CXX
 AC_PROG_RANLIB
+AX_CXX_COMPILE_STDCXX_11
 #AM_PROG_AR
 
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])

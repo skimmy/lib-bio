@@ -4,9 +4,10 @@
 #include <string>
 #include <list>
 
-typedef std::pair< std::string, int64_t> AlignPair;
+typedef std::pair<std::string, int64_t> AlignPair;
 
 std::string loadFromFile(const std::string &fileName);
-void loadAlignFromSAM(const std::string& filePath, std::list<AlignPair>& aligns);
+
+void loadAlignFromSAM(const std::string &filePath, std::list<AlignPair> &aligns);
 
 #endif

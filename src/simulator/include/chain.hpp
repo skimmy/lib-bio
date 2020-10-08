@@ -4,7 +4,7 @@
 #include <include/generator.hpp>
 
 void
-computeExpectedFalsePositiveMatrix(double** m);
+computeExpectedFalsePositiveMatrix(double **m);
 
 void
 printFalsePositiveMatrix();
@@ -22,8 +22,9 @@ void
 printNonOverlapDistribution();
 
 void
-evaluateChainRelation(const lbio::sim::generator::Read& r1,
-		      const lbio::sim::generator::Read& r2, size_t s);
+evaluateChainRelation(const lbio::sim::generator::Read &r1,
+                      const lbio::sim::generator::Read &r2, size_t s);
+
 void
 addNonOverlapRecord(size_t d);
 

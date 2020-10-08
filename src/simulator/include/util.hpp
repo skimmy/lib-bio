@@ -48,7 +48,7 @@ double elementsSumDoubleMatrix(double** matrix, size_t n, size_t m);
 
 
 template<typename T>
-void printVector(T* v, size_t n, char* delim = " ") {
+void printVector(T* v, size_t n, std::string delim = " ") {
   for (int i =0; i <n;i++){
     std::cout << v[i] << delim;
   }

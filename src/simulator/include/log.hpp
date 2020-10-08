@@ -15,7 +15,7 @@ const std::string TermColUnderline = "\033[4m";
 const std::string TermColEndColor = "\033[0m";
 
 
-  
+
 
 // If debug is disabled or log operations are mapped to no operation
 #if defined NDEBUG
@@ -30,24 +30,31 @@ const std::string TermColEndColor = "\033[0m";
 #define logDebug(x) _logDebug(x)
 #endif
 
-void setLogStream(std::ostream* stream);
+void setLogStream(std::ostream *stream);
 
-void _logError(const std::string& msg);
-void _logWarning(const std::string& msg);
-void _logInfo(const std::string& msg);
-void _logDebug(const std::string& msg);
+void _logError(const std::string &msg);
+
+void _logWarning(const std::string &msg);
+
+void _logInfo(const std::string &msg);
+
+void _logDebug(const std::string &msg);
 
 void fatal_error(const std::string &msg, int exit_code = 1);
 
-namespace lbio { namespace sim { namespace log {
+namespace lbio {
+namespace sim {
+namespace log {
 
-std::string colorifyString(const std::string& plain, const std::string& color);
+std::string colorifyString(const std::string &plain, const std::string &color);
 
 std::string debug_string(std::string head, std::string msg);
 
-std::string make_bold(const std::string& plain);
+std::string make_bold(const std::string &plain);
 
-} } } // namespaces
+}
+}
+} // namespaces
 
 
 #endif
